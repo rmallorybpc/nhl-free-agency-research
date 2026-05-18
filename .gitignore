@@ -1,0 +1,17 @@
+# R project files
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+
+# Data files (do not commit raw or processed datasets)
+data/**/*.csv
+data/**/*.rds
+data/**/*.html
+data/**/*.xls
+data/**/*.xlsx
