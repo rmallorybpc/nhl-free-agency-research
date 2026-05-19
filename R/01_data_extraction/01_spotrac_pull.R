@@ -13,7 +13,7 @@ spotrac_ua <- httr::user_agent(
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
 
-years <- 2017:2026
+years <- 2017:2025
 positions <- c("g", "d", "c", "lw", "rw")
 
 clean_colnames <- function(x) {
@@ -85,8 +85,10 @@ for (yr in years) {
 				page <- httr::content(resp, as = "text", encoding = "UTF-8") |>
 					read_html()
 
-				tables <- page |>
-					html_elements("table") |>
+				table_nodes <- page |>
+					html_elements("table")
+
+				tables <- table_nodes |>
 					html_table(fill = TRUE)
 
 				if (length(tables) == 0) {
@@ -121,9 +123,61 @@ for (yr in years) {
 					return(NULL)
 				}
 
-				tbl <- tables[[table_idx[1]]] |>
-					setNames(clean_colnames(names(.))) |>
+				selected_idx <- table_idx[1]
+				tbl <- tables[[selected_idx]]
+				tbl_node <- table_nodes[[selected_idx]]
+				nms <- clean_colnames(names(tbl))
+				blank_idx <- which(is.na(nms) | nms == "")
+				if (length(blank_idx) > 0) {
+					nms[blank_idx] <- paste0("col_", blank_idx)
+				}
+				names(tbl) <- make.unique(nms, sep = "_")
+				tbl <- tbl |>
 					mutate(across(everything(), ~ stringr::str_squish(as.character(.x))))
+
+				headers_clean <- tbl_node |>
+					html_elements("thead th") |>
+					html_text2() |>
+					clean_colnames()
+
+				years_col_idx <- which(stringr::str_detect(headers_clean, "^yrs$|year|term"))
+
+				years_from_data_sort <- rep(NA_character_, nrow(tbl))
+
+				if (length(years_col_idx) > 0) {
+					row_nodes <- tbl_node |>
+						html_elements("tbody tr")
+
+					years_from_data_sort <- purrr::map_chr(row_nodes, function(rn) {
+						tds <- rn |>
+							html_elements("td")
+
+						if (length(tds) < years_col_idx[1]) {
+							return(NA_character_)
+						}
+
+						years_td <- tds[[years_col_idx[1]]]
+						years_attr <- years_td |>
+							html_attr("data-sort")
+						years_text <- years_td |>
+							html_text2() |>
+							stringr::str_squish()
+
+						if (!is.na(years_attr) && years_attr != "") {
+							return(years_attr)
+						}
+
+						if (years_text == "") {
+							return(NA_character_)
+						}
+
+						years_text
+					})
+
+					if (length(years_from_data_sort) != nrow(tbl)) {
+						years_from_data_sort <- rep(NA_character_, nrow(tbl))
+					}
+				}
 
 				# Skip effectively empty pulls.
 				if (nrow(tbl) == 0 || all(tbl == "" | is.na(tbl))) {
@@ -141,7 +195,7 @@ for (yr in years) {
 				previous_team_col <- pick_col(tbl, "previousteam|fromteam|formerteam|from")
 				contract_value_col <- pick_col(tbl, "contractvalue|value")
 				aav_col <- pick_col(tbl, "^aav$|averageannual|avgannual")
-				contract_years_col <- pick_col(tbl, "contractyears|years|term")
+				contract_years_col <- pick_col(tbl, "contractyears|years|term|^yrs$")
 				ufa_rfa_col <- pick_col(tbl, "ufarfa|ufa_rfa|status|type")
 
 				out_tbl <- tibble(
@@ -151,7 +205,13 @@ for (yr in years) {
 					previous_team = if (!is.na(previous_team_col)) tbl[[previous_team_col]] else NA_character_,
 					contract_value = if (!is.na(contract_value_col)) tbl[[contract_value_col]] else NA_character_,
 					aav = if (!is.na(aav_col)) tbl[[aav_col]] else NA_character_,
-					contract_years = if (!is.na(contract_years_col)) tbl[[contract_years_col]] else NA_character_,
+					contract_years = if (any(!is.na(years_from_data_sort) & years_from_data_sort != "")) {
+						years_from_data_sort
+					} else if (!is.na(contract_years_col)) {
+						tbl[[contract_years_col]]
+					} else {
+						NA_character_
+					},
 					ufa_rfa_type = if (!is.na(ufa_rfa_col)) tbl[[ufa_rfa_col]] else NA_character_
 				)
 
