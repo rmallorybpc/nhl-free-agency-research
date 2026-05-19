@@ -259,11 +259,19 @@ for (yr in years) {
 	}
 }
 
+rows_before_dedup <- nrow(master_tbl)
+master_tbl <- master_tbl |>
+	add_count(player_name, signing_team, spotrac_year, position_filter, name = "key_row_count") |>
+	filter(key_row_count == 1) |>
+	select(-key_row_count)
+rows_after_dedup <- nrow(master_tbl)
+
 output_path <- here::here("data", "raw", "spotrac", "nhl_signed_free_agents_raw.csv")
 dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
 readr::write_csv(master_tbl, output_path)
 
 message(sprintf("Completed Spotrac pull. Total rows extracted: %s", nrow(master_tbl)))
+message(sprintf("Dedup step removed %s rows based on player_name/signing_team/spotrac_year/position_filter.", rows_before_dedup - rows_after_dedup))
 
 if (nrow(breakdown) > 0) {
 	message("Year and position breakdown:")
