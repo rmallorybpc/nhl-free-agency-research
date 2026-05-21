@@ -82,8 +82,8 @@
         <p class="tmg-body">
           The research question comes from behavioral economics work on whether performance naturally corrects after extreme outcomes — independent of what a team does in the offseason. Applied to NHL free agency: is a team's offseason activity actually changing their trajectory, or are they riding a wave they cannot control?
         </p>
-        <p class="tmg-body" style="border-left: 3px solid var(--tmg-sage); padding-left: 16px; margin: 20px 0;">
-          <strong>Yes — strongly.</strong> Prior season points percentage is the dominant predictor of season-over-season performance change. Teams that finished near the top fall back. Teams that finished near the bottom bounce up. This effect is robust across all model specifications and persists when COVID seasons are excluded.
+        <p id="finding1Plain" class="tmg-body" style="border-left:3px solid var(--tmg-sage); padding-left:16px; margin:20px 0">
+          Loading finding...
         </p>
       </section>
 
@@ -174,8 +174,8 @@
         <p class="tmg-body">
           The question every front office faces every July: is spending big in free agency worth it? This analysis compares offseason UFA investment — measured two ways — against actual season-over-season performance change for all 32 NHL teams across nine seasons.
         </p>
-        <p class="tmg-body" style="border-left: 3px solid var(--tmg-sage); padding-left: 16px; margin: 20px 0;">
-          <strong>No — not reliably.</strong> Neither total AAV spent nor the position-weighted Movement Impact Score reaches statistical significance after controlling for prior season performance. In most seasons the team that spent the most did not produce the biggest performance gain. The null result holds in both the full sample and when COVID seasons are excluded.
+        <p id="finding2Plain" class="tmg-body" style="border-left:3px solid var(--tmg-sage); padding-left:16px; margin:20px 0">
+          Loading finding...
         </p>
       </section>
 
@@ -313,70 +313,249 @@
   <script>
     const BASE = '/nhl-free-agency-research';
 
-    fetch(`${BASE}/output/tables/model_comparison_summary.csv`)
-      .then(r => r.text())
-      .then(csv => {
-        const targets = {
-          model_a_full: document.querySelector('[data-model="model_a_full"]'),
-          model_b_full: document.querySelector('[data-model="model_b_full"]'),
-          model_a_restricted: document.querySelector('[data-model="model_a_restricted"]'),
-          model_b_restricted: document.querySelector('[data-model="model_b_restricted"]')
-        };
+    // Translate a coefficient or strength value into plain-language adjective.
+    function strengthWord(value, type) {
+      const abs = Math.abs(value);
+      if (type === 'coefficient') {
+        if (abs >= 0.40) return 'strongly';
+        if (abs >= 0.25) return 'meaningfully';
+        if (abs >= 0.15) return 'modestly';
+        return 'weakly';
+      }
+      if (type === 'pvalue') {
+        if (value < 0.001) return 'extremely strong';
+        if (value < 0.01) return 'strong';
+        if (value < 0.05) return 'clear';
+        if (value < 0.10) return 'suggestive';
+        return 'not statistically meaningful';
+      }
+      if (type === 'rsquared_compare') {
+        // value here is the difference between Model B and Model A.
+        if (Math.abs(value) < 0.005) return 'did not meaningfully change';
+        if (value > 0) return 'improved';
+        return 'did not improve';
+      }
+      return 'mixed';
+    }
 
-        const fallbackAll = () => {
-          Object.values(targets).forEach(cell => {
-            if (cell) cell.textContent = '--';
-          });
-        };
+    // Translate yes/no based on p-value threshold.
+    function significanceAnswer(pvalue) {
+      if (pvalue < 0.05) return { word: 'Yes', tone: 'success' };
+      if (pvalue < 0.10) return { word: 'Suggestive', tone: 'warning' };
+      return { word: 'No', tone: 'muted' };
+    }
 
-        const rows = csv.trim().split(/\r?\n/);
-        if (rows.length < 2) {
-          fallbackAll();
-          return;
-        }
+    // Convert a coefficient into plain language for a 10-point standings change.
+    function reversionInPlainLanguage(coefficient) {
+      const dropPerTenPP = Math.round(Math.abs(coefficient) * 10 * 10) / 10;
+      const direction = coefficient < 0 ? 'fall back' : 'climb';
+      return `For every 10 percentage points a team finished above average last season, the model expects them to ${direction} about ${dropPerTenPP} percentage points this season.`;
+    }
 
-        const header = rows[0].split(',').map(v => v.trim());
-        const modelIdx = header.indexOf('model_name');
-        const adjR2Idx = header.indexOf('adj.r.squared');
+    // COVID context note changes based on restricted-sample consistency.
+    function covidPhrase(heldInRestricted) {
+      return heldInRestricted
+        ? 'This pattern shows up in every version of the analysis, including when we set aside the unusual COVID-affected 2020 and 2021 seasons.'
+        : 'This pattern is sensitive to the inclusion of the COVID-affected 2020 and 2021 seasons — results differ when those years are removed.';
+    }
 
-        if (modelIdx === -1 || adjR2Idx === -1) {
-          fallbackAll();
-          return;
-        }
+    function parseCsv(csvText) {
+      const rows = (csvText || '').trim().split(/\r?\n/);
+      if (rows.length < 2) return [];
 
-        const modelKeyMap = {
-          'Model A Full': 'model_a_full',
-          'Model B Full': 'model_b_full',
-          'Model A Restricted': 'model_a_restricted',
-          'Model B Restricted': 'model_b_restricted'
-        };
-
-        Object.values(targets).forEach(cell => {
-          if (cell) cell.textContent = '--';
+      const headers = rows[0].split(',').map(v => v.trim());
+      return rows.slice(1).filter(Boolean).map(line => {
+        const cols = line.split(',');
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header] = (cols[idx] || '').trim();
         });
-
-        rows.slice(1).forEach(line => {
-          const cols = line.split(',');
-          const modelName = (cols[modelIdx] || '').trim();
-          const rawAdj = (cols[adjR2Idx] || '').trim();
-          const modelKey = modelKeyMap[modelName];
-          const cell = targets[modelKey];
-
-          if (!cell) return;
-
-          const value = Number(rawAdj);
-          if (Number.isFinite(value)) {
-            cell.textContent = value.toFixed(3);
-          } else {
-            cell.textContent = '--';
-          }
-        });
-      })
-      .catch(() => {
-        document.querySelectorAll('td[data-model]').forEach(cell => {
-          cell.textContent = '--';
-        });
+        return row;
       });
+    }
+
+    function toNumber(value) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : NaN;
+    }
+
+    function getRowByTerm(rows, term) {
+      return rows.find(row => row.term === term) || null;
+    }
+
+    function setFindingsFallback() {
+      const fallbackHtml = '<em>Finding language temporarily unavailable — review the data tables below for the underlying numbers.</em>';
+      const f1 = document.getElementById('finding1Plain');
+      const f2 = document.getElementById('finding2Plain');
+      if (f1) f1.innerHTML = fallbackHtml;
+      if (f2) f2.innerHTML = fallbackHtml;
+    }
+
+    function renderModelComparison(modelComparisonRows) {
+      const targets = {
+        model_a_full: document.querySelector('[data-model="model_a_full"]'),
+        model_b_full: document.querySelector('[data-model="model_b_full"]'),
+        model_a_restricted: document.querySelector('[data-model="model_a_restricted"]'),
+        model_b_restricted: document.querySelector('[data-model="model_b_restricted"]')
+      };
+
+      const modelKeyMap = {
+        'Model A Full': 'model_a_full',
+        'Model B Full': 'model_b_full',
+        'Model A Restricted': 'model_a_restricted',
+        'Model B Restricted': 'model_b_restricted'
+      };
+
+      Object.values(targets).forEach(cell => {
+        if (cell) cell.textContent = '--';
+      });
+
+      modelComparisonRows.forEach(row => {
+        const modelKey = modelKeyMap[row.model_name];
+        const cell = targets[modelKey];
+        if (!cell) return;
+
+        const value = toNumber(row['adj.r.squared']);
+        cell.textContent = Number.isFinite(value) ? value.toFixed(3) : '--';
+      });
+    }
+
+    function renderFinding1Plain(modelBFullRows, modelBRestrictedRows) {
+      const fullRow = getRowByTerm(modelBFullRows, 'prior_season_points_pct');
+      const restrictedRow = getRowByTerm(modelBRestrictedRows, 'prior_season_points_pct');
+
+      if (!fullRow || !restrictedRow) {
+        setFindingsFallback();
+        return;
+      }
+
+      const coef = toNumber(fullRow.estimate);
+      const pval = toNumber(fullRow['p.value']);
+      const restrictedCoef = toNumber(restrictedRow.estimate);
+
+      if (!Number.isFinite(coef) || !Number.isFinite(pval) || !Number.isFinite(restrictedCoef)) {
+        setFindingsFallback();
+        return;
+      }
+
+      const heldInRestricted = (Math.sign(coef) === Math.sign(restrictedCoef))
+        && (Math.abs(restrictedCoef) > 0.15);
+
+      const answer = significanceAnswer(pval);
+      const strength = strengthWord(coef, 'coefficient');
+
+      const sentence = `
+        <strong>${answer.word} — ${strength}.</strong>
+        Where a team finished last season is the single biggest predictor of how much
+        better or worse they will be this season. Teams that finished near the top
+        of the standings tend to fall back. Teams that finished near the bottom
+        tend to bounce up. ${reversionInPlainLanguage(coef)} ${covidPhrase(heldInRestricted)}
+      `;
+
+      const container = document.getElementById('finding1Plain');
+      if (container) container.innerHTML = sentence;
+    }
+
+    function renderFinding2Plain(modelAFullRows, modelBFullRows, modelARestrictedRows, modelBRestrictedRows, modelComparisonRows) {
+      const aavFullRow = getRowByTerm(modelAFullRows, 'total_aav_spent');
+      const misFullRow = getRowByTerm(modelBFullRows, 'total_mis');
+      const aavRestrictedRow = getRowByTerm(modelARestrictedRows, 'total_aav_spent');
+      const misRestrictedRow = getRowByTerm(modelBRestrictedRows, 'total_mis');
+
+      const modelAFull = modelComparisonRows.find(row => row.model_name === 'Model A Full') || null;
+      const modelBFull = modelComparisonRows.find(row => row.model_name === 'Model B Full') || null;
+
+      if (!aavFullRow || !misFullRow || !aavRestrictedRow || !misRestrictedRow || !modelAFull || !modelBFull) {
+        setFindingsFallback();
+        return;
+      }
+
+      const aavPval = toNumber(aavFullRow['p.value']);
+      const misPval = toNumber(misFullRow['p.value']);
+      const modelADiff = toNumber(modelAFull['adj.r.squared']);
+      const modelBDiff = toNumber(modelBFull['adj.r.squared']);
+      const rDiff = modelBDiff - modelADiff;
+      const aavPvalR = toNumber(aavRestrictedRow['p.value']);
+      const misPvalR = toNumber(misRestrictedRow['p.value']);
+
+      if (!Number.isFinite(aavPval) || !Number.isFinite(misPval) || !Number.isFinite(modelADiff)
+          || !Number.isFinite(modelBDiff) || !Number.isFinite(aavPvalR) || !Number.isFinite(misPvalR)) {
+        setFindingsFallback();
+        return;
+      }
+
+      const heldInRestricted = (aavPvalR > 0.10) && (misPvalR > 0.10);
+
+      const aavAnswer = significanceAnswer(aavPval);
+      const misAnswer = significanceAnswer(misPval);
+      const weightingResult = strengthWord(rDiff, 'rsquared_compare');
+
+      let answerWord;
+      if (aavAnswer.word === 'No' && misAnswer.word === 'No') {
+        answerWord = 'No';
+      } else if (aavAnswer.word === 'Yes' || misAnswer.word === 'Yes') {
+        answerWord = 'Yes';
+      } else {
+        answerWord = 'Suggestive';
+      }
+
+      const sentence = `
+        <strong>${answerWord} — not reliably.</strong>
+        Whether we measure offseason activity in raw dollars spent or in a
+        position-weighted score that values goalies and defencemen more heavily,
+        neither approach reliably predicts how much a team improves the next season.
+        The team that spent the most did not produce the biggest gain in most
+        seasons in the data. Weighting by position ${weightingResult} the prediction.
+        ${covidPhrase(heldInRestricted)}
+      `;
+
+      const container = document.getElementById('finding2Plain');
+      if (container) container.innerHTML = sentence;
+    }
+
+    function fetchCsvSafe(url, label) {
+      return fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          return response.text();
+        })
+        .catch(error => {
+          console.error(`Failed to load ${label}:`, error);
+          return null;
+        });
+    }
+
+    Promise.all([
+      fetchCsvSafe(`${BASE}/output/tables/model_comparison_summary.csv`, 'model_comparison_summary.csv'),
+      fetchCsvSafe(`${BASE}/output/tables/model_a_full_coefficients.csv`, 'model_a_full_coefficients.csv'),
+      fetchCsvSafe(`${BASE}/output/tables/model_b_full_coefficients.csv`, 'model_b_full_coefficients.csv'),
+      fetchCsvSafe(`${BASE}/output/tables/model_a_restricted_coefficients.csv`, 'model_a_restricted_coefficients.csv'),
+      fetchCsvSafe(`${BASE}/output/tables/model_b_restricted_coefficients.csv`, 'model_b_restricted_coefficients.csv')
+    ]).then(([comparisonCsv, modelAFullCsv, modelBFullCsv, modelARestrictedCsv, modelBRestrictedCsv]) => {
+      const modelComparisonRows = comparisonCsv ? parseCsv(comparisonCsv) : [];
+      renderModelComparison(modelComparisonRows);
+
+      if (!modelAFullCsv || !modelBFullCsv || !modelARestrictedCsv || !modelBRestrictedCsv) {
+        setFindingsFallback();
+        return;
+      }
+
+      const modelAFullRows = parseCsv(modelAFullCsv);
+      const modelBFullRows = parseCsv(modelBFullCsv);
+      const modelARestrictedRows = parseCsv(modelARestrictedCsv);
+      const modelBRestrictedRows = parseCsv(modelBRestrictedCsv);
+
+      renderFinding1Plain(modelBFullRows, modelBRestrictedRows);
+      renderFinding2Plain(
+        modelAFullRows,
+        modelBFullRows,
+        modelARestrictedRows,
+        modelBRestrictedRows,
+        modelComparisonRows
+      );
+    });
   </script>
 </body>
 </html>
