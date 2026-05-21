@@ -365,6 +365,8 @@
   </script>
 
   <script>
+    const BASE = '/nhl-free-agency-research';
+
     // 1. State
     let masterData = [];
     let misData = [];
@@ -397,10 +399,10 @@
     // 2. Data loading — fetch all CSVs in parallel using Promise.all
     async function loadData() {
       const paths = [
-        '../../data/processed/nhl_master_analysis_panel.csv',
-        '../../data/processed/nhl_team_mis_scores.csv',
-        '../../output/tables/model_comparison_summary.csv',
-        '../../data/processed/nhl_team_geography_variables.csv'
+        `${BASE}/data/processed/nhl_master_analysis_panel.csv`,
+        `${BASE}/data/processed/nhl_team_mis_scores.csv`,
+        `${BASE}/output/tables/model_comparison_summary.csv`,
+        `${BASE}/data/processed/nhl_team_geography_variables.csv`
       ];
 
       const [masterText, misText, modelText, geoText] = await Promise.all(

@@ -311,7 +311,9 @@
   </script>
 
   <script>
-    fetch('../../output/tables/model_comparison_summary.csv')
+    const BASE = '/nhl-free-agency-research';
+
+    fetch(`${BASE}/output/tables/model_comparison_summary.csv`)
       .then(r => r.text())
       .then(csv => {
         const targets = {
