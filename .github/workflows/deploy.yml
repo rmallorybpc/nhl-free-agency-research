@@ -37,6 +37,7 @@ jobs:
           mkdir -p _site/output/tables
 
           cp data/processed/nhl_master_analysis_panel.csv _site/data/processed/
+          cp data/processed/nhl_signed_free_agents_clean.csv _site/data/processed/
           cp data/processed/nhl_team_mis_scores.csv _site/data/processed/
           cp data/processed/nhl_team_geography_variables.csv _site/data/processed/
           cp output/tables/model_comparison_summary.csv _site/output/tables/
