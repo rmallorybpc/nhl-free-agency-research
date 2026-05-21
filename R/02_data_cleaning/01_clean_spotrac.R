@@ -7,6 +7,10 @@ suppressPackageStartupMessages({
 	library(here)
 })
 
+expected_input_rows <- 2493
+expected_ufa_rows <- 1878
+expected_years <- 2017:2025
+
 input_path <- here::here("data", "raw", "spotrac", "nhl_signed_free_agents_raw.csv")
 output_path <- here::here("data", "processed", "nhl_signed_free_agents_clean.csv")
 
@@ -43,7 +47,7 @@ clean_df <- raw_df |>
 	) |>
 	# Deliberate scope decision: exclude RFAs because qualifying-offer rules constrain
 	# market choice and make them analytically different from UFAs. RFA rows remain
-	# in the raw extract for transparency.
+	# in the raw extract for transparency; this is documented in README and scope docs.
 	filter(ufa_rfa_type == "UFA") |>
 	# Reserved for future integration with trade transactions (transaction_type = "trade").
 	mutate(
@@ -75,31 +79,42 @@ clean_df <- raw_df |>
 		aav = to_numeric_currency(aav),
 		contract_years = contract_years |>
 			as.character() |>
-			stringr::str_extract("\\d+") |>
+			stringr::str_replace_all("[^0-9.-]", "") |>
+			na_if("") |>
 			as.integer(),
 		spotrac_year = as.integer(spotrac_year),
 		same_team_resign = signing_team == previous_team,
+		# Placeholder fields are populated in R/03_feature_engineering/03_build_geography.R.
 		division_change = NA,
 		conference_change = NA
 	)
 
 rows_after_ufa <- nrow(clean_df)
 
-year_counts <- clean_df |>
-	count(spotrac_year, name = "rows") |>
+year_counts <- tibble(spotrac_year = expected_years) |>
+	left_join(
+		clean_df |>
+			count(spotrac_year, name = "rows"),
+		by = "spotrac_year"
+	) |>
+	mutate(rows = replace_na(rows, 0L)) |>
 	arrange(spotrac_year)
 
-year_zero_check <- if (nrow(year_counts) > 0) {
-	year_seq <- tibble(spotrac_year = seq(min(year_counts$spotrac_year), max(year_counts$spotrac_year)))
-	year_seq |>
-		left_join(year_counts, by = "spotrac_year") |>
-		mutate(rows = replace_na(rows, 0L))
-} else {
-	tibble(spotrac_year = integer(), rows = integer())
-}
+year_zero_check <- year_counts |>
+	filter(rows == 0)
 
 same_team_counts <- clean_df |>
 	count(same_team_resign, name = "rows")
+
+same_team_true <- same_team_counts |>
+	filter(same_team_resign) |>
+	pull(rows)
+if (length(same_team_true) == 0) same_team_true <- 0
+
+movement_false <- same_team_counts |>
+	filter(!same_team_resign) |>
+	pull(rows)
+if (length(movement_false) == 0) movement_false <- 0
 
 na_counts <- clean_df |>
 	summarise(
@@ -111,6 +126,7 @@ na_counts <- clean_df |>
 
 aav_min <- suppressWarnings(min(clean_df$aav, na.rm = TRUE))
 aav_max <- suppressWarnings(max(clean_df$aav, na.rm = TRUE))
+contract_years_non_positive <- sum(clean_df$contract_years <= 0, na.rm = TRUE)
 
 if (!is.finite(aav_min)) {
 	aav_min <- NA_real_
@@ -120,16 +136,16 @@ if (!is.finite(aav_max)) {
 }
 
 cat("\n=== Spotrac Clean QA ===\n")
-cat(sprintf("Total rows after UFA filter: %s\n", rows_after_ufa))
+cat(sprintf("Total rows after UFA filter: %s (expected: %s)\n", rows_after_ufa, expected_ufa_rows))
 
 cat("\nRow count by spotrac_year:\n")
 print(year_counts)
 
-if (nrow(year_zero_check) > 0 && any(year_zero_check$rows == 0)) {
+if (nrow(year_zero_check) > 0) {
 	cat("WARNING: One or more years have zero rows after UFA filter.\n")
-	print(year_zero_check |> filter(rows == 0))
+	print(year_zero_check)
 } else {
-	cat("No zero-row years detected in the observed year range.\n")
+	cat("No zero-row years detected for 2017 to 2025.\n")
 }
 
 cat("\nCount of same_team_resign TRUE/FALSE:\n")
@@ -149,11 +165,16 @@ if (!is.na(aav_max) && aav_max > 15000000) {
 	cat("WARNING: Max AAV above 15000000. Check parsing or source anomalies.\n")
 }
 
+if (contract_years_non_positive > 0) {
+	cat(sprintf("WARNING: contract_years has %s non-positive values (<= 0).\n", contract_years_non_positive))
+}
+
 dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
 readr::write_csv(clean_df, output_path)
 
 cat("\n=== Cleaning Complete ===\n")
-cat(sprintf("Input rows: %s\n", input_rows))
-cat(sprintf("Rows after UFA filter: %s\n", rows_after_ufa))
-cat(sprintf("Output rows written: %s\n", nrow(clean_df)))
+cat(sprintf("Input rows: %s (expected: %s)\n", input_rows, expected_input_rows))
+cat(sprintf("Rows after UFA filter: %s (expected: %s)\n", rows_after_ufa, expected_ufa_rows))
+cat(sprintf("Same-team re-signs: %s | Genuine movement events: %s\n", same_team_true, movement_false))
+cat(sprintf("Output rows written: %s (expected: %s)\n", nrow(clean_df), expected_ufa_rows))
 cat(sprintf("Output file: %s\n", output_path))
