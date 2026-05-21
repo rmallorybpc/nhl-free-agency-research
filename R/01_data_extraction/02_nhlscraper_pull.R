@@ -120,6 +120,17 @@ for (i in seq_len(nrow(season_end_dates))) {
 	master_df <- bind_rows(master_df, season_selected)
 }
 
+# COVID season proxy mapping: 2021 used temporary divisions, so infer conference
+# from division when conferenceAbbrev is missing.
+master_df <- master_df |>
+	mutate(
+		conferenceAbbrev = case_when(
+			season_year == 2021 & is.na(conferenceAbbrev) & divisionAbbrev %in% c("EST", "CEN") ~ "E",
+			season_year == 2021 & is.na(conferenceAbbrev) & divisionAbbrev %in% c("WST", "NTH") ~ "W",
+			TRUE ~ conferenceAbbrev
+		)
+	)
+
 if (nrow(master_df) != expected_total_rows) {
 	warning(sprintf(
 		"Master dataframe row count warning. Returned rows=%s (expected %s).",
