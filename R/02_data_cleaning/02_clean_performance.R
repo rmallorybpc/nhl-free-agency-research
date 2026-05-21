@@ -236,3 +236,8 @@ if (length(validation_warnings) == 0) {
 		cat(sprintf("- %s\n", warn_msg))
 	}
 }
+
+# Version 1 analysis-window note:
+# Effective season-over-season outcome window is 2018 to 2025 because 2016
+# baseline performance is out of scope. As a result, 2017 Spotrac signings are
+# excluded from regression models that require a prior-season baseline.
