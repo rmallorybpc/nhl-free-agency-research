@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Findings — NHL Free Agency Research</title>
+  <meta name="description" content="Two research questions, nine seasons of NHL data, and what the numbers actually show about offseason spending and team performance.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <!-- CDN to restore when published:
+  <link rel="stylesheet" href="https://rmallorybpc.github.io/tmg-brand-guide/dist/tmg.css">
+  -->
+  <link rel="stylesheet" href="./tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px; border-radius: var(--tmg-nav-radius);
+      font-size: 13px; font-weight: 500; color: var(--tmg-charcoal);
+      text-decoration: none; transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] {
+      background: rgba(132,169,140,0.15); color: var(--tmg-sage-hover);
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html">Welcome</a>
+      <a href="./findings.html" aria-current="page">Key Findings</a>
+      <a href="./index.html">Overview</a>
+      <a href="./team.html">Team Detail</a>
+      <a href="./explorer.html">All Signings</a>
+    </div>
+    <div class="tmg-dropdown-wrap">
+      <button class="tmg-dropdown-btn" id="tmgDdBtn"
+              aria-haspopup="true" aria-expanded="false" aria-controls="tmgDdMenu">
+        TMG Tool Suite
+        <svg class="tmg-chevron" viewBox="0 0 12 12" fill="none"
+             width="12" height="12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tmg-dropdown-menu" id="tmgDdMenu" role="menu">
+        <a href="https://rmallorybpc.github.io/pdf-multi-agent-analysis/"
+           target="_blank" rel="noreferrer" role="menuitem">PDF Multi-Agent Analysis</a>
+        <a href="https://rmallorybpc.github.io/housing-market-intel/"
+           target="_blank" rel="noreferrer" role="menuitem">Housing Market Intel</a>
+        <a href="https://rmallorybpc.github.io/real-estate-report/"
+           target="_blank" rel="noreferrer" role="menuitem">Real Estate Report</a>
+        <a href="https://rmallorybpc.github.io/nflanalysis/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NFL Analysis</a>
+        <a href="https://rmallorybpc.github.io/nhl-free-agency-research/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NHL Analysis</a>
+        <a href="https://rmallorybpc.github.io/recipes/"
+           target="_blank" rel="noreferrer" role="menuitem">Recipe Book</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow">Key Findings</p>
+        <h1 class="tmg-page-title">Two questions. Nine seasons. Here is what the data shows.</h1>
+        <p class="tmg-page-desc">
+          1,648 UFA movement events across 252 NHL team-seasons, 2018–2025.
+          Two research questions examined through regression analysis with
+          COVID-season sensitivity checks.
+        </p>
+      </div>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Does prior season performance predict the following season's change?</h2>
+        <p class="tmg-body">
+          The research question comes from behavioral economics work on whether performance naturally corrects after extreme outcomes — independent of what a team does in the offseason. Applied to NHL free agency: is a team's offseason activity actually changing their trajectory, or are they riding a wave they cannot control?
+        </p>
+        <p class="tmg-body" style="border-left: 3px solid var(--tmg-sage); padding-left: 16px; margin: 20px 0;">
+          <strong>Yes — strongly.</strong> Prior season points percentage is the dominant predictor of season-over-season performance change. Teams that finished near the top fall back. Teams that finished near the bottom bounce up. This effect is robust across all model specifications and persists when COVID seasons are excluded.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Mean reversion result</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px;">
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">MEAN REVERSION COEFFICIENT</p>
+            <p class="tmg-card-value">−0.42</p>
+            <p class="tmg-card-sub">Per unit of prior season points %</p>
+          </article>
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">STATISTICAL SIGNIFICANCE</p>
+            <p class="tmg-card-value">p &lt; 0.001</p>
+            <p class="tmg-card-sub">Confirmed across all four model specifications</p>
+          </article>
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">STANDARD ERROR</p>
+            <p class="tmg-card-value">0.052</p>
+            <p class="tmg-card-sub">Tight confidence interval</p>
+          </article>
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">MODELS CONFIRMED IN</p>
+            <p class="tmg-card-value">4 of 4</p>
+            <p class="tmg-card-sub">Full sample and COVID-restricted</p>
+          </article>
+        </div>
+        <p class="tmg-body" style="margin-top: 18px;">
+          A coefficient of −0.42 means that for every 10 percentage points a team finished above average last season, the model predicts they will fall back approximately 4.2 percentage points this season — regardless of what they spent in free agency. This is mean reversion, not regression to mediocrity: exceptional teams get worse, struggling teams get better, and the offseason activity in between does not reliably change that trajectory.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Mean reversion across performance quartiles</h2>
+        <p class="tmg-body">
+          Teams divided into four groups by prior season points percentage.
+          Average season-over-season change shown for each group. N=252
+          team-seasons, 2018–2025.
+        </p>
+        <div style="overflow-x: auto; margin-top: 12px;">
+          <table class="tmg-table" aria-label="Mean reversion quartile table">
+            <thead>
+              <tr>
+                <th>Prior season quartile</th>
+                <th>Points % range</th>
+                <th>Avg change</th>
+                <th>Direction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Q4 — Top 25%</td>
+                <td>Above ~0.622</td>
+                <td>Negative</td>
+                <td style="color: var(--tmg-error); font-weight: 500;">▼ Declined</td>
+              </tr>
+              <tr>
+                <td>Q3 — Upper mid</td>
+                <td>0.549 – 0.622</td>
+                <td>Near zero</td>
+                <td style="color: rgba(45, 52, 54, 0.55); font-weight: 500;">→ Flat</td>
+              </tr>
+              <tr>
+                <td>Q2 — Lower mid</td>
+                <td>0.476 – 0.549</td>
+                <td>Near zero</td>
+                <td style="color: rgba(45, 52, 54, 0.55); font-weight: 500;">→ Flat</td>
+              </tr>
+              <tr>
+                <td>Q1 — Bottom 25%</td>
+                <td>Below ~0.476</td>
+                <td>Positive</td>
+                <td style="color: var(--tmg-success); font-weight: 500;">▲ Improved</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="tmg-body-sm tmg-text-muted" style="margin-top: 12px;">
+          Top-quartile teams declined on average the following season.
+          Bottom-quartile teams improved. The middle two quartiles showed
+          negligible average change. This pattern held in 7 of 8 seasons
+          in the analysis window.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Does offseason UFA spending predict team improvement?</h2>
+        <p class="tmg-body">
+          The question every front office faces every July: is spending big in free agency worth it? This analysis compares offseason UFA investment — measured two ways — against actual season-over-season performance change for all 32 NHL teams across nine seasons.
+        </p>
+        <p class="tmg-body" style="border-left: 3px solid var(--tmg-sage); padding-left: 16px; margin: 20px 0;">
+          <strong>No — not reliably.</strong> Neither total AAV spent nor the position-weighted Movement Impact Score reaches statistical significance after controlling for prior season performance. In most seasons the team that spent the most did not produce the biggest performance gain. The null result holds in both the full sample and when COVID seasons are excluded.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Model A vs Model B — does positional weighting help?</h2>
+        <p class="tmg-body">
+          Model A uses total AAV spent. Model B uses the weighted Movement Impact Score. If positional weighting improved predictive power, Model B would show a higher adjusted R-squared.
+        </p>
+        <div style="overflow-x: auto; margin-top: 12px;">
+          <table class="tmg-table" aria-label="Model comparison table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Sample</th>
+                <th>Primary variable</th>
+                <th>Adj. R-squared</th>
+                <th>Primary variable p-value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Model A</td>
+                <td>Full 2018–2025</td>
+                <td>Total AAV spent</td>
+                <td data-model="model_a_full" aria-live="polite">Loading...</td>
+                <td>0.573</td>
+              </tr>
+              <tr>
+                <td>Model B</td>
+                <td>Full 2018–2025</td>
+                <td>Movement Impact Score</td>
+                <td data-model="model_b_full" aria-live="polite">Loading...</td>
+                <td>0.822</td>
+              </tr>
+              <tr>
+                <td>Model A</td>
+                <td>COVID-restricted</td>
+                <td>Total AAV spent</td>
+                <td data-model="model_a_restricted" aria-live="polite">Loading...</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Model B</td>
+                <td>COVID-restricted</td>
+                <td>Movement Impact Score</td>
+                <td data-model="model_b_restricted" aria-live="polite">Loading...</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="tmg-body" style="margin-top: 14px;">
+          Model B did not outperform Model A in any specification. Positional weighting via MIS does not improve prediction over raw spending volume. This suggests either that the position tier weights (35/25/20/15/5) require empirical calibration, or that single-season team performance is too noisy for the weighting signal to be detectable at this sample size. Both are documented as Version 2 directions.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">What the null result does and does not mean</h2>
+        <p class="tmg-body">
+          Offseason spending is not the primary driver of whether an NHL team improves next season. The strongest predictor is where they started. Teams and analysts who attribute a team's improvement primarily to their offseason moves should consider how much of that improvement would have happened regardless.
+        </p>
+        <p class="tmg-body">
+          This analysis measures team-level aggregate spending against team-level performance change. It does not measure whether individual signings were good value, whether specific players improved after moving teams, or whether the composition of a roster matters independent of spending. Those are separate research questions.
+        </p>
+        <p class="tmg-body">
+          This study covers UFA signings only — players with full market choice. RFAs, trades, draft picks, and development are all excluded from Version 1. A team that built through the draft rather than free agency may improve substantially despite a low MIS score. The model measures one input to roster construction, not the whole picture.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">COVID sensitivity check</h2>
+        <p class="tmg-body">
+          The 2020 season was suspended in March and completed in a bubble format. The 2021 season used temporary geographic divisions and a shortened schedule. Both seasons are flagged in the dataset and excluded from the restricted sample models.
+        </p>
+        <p class="tmg-body">
+          Result: both findings — mean reversion dominance and spending null result — hold in the COVID-restricted sample. The results are not driven by the unusual competitive environment of those two seasons.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px;">
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">MEAN REVERSION IN RESTRICTED SAMPLE</p>
+            <p class="tmg-card-value" style="color: var(--tmg-success);">Confirmed</p>
+          </article>
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">SPENDING NULL IN RESTRICTED SAMPLE</p>
+            <p class="tmg-card-value" style="color: var(--tmg-success);">Confirmed</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Data and methodology</h2>
+        <ul class="tmg-body-sm" style="margin: 10px 0 14px 18px; padding: 0;">
+          <li>Data sources: Spotrac (contract and transaction data), NHL API via nhlscraper (team performance data)</li>
+          <li>Analysis window: 2018–2025 outcome seasons (2016 baseline out of scope)</li>
+          <li>Dependent variable: season-over-season change in points percentage</li>
+          <li>Primary independent variables: total AAV spent, weighted MIS</li>
+          <li>Controls: prior season points percentage, season type, cap ceiling change</li>
+          <li>Models: OLS regression, four specifications</li>
+          <li>COVID seasons: flagged and excluded in sensitivity check</li>
+          <li>RFA signings: excluded by scope — UFA only</li>
+          <li>Minor league contracts: excluded from dataset</li>
+        </ul>
+        <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+           target="_blank" rel="noreferrer" class="tmg-text-accent">
+          View full methodology and source code on GitHub →</a>
+      </section>
+    </div>
+  </main>
+
+  <footer class="tmg-footer">
+    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
+    movement events, Spotrac contract data, and NHL API game results via
+    nhlscraper. &nbsp;·&nbsp;
+    <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+       target="_blank" rel="noreferrer">View the source on GitHub →</a>
+  </footer>
+
+  <script>
+    const btn  = document.getElementById('tmgDdBtn');
+    const menu = document.getElementById('tmgDdMenu');
+    btn.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script>
+    fetch('../../output/tables/model_comparison_summary.csv')
+      .then(r => r.text())
+      .then(csv => {
+        const targets = {
+          model_a_full: document.querySelector('[data-model="model_a_full"]'),
+          model_b_full: document.querySelector('[data-model="model_b_full"]'),
+          model_a_restricted: document.querySelector('[data-model="model_a_restricted"]'),
+          model_b_restricted: document.querySelector('[data-model="model_b_restricted"]')
+        };
+
+        const fallbackAll = () => {
+          Object.values(targets).forEach(cell => {
+            if (cell) cell.textContent = '--';
+          });
+        };
+
+        const rows = csv.trim().split(/\r?\n/);
+        if (rows.length < 2) {
+          fallbackAll();
+          return;
+        }
+
+        const header = rows[0].split(',').map(v => v.trim());
+        const modelIdx = header.indexOf('model_name');
+        const adjR2Idx = header.indexOf('adj.r.squared');
+
+        if (modelIdx === -1 || adjR2Idx === -1) {
+          fallbackAll();
+          return;
+        }
+
+        const modelKeyMap = {
+          'Model A Full': 'model_a_full',
+          'Model B Full': 'model_b_full',
+          'Model A Restricted': 'model_a_restricted',
+          'Model B Restricted': 'model_b_restricted'
+        };
+
+        Object.values(targets).forEach(cell => {
+          if (cell) cell.textContent = '--';
+        });
+
+        rows.slice(1).forEach(line => {
+          const cols = line.split(',');
+          const modelName = (cols[modelIdx] || '').trim();
+          const rawAdj = (cols[adjR2Idx] || '').trim();
+          const modelKey = modelKeyMap[modelName];
+          const cell = targets[modelKey];
+
+          if (!cell) return;
+
+          const value = Number(rawAdj);
+          if (Number.isFinite(value)) {
+            cell.textContent = value.toFixed(3);
+          } else {
+            cell.textContent = '--';
+          }
+        });
+      })
+      .catch(() => {
+        document.querySelectorAll('td[data-model]').forEach(cell => {
+          cell.textContent = '--';
+        });
+      });
+  </script>
+</body>
+</html>
