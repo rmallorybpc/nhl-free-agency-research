@@ -22,6 +22,20 @@ season_end_dates <- tibble(
 	))
 )
 
+expected_team_counts <- c(
+	`2017` = 30,
+	`2018` = 31,
+	`2019` = 31,
+	`2020` = 31,
+	`2021` = 31,
+	`2022` = 32,
+	`2023` = 32,
+	`2024` = 32,
+	`2025` = 32
+)
+
+expected_total_rows <- sum(unname(expected_team_counts))
+
 required_columns <- c(
 	"seasonId",
 	"teamTriCode",
@@ -67,12 +81,14 @@ for (i in seq_len(nrow(season_end_dates))) {
 
 	season_df <- as_tibble(season_df)
 	season_rows <- nrow(season_df)
+	expected_rows <- unname(expected_team_counts[as.character(season_year_i)])
 
-	if (season_rows != 32) {
+	if (!is.na(expected_rows) && season_rows != expected_rows) {
 		warning(sprintf(
-			"Row count warning for season_year=%s. Returned rows=%s (expected 32).",
+			"Row count warning for season_year=%s. Returned rows=%s (expected %s).",
 			season_year_i,
-			season_rows
+			season_rows,
+			expected_rows
 		))
 	}
 
@@ -104,10 +120,11 @@ for (i in seq_len(nrow(season_end_dates))) {
 	master_df <- bind_rows(master_df, season_selected)
 }
 
-if (nrow(master_df) != 288) {
+if (nrow(master_df) != expected_total_rows) {
 	warning(sprintf(
-		"Master dataframe row count warning. Returned rows=%s (expected 288).",
-		nrow(master_df)
+		"Master dataframe row count warning. Returned rows=%s (expected %s).",
+		nrow(master_df),
+		expected_total_rows
 	))
 }
 
@@ -145,8 +162,9 @@ readr::write_csv(master_df, output_path)
 
 if (nrow(master_df) > 0) {
 	message(sprintf(
-		"Completed nhlscraper pull. Rows=%s | Seasons=%s | points_percentage_min=%.4f | points_percentage_max=%.4f",
+		"Completed nhlscraper pull. Rows=%s (validated target=%s) | Seasons=%s | points_percentage_min=%.4f | points_percentage_max=%.4f",
 		nrow(master_df),
+		expected_total_rows,
 		paste(sort(unique(master_df$season_year)), collapse = ","),
 		min(master_df$points_percentage, na.rm = TRUE),
 		max(master_df$points_percentage, na.rm = TRUE)
