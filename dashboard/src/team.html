@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Detail — NHL Free Agency Research</title>
+  <meta name="description" content="UFA signing history, Movement Impact Score breakdown, and season-over-season performance for any NHL team and season.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <!-- CDN to restore when published:
+  <link rel="stylesheet" href="https://rmallorybpc.github.io/tmg-brand-guide/dist/tmg.css">
+  -->
+  <link rel="stylesheet" href="./tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px;
+      border-radius: var(--tmg-nav-radius);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tmg-charcoal);
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] {
+      background: rgba(132,169,140,0.15);
+      color: var(--tmg-sage-hover);
+    }
+
+    .team-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: var(--tmg-gap);
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .tmg-card-sub-row {
+      margin: 0;
+      font-size: 12px;
+      color: rgba(45, 52, 54, 0.65);
+    }
+
+    .mis-stack {
+      display: flex;
+      width: 100%;
+      height: 22px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(45, 52, 54, 0.08);
+      border: 1px solid rgba(45, 52, 54, 0.12);
+      margin: 14px 0;
+    }
+
+    .mis-segment {
+      height: 100%;
+      min-width: 0;
+      transition: width 0.2s ease;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .geo-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      line-height: 1.3;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .geo-within {
+      background: rgba(132,169,140,0.22);
+      border-color: rgba(132,169,140,0.45);
+      color: var(--tmg-charcoal);
+    }
+
+    .geo-cross-div {
+      background: rgba(132,169,140,0.13);
+      border-color: rgba(132,169,140,0.35);
+      color: var(--tmg-charcoal);
+    }
+
+    .geo-cross-conf {
+      background: var(--tmg-charcoal);
+      border-color: var(--tmg-charcoal);
+      color: var(--tmg-white);
+    }
+
+    .geo-same-team {
+      background: rgba(45, 52, 54, 0.08);
+      border-color: rgba(45, 52, 54, 0.2);
+      color: var(--tmg-charcoal);
+    }
+
+    .context-row {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--tmg-charcoal);
+    }
+
+    .context-expected {
+      font-weight: 500;
+    }
+
+    .selector-hint {
+      margin: 0 0 var(--tmg-gap);
+      color: rgba(45, 52, 54, 0.7);
+      font-size: 13px;
+    }
+
+    .tier-note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: rgba(45, 52, 54, 0.65);
+    }
+
+    .tmg-btn-ghost[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    @media (max-width: 680px) {
+      .team-controls > div {
+        width: 100%;
+      }
+
+      .team-controls select {
+        width: 100% !important;
+      }
+
+      .team-controls #loadTeamBtn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html">Welcome</a>
+      <a href="./findings.html">Key Findings</a>
+      <a href="./index.html">Overview</a>
+      <a href="./team.html" aria-current="page">Team Detail</a>
+      <a href="./explorer.html">All Signings</a>
+    </div>
+    <div class="tmg-dropdown-wrap">
+      <button class="tmg-dropdown-btn" id="tmgDdBtn"
+              aria-haspopup="true" aria-expanded="false" aria-controls="tmgDdMenu">
+        TMG Tool Suite
+        <svg class="tmg-chevron" viewBox="0 0 12 12" fill="none"
+             width="12" height="12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tmg-dropdown-menu" id="tmgDdMenu" role="menu">
+        <a href="https://rmallorybpc.github.io/pdf-multi-agent-analysis/"
+           target="_blank" rel="noreferrer" role="menuitem">PDF Multi-Agent Analysis</a>
+        <a href="https://rmallorybpc.github.io/housing-market-intel/"
+           target="_blank" rel="noreferrer" role="menuitem">Housing Market Intel</a>
+        <a href="https://rmallorybpc.github.io/real-estate-report/"
+           target="_blank" rel="noreferrer" role="menuitem">Real Estate Report</a>
+        <a href="https://rmallorybpc.github.io/nflanalysis/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NFL Analysis</a>
+        <a href="https://rmallorybpc.github.io/nhl-free-agency-research/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NHL Analysis</a>
+        <a href="https://rmallorybpc.github.io/recipes/"
+           target="_blank" rel="noreferrer" role="menuitem">Recipe Book</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow" id="teamEyebrow">Team Detail</p>
+        <h1 class="tmg-page-title" id="teamTitle">Loading...</h1>
+        <p class="tmg-page-desc" id="teamDesc">Loading team data...</p>
+      </div>
+
+      <div id="covidBannerWrap"></div>
+
+      <div class="team-controls">
+        <div>
+          <label class="tmg-field-label" for="teamSelect">Team</label>
+          <select class="tmg-select" id="teamSelect" style="width:200px">
+            <option value="">Select team</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="tmg-field-label" for="seasonSelect">Season</label>
+          <select class="tmg-select" id="seasonSelect" style="width:140px">
+            <option value="">Select season</option>
+          </select>
+        </div>
+
+        <div style="display:flex; align-items:flex-end">
+          <button class="tmg-btn" id="loadTeamBtn">Load Team</button>
+        </div>
+      </div>
+
+      <p class="selector-hint" id="selectorHint" aria-live="polite"></p>
+
+      <section class="tmg-bento-grid" id="summaryTiles" style="margin-bottom: var(--tmg-gap);" aria-live="polite"></section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="misCard" aria-live="polite"></section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="signingsCard" aria-live="polite"></section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="performanceCard" aria-live="polite"></section>
+
+      <div style="display:flex; justify-content:space-between; margin-top:var(--tmg-gap)">
+        <button class="tmg-btn-ghost" id="prevSeasonBtn">← Prior season</button>
+        <a href="./index.html" class="tmg-btn-ghost">← Back to overview</a>
+        <button class="tmg-btn-ghost" id="nextSeasonBtn">Next season →</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="tmg-footer">
+    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
+    movement events, Spotrac contract data, and NHL API game results via
+    nhlscraper. &nbsp;·&nbsp;
+    <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+       target="_blank" rel="noreferrer">View the source on GitHub →</a>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('tmgDdBtn');
+    const menu = document.getElementById('tmgDdMenu');
+    btn.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script>
+    const BASE = '/nhl-free-agency-research';
+
+    // State
+    let allData = {};
+    let currentTeam = null;
+    let currentSeason = null;
+
+    const els = {
+      teamEyebrow: document.getElementById('teamEyebrow'),
+      teamTitle: document.getElementById('teamTitle'),
+      teamDesc: document.getElementById('teamDesc'),
+      covidBannerWrap: document.getElementById('covidBannerWrap'),
+      teamSelect: document.getElementById('teamSelect'),
+      seasonSelect: document.getElementById('seasonSelect'),
+      loadTeamBtn: document.getElementById('loadTeamBtn'),
+      selectorHint: document.getElementById('selectorHint'),
+      summaryTiles: document.getElementById('summaryTiles'),
+      misCard: document.getElementById('misCard'),
+      signingsCard: document.getElementById('signingsCard'),
+      performanceCard: document.getElementById('performanceCard'),
+      prevSeasonBtn: document.getElementById('prevSeasonBtn'),
+      nextSeasonBtn: document.getElementById('nextSeasonBtn')
+    };
+
+    const tierConfig = [
+      { key: 'goalie', label: 'Goalie', color: '#5F7F66', weight: 0.35 },
+      { key: 'defence', label: 'Defence', color: 'var(--tmg-sage)', weight: 0.25 },
+      { key: 'centre', label: 'Centre', color: 'rgba(132,169,140,0.70)', weight: 0.20 },
+      { key: 'wingers', label: 'Wingers', color: 'rgba(132,169,140,0.45)', weight: 0.15 },
+      { key: 'other', label: 'Other', color: 'rgba(132,169,140,0.20)', weight: 0.05 }
+    ];
+
+    // loadAllData() — Promise.all four CSVs
+    async function loadAllData() {
+      const paths = [
+        `${BASE}/data/processed/nhl_master_analysis_panel.csv`,
+        `${BASE}/data/processed/nhl_signed_free_agents_clean.csv`,
+        `${BASE}/data/processed/nhl_team_geography_variables.csv`,
+        `${BASE}/data/processed/nhl_team_mis_scores.csv`
+      ];
+
+      const [masterText, signingsText, geographyText, misText] = await Promise.all(
+        paths.map(path => fetch(path).then(resp => {
+          if (!resp.ok) {
+            throw new Error(`Failed to load ${path} (${resp.status})`);
+          }
+          return resp.text();
+        }))
+      );
+
+      allData = {
+        master: parseCSV(masterText),
+        signings: parseCSV(signingsText),
+        geography: parseCSV(geographyText),
+        mis: parseCSV(misText)
+      };
+    }
+
+    // parseCSV(text) — returns array of objects
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (lines.length < 2) return [];
+
+      const headers = parseCSVLine(lines[0]);
+      return lines.slice(1).filter(line => line.trim()).map(line => {
+        const cols = parseCSVLine(line);
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header] = (cols[idx] || '').trim();
+        });
+        return row;
+      });
+    }
+
+    function parseCSVLine(line) {
+      const cols = [];
+      let cur = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i += 1) {
+        const ch = line[i];
+        const next = line[i + 1];
+
+        if (ch === '"') {
+          if (inQuotes && next === '"') {
+            cur += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          cols.push(cur);
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+
+      cols.push(cur);
+      return cols;
+    }
+
+    // getURLParams() — read team and season from URL
+    function getURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      const team = (params.get('team') || '').toUpperCase();
+      const seasonRaw = params.get('season');
+      const season = Number.parseInt(seasonRaw || '', 10);
+
+      return {
+        team: team || null,
+        season: Number.isFinite(season) ? season : null
+      };
+    }
+
+    function updateURL(team, season) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('team', team);
+      params.set('season', String(season));
+      const url = `${window.location.pathname}?${params.toString()}`;
+      history.pushState({ team, season }, '', url);
+    }
+
+    function toNum(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatPctDecimal(value) {
+      if (!Number.isFinite(value)) return '--';
+      const fixed = value.toFixed(3);
+      return fixed.startsWith('0') ? fixed.slice(1) : fixed;
+    }
+
+    function formatSignedPP(value, digits = 1) {
+      if (!Number.isFinite(value)) return '--';
+      const sign = value > 0 ? '+' : '';
+      return `${sign}${value.toFixed(digits)} pp`;
+    }
+
+    function formatCurrencyMillions(value, digits = 2) {
+      if (!Number.isFinite(value)) return '--';
+      return `$${(value / 1000000).toFixed(digits)}M`;
+    }
+
+    function ordinal(n) {
+      if (!Number.isFinite(n) || n < 1) return '--';
+      const mod100 = n % 100;
+      if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+      const mod10 = n % 10;
+      if (mod10 === 1) return `${n}st`;
+      if (mod10 === 2) return `${n}nd`;
+      if (mod10 === 3) return `${n}rd`;
+      return `${n}th`;
+    }
+
+    function conferenceLabel(abbrev) {
+      if (abbrev === 'E') return 'Eastern';
+      if (abbrev === 'W') return 'Western';
+      return abbrev || 'Unknown';
+    }
+
+    // populateTeamSelector() — fill team dropdown from master panel
+    function populateTeamSelector() {
+      const teams = [];
+      const seen = new Set();
+
+      allData.master.forEach(row => {
+        const code = row.teamTriCode;
+        const name = row.teamCommonName;
+        if (!code || !name) return;
+        if (seen.has(code)) return;
+        seen.add(code);
+        teams.push({ code, name });
+      });
+
+      teams.sort((a, b) => a.name.localeCompare(b.name));
+
+      els.teamSelect.innerHTML = '<option value="">Select team</option>';
+      teams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team.code;
+        option.textContent = `${team.name} (${team.code})`;
+        els.teamSelect.appendChild(option);
+      });
+    }
+
+    // populateSeasonSelector(team) — seasons available for selected team
+    function populateSeasonSelector(team) {
+      const seasons = allData.master
+        .filter(row => row.teamTriCode === team)
+        .map(row => Number.parseInt(row.season_year, 10))
+        .filter(Number.isFinite)
+        .sort((a, b) => b - a);
+
+      const uniqueSeasons = [...new Set(seasons)];
+
+      els.seasonSelect.innerHTML = '<option value="">Select season</option>';
+      uniqueSeasons.forEach(season => {
+        const option = document.createElement('option');
+        option.value = String(season);
+        option.textContent = String(season);
+        els.seasonSelect.appendChild(option);
+      });
+    }
+
+    function renderSelectionPrompt() {
+      els.teamEyebrow.textContent = 'Team Detail';
+      els.teamTitle.textContent = 'Select a team and season';
+      els.teamDesc.textContent = 'Use the selectors below to load a team-season view.';
+      els.selectorHint.textContent = 'Choose a team and season, then select Load Team.';
+      els.covidBannerWrap.innerHTML = '';
+      els.summaryTiles.innerHTML = '';
+      els.misCard.innerHTML = '';
+      els.signingsCard.innerHTML = '';
+      els.performanceCard.innerHTML = '';
+      els.prevSeasonBtn.disabled = true;
+      els.nextSeasonBtn.disabled = true;
+    }
+
+    // renderPage(team, season) — orchestrate all render functions
+    function renderPage(team, season) {
+      const teamRows = allData.master.filter(
+        row => row.teamTriCode === team && Number.parseInt(row.season_year, 10) === season
+      );
+
+      const signings = allData.signings
+        .filter(row => row.signing_team === team && Number.parseInt(row.spotrac_year, 10) === season)
+        .sort((a, b) => toNum(b.aav) - toNum(a.aav));
+
+      const geoRows = allData.geography.filter(
+        row => row.signing_team === team && Number.parseInt(row.season_year, 10) === season
+      );
+
+      const misRows = allData.mis.filter(
+        row => row.signing_team === team && Number.parseInt(row.season_year, 10) === season
+      );
+
+      const teamRow = teamRows[0];
+      const geoRow = geoRows[0] || null;
+      const misRow = misRows[0] || null;
+
+      if (!teamRow) {
+        els.teamEyebrow.textContent = 'Team Detail';
+        els.teamTitle.textContent = 'No data for selected team-season';
+        els.teamDesc.textContent = 'Try a different team or season from the selectors.';
+        els.selectorHint.textContent = '';
+        els.covidBannerWrap.innerHTML = '';
+        els.summaryTiles.innerHTML = '';
+        els.misCard.innerHTML = '<h2 class="tmg-h2">Movement Impact Score breakdown by position tier</h2><p class="tmg-body">No team-season row found.</p>';
+        els.signingsCard.innerHTML = '<h2 class="tmg-h2">UFA signings</h2><p class="tmg-body">No signings available.</p>';
+        els.performanceCard.innerHTML = '<h2 class="tmg-h2">Season performance in league context</h2><p class="tmg-body">No context available.</p>';
+        els.prevSeasonBtn.disabled = true;
+        els.nextSeasonBtn.disabled = true;
+        return;
+      }
+
+      currentTeam = team;
+      currentSeason = season;
+      els.selectorHint.textContent = '';
+
+      renderHeader(teamRow);
+      showCovidBanner(teamRow.season_type, season);
+      renderTiles(teamRow);
+      renderMISTierBreakdown(teamRow, misRow, signings, geoRow);
+      renderSigningsTable(signings, season);
+
+      const allSeasonRows = allData.master.filter(
+        row => Number.parseInt(row.season_year, 10) === season
+      );
+      renderPerformanceContext(teamRow, allSeasonRows);
+      renderSeasonNav(team, season);
+    }
+
+    // renderHeader(teamRow)
+    function renderHeader(teamRow) {
+      const conference = teamRow.conferenceAbbrev || '--';
+      const division = teamRow.divisionAbbrev || '--';
+      const season = Number.parseInt(teamRow.season_year, 10);
+      const gp = toNum(teamRow.gamesPlayed);
+      const wins = toNum(teamRow.wins);
+      const losses = toNum(teamRow.losses);
+      const otLosses = toNum(teamRow.otLosses);
+      const points = toNum(teamRow.points);
+
+      els.teamEyebrow.textContent = `${conference} Conference · ${division} Division`;
+      els.teamTitle.textContent = `${teamRow.teamCommonName || teamRow.teamTriCode} — ${season} Season`;
+      els.teamDesc.textContent = `${gp} games · ${wins}W / ${losses}L / ${otLosses}OTL · ${points} points`;
+    }
+
+    // renderTiles(teamRow)
+    function renderTiles(teamRow) {
+      const pointsPct = toNum(teamRow.points_percentage);
+      const priorPct = toNum(teamRow.prior_season_points_pct);
+      const changePP = (pointsPct - priorPct) * 100;
+      const totalMis = toNum(teamRow.total_mis);
+      const totalAav = toNum(teamRow.total_aav_spent);
+      const signings = toNum(teamRow.signing_count);
+      const hasGoalie = String(teamRow.has_goalie_signing).toUpperCase() === 'TRUE';
+
+      const trendSymbol = changePP >= 0 ? '▲' : '▼';
+      const trendClass = changePP >= 0 ? 'tmg-trend-up' : 'tmg-trend-down';
+      const changeColor = changePP > 0
+        ? 'var(--tmg-success)'
+        : changePP < 0
+          ? 'var(--tmg-error)'
+          : 'var(--tmg-charcoal)';
+
+      els.summaryTiles.innerHTML = `
+        <article class="tmg-card">
+          <p class="tmg-card-label">POINTS PERCENTAGE</p>
+          <p class="tmg-card-value">${formatPctDecimal(pointsPct)}</p>
+          <p class="tmg-card-sub">Current season</p>
+          <p class="${trendClass}" style="margin:8px 0 0;">${trendSymbol} ${Math.abs(changePP).toFixed(1)} pp</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">PRIOR SEASON PTS%</p>
+          <p class="tmg-card-value">${formatPctDecimal(priorPct)}</p>
+          <p class="tmg-card-sub">Previous season baseline</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">SEASON CHANGE</p>
+          <p class="tmg-card-value" style="color:${changeColor}">${formatSignedPP(changePP, 1)}</p>
+          <p class="tmg-card-sub">vs prior season</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">MOVEMENT IMPACT SCORE</p>
+          <p class="tmg-card-value">${formatCurrencyMillions(totalMis, 2)}</p>
+          <p class="tmg-card-sub">Weighted offseason investment</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">TOTAL AAV SPENT</p>
+          <p class="tmg-card-value">${formatCurrencyMillions(totalAav, 2)}</p>
+          <p class="tmg-card-sub">Unweighted offseason spend</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">UFA SIGNINGS</p>
+          <p class="tmg-card-value">${signings}</p>
+          <p class="tmg-card-sub">Goalie signed: ${hasGoalie ? '✓' : '—'}</p>
+        </article>
+      `;
+    }
+
+    function buildTierStats(signings) {
+      const stats = {
+        goalie: { count: 0, weighted: 0 },
+        defence: { count: 0, weighted: 0 },
+        centre: { count: 0, weighted: 0 },
+        wingers: { count: 0, weighted: 0 },
+        other: { count: 0, weighted: 0 }
+      };
+
+      signings.forEach(row => {
+        const pos = (row.position || '').toUpperCase();
+        const aav = toNum(row.aav);
+
+        let key = 'other';
+        let weight = 0.05;
+
+        if (pos === 'G') {
+          key = 'goalie';
+          weight = 0.35;
+        } else if (pos === 'D') {
+          key = 'defence';
+          weight = 0.25;
+        } else if (pos === 'C') {
+          key = 'centre';
+          weight = 0.2;
+        } else if (pos === 'LW' || pos === 'RW') {
+          key = 'wingers';
+          weight = 0.15;
+        }
+
+        stats[key].count += 1;
+        stats[key].weighted += aav * weight;
+      });
+
+      return stats;
+    }
+
+    // renderMISTierBreakdown(teamRow, misRow)
+    function renderMISTierBreakdown(teamRow, misRow, signings, geoRow) {
+      const totalMis = toNum(teamRow.total_mis) || toNum(misRow?.total_mis);
+      const tierStats = buildTierStats(signings);
+
+      if (!Number.isFinite(totalMis) || totalMis <= 0) {
+        els.misCard.innerHTML = `
+          <h2 class="tmg-h2">Movement Impact Score breakdown by position tier</h2>
+          <p class="tmg-body">No UFA signings recorded for this team in this offseason.</p>
+          <p class="tier-note">
+            MIS weights: Goalie 0.35 · Defence 0.25 · Centre 0.20 · Wingers 0.15 · Other 0.05.
+            Weights are prior assumptions - empirical calibration is a Version 2 direction.
+          </p>
+        `;
+        return;
+      }
+
+      const segments = tierConfig.map(tier => {
+        const weighted = tierStats[tier.key].weighted;
+        const pct = totalMis > 0 ? (weighted / totalMis) * 100 : 0;
+        return {
+          ...tier,
+          weighted,
+          count: tierStats[tier.key].count,
+          pct: Math.max(0, pct)
+        };
+      });
+
+      const bar = segments.map(seg => {
+        const width = seg.pct;
+        return `<div class="mis-segment" style="width:${width}%; background:${seg.color};" title="${seg.label}: ${seg.pct.toFixed(1)}%"></div>`;
+      }).join('');
+
+      const tableRows = segments.map(seg => `
+        <tr>
+          <td>${seg.label}</td>
+          <td>${seg.count}</td>
+          <td>${formatCurrencyMillions(seg.weighted, 2)}</td>
+          <td>${seg.pct.toFixed(1)}%</td>
+        </tr>
+      `).join('');
+
+      const geoFootnote = geoRow
+        ? `<p class="tmg-body-sm tmg-text-muted" style="margin:10px 0 0;">Geography reference: ${toNum(geoRow.total_signing_count)} total signings, ${(toNum(geoRow.pct_cross_conference) * 100).toFixed(1)}% cross conference.</p>`
+        : '';
+
+      els.misCard.innerHTML = `
+        <h2 class="tmg-h2">Movement Impact Score breakdown by position tier</h2>
+        <div class="mis-stack" aria-label="MIS tier contribution bar">${bar}</div>
+        <div class="table-wrap">
+          <table class="tmg-table" aria-label="MIS tier breakdown table">
+            <thead>
+              <tr>
+                <th>Tier</th>
+                <th>Signings</th>
+                <th>Total weighted AAV</th>
+                <th>% of total MIS</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>
+        ${geoFootnote}
+        <p class="tier-note">
+          MIS weights: Goalie 0.35 · Defence 0.25 · Centre 0.20 · Wingers 0.15 · Other 0.05.
+          Weights are prior assumptions - empirical calibration is a Version 2 direction.
+        </p>
+      `;
+    }
+
+    function geographyBadge(value) {
+      switch ((value || '').trim()) {
+        case 'within_division':
+          return '<span class="geo-badge geo-within">Within division</span>';
+        case 'cross_division_same_conference':
+          return '<span class="geo-badge geo-cross-div">Cross division</span>';
+        case 'cross_conference':
+          return '<span class="geo-badge geo-cross-conf">Cross conference</span>';
+        case 'same_team':
+          return '<span class="geo-badge geo-same-team">Re-signed</span>';
+        default:
+          return '<span class="geo-badge geo-same-team">Unknown</span>';
+      }
+    }
+
+    // renderSigningsTable(signings)
+    function renderSigningsTable(signings, season) {
+      const header = `
+        <h2 class="tmg-h2">UFA signings - ${season} offseason</h2>
+        <p class="tmg-body-sm tmg-text-muted" style="margin:0 0 12px;">
+          Re-signings excluded. UFA only. Minor league contracts excluded.
+        </p>
+      `;
+
+      if (!signings.length) {
+        els.signingsCard.innerHTML = `${header}<p class="tmg-body">This team made no UFA signings in the selected offseason.</p>`;
+        return;
+      }
+
+      const rows = signings.map(row => {
+        const capFlag = row.data_quality_note && row.data_quality_note !== 'NA' ? '⚠' : '';
+        const prevTeam = row.previous_team || 'UNKNOWN';
+
+        return `
+          <tr>
+            <td>${row.player_name || '--'}</td>
+            <td>${(row.position || '--').toUpperCase()}</td>
+            <td>${prevTeam}</td>
+            <td>${geographyBadge(row.movement_geography)}</td>
+            <td>${formatCurrencyMillions(toNum(row.aav), 2)}</td>
+            <td>${toNum(row.contract_years)}</td>
+            <td>${capFlag}</td>
+          </tr>
+        `;
+      }).join('');
+
+      els.signingsCard.innerHTML = `
+        ${header}
+        <div class="table-wrap">
+          <table class="tmg-table" aria-label="Individual UFA signings table">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Pos</th>
+                <th>Previous team</th>
+                <th>Geography</th>
+                <th>AAV</th>
+                <th>Years</th>
+                <th>Cap flag</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function getRank(rows, teamCode) {
+      const ranked = rows
+        .slice()
+        .sort((a, b) => toNum(b.points_percentage) - toNum(a.points_percentage));
+      const idx = ranked.findIndex(row => row.teamTriCode === teamCode);
+      return idx === -1 ? null : idx + 1;
+    }
+
+    // renderPerformanceContext(teamRow, allSeasonRows)
+    function renderPerformanceContext(teamRow, allSeasonRows) {
+      const teamCode = teamRow.teamTriCode;
+      const season = Number.parseInt(teamRow.season_year, 10);
+      const pointsPct = toNum(teamRow.points_percentage);
+
+      const leagueRank = getRank(allSeasonRows, teamCode);
+
+      const conferenceRows = allSeasonRows.filter(
+        row => row.conferenceAbbrev === teamRow.conferenceAbbrev
+      );
+      const confRank = getRank(conferenceRows, teamCode);
+
+      const priorSeason = season - 1;
+      const priorRows = allData.master.filter(
+        row => Number.parseInt(row.season_year, 10) === priorSeason
+      );
+      const priorRank = getRank(priorRows, teamCode);
+
+      const priorPct = toNum(teamRow.prior_season_points_pct);
+      let expected = 'Neutral';
+      let expectedColor = 'var(--tmg-text-muted)';
+      if (priorPct > 0.600) {
+        expected = 'Decline';
+        expectedColor = 'var(--tmg-error)';
+      } else if (priorPct < 0.470) {
+        expected = 'Improvement';
+        expectedColor = 'var(--tmg-success)';
+      }
+
+      els.performanceCard.innerHTML = `
+        <h2 class="tmg-h2">Season performance in league context</h2>
+        <p class="context-row">Finished ${ordinal(leagueRank)} in the league with a points percentage of ${formatPctDecimal(pointsPct)}</p>
+        <p class="context-row">${ordinal(confRank)} in the ${conferenceLabel(teamRow.conferenceAbbrev)} Conference</p>
+        <p class="context-row">
+          Prior season rank: ${ordinal(priorRank)} · Expected direction:
+          <span class="context-expected" style="color:${expectedColor};">${expected}</span>
+        </p>
+        <p class="tmg-body-sm tmg-text-muted" style="margin:10px 0 0;">
+          Expected direction is based on the mean reversion pattern observed across 252 team-seasons.
+          It is not a prediction - it reflects the average historical tendency for teams at this performance level.
+        </p>
+      `;
+    }
+
+    // renderSeasonNav(team, season)
+    function renderSeasonNav(team, season) {
+      const seasons = allData.master
+        .filter(row => row.teamTriCode === team)
+        .map(row => Number.parseInt(row.season_year, 10))
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b);
+
+      const uniqueSeasons = [...new Set(seasons)];
+      const idx = uniqueSeasons.indexOf(season);
+      const prevSeason = idx > 0 ? uniqueSeasons[idx - 1] : null;
+      const nextSeason = idx >= 0 && idx < uniqueSeasons.length - 1 ? uniqueSeasons[idx + 1] : null;
+
+      els.prevSeasonBtn.disabled = !prevSeason;
+      els.nextSeasonBtn.disabled = !nextSeason;
+
+      els.prevSeasonBtn.onclick = () => {
+        if (!prevSeason) return;
+        els.seasonSelect.value = String(prevSeason);
+        updateURL(team, prevSeason);
+        renderPage(team, prevSeason);
+      };
+
+      els.nextSeasonBtn.onclick = () => {
+        if (!nextSeason) return;
+        els.seasonSelect.value = String(nextSeason);
+        updateURL(team, nextSeason);
+        renderPage(team, nextSeason);
+      };
+    }
+
+    // showCovidBanner(seasonType)
+    function showCovidBanner(seasonType, season) {
+      if (seasonType !== 'covid_shortened' && seasonType !== 'covid_bubble') {
+        els.covidBannerWrap.innerHTML = '';
+        return;
+      }
+
+      let message = '';
+      if (season === 2020) {
+        message = 'The 2020 season was suspended in March and completed in a bubble format with a shortened playoff. Regular season data is based on 71 or fewer games for most teams.';
+      } else if (season === 2021) {
+        message = 'The 2021 season used temporary geographic divisions due to COVID travel restrictions. Conference assignments use a proxy mapping - Eastern for EST/CEN divisions, Western for NTH/WST divisions.';
+      }
+
+      if (!message) {
+        els.covidBannerWrap.innerHTML = '';
+        return;
+      }
+
+      els.covidBannerWrap.innerHTML = `
+        <div style="background:rgba(196,127,0,0.10); border:1px solid rgba(196,127,0,0.30);
+                    border-radius:8px; padding:12px 16px; margin-bottom:var(--tmg-gap);
+                    font-size:13px; color:var(--tmg-charcoal)">
+          ⚠ <strong>COVID-affected season.</strong> ${message}
+        </div>
+      `;
+    }
+
+    function applySelectionFromURL() {
+      const params = getURLParams();
+      const teamExists = params.team && allData.master.some(row => row.teamTriCode === params.team);
+
+      if (teamExists) {
+        els.teamSelect.value = params.team;
+        populateSeasonSelector(params.team);
+
+        const seasonExists = params.season && allData.master.some(
+          row => row.teamTriCode === params.team && Number.parseInt(row.season_year, 10) === params.season
+        );
+
+        if (seasonExists) {
+          els.seasonSelect.value = String(params.season);
+          renderPage(params.team, params.season);
+          return;
+        }
+      }
+
+      if (els.teamSelect.value) {
+        populateSeasonSelector(els.teamSelect.value);
+      }
+
+      renderSelectionPrompt();
+    }
+
+    // init() — on DOMContentLoaded
+    async function init() {
+      try {
+        await loadAllData();
+      } catch (error) {
+        els.teamTitle.textContent = 'Unable to load team detail data';
+        els.teamDesc.textContent = error.message;
+        els.selectorHint.textContent = 'Check CSV file availability and try again.';
+        return;
+      }
+
+      populateTeamSelector();
+
+      const firstTeam = els.teamSelect.options[1]?.value || '';
+      if (firstTeam) {
+        els.teamSelect.value = firstTeam;
+        populateSeasonSelector(firstTeam);
+        els.teamSelect.value = '';
+        els.seasonSelect.innerHTML = '<option value="">Select season</option>';
+      }
+
+      applySelectionFromURL();
+
+      els.teamSelect.addEventListener('change', () => {
+        const team = els.teamSelect.value;
+        if (!team) {
+          els.seasonSelect.innerHTML = '<option value="">Select season</option>';
+          renderSelectionPrompt();
+          return;
+        }
+
+        populateSeasonSelector(team);
+      });
+
+      els.loadTeamBtn.addEventListener('click', () => {
+        const team = els.teamSelect.value;
+        const season = Number.parseInt(els.seasonSelect.value || '', 10);
+
+        if (!team || !Number.isFinite(season)) {
+          renderSelectionPrompt();
+          return;
+        }
+
+        updateURL(team, season);
+        renderPage(team, season);
+      });
+
+      window.addEventListener('popstate', () => {
+        applySelectionFromURL();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
