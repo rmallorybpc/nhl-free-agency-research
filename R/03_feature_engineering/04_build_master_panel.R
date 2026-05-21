@@ -107,7 +107,20 @@ master_panel <- performance %>%
 		prior_season_points_pct = coalesce(prior_season_points_pct, league_prior_season_points_pct)
 	) %>%
 	filter(season_year >= 2018L, season_year <= 2025L) %>%
+	group_by(season_year) %>%
+	mutate(
+		season_mis_min = min(total_mis, na.rm = TRUE),
+		season_mis_max = max(total_mis, na.rm = TRUE),
+		mis_index = case_when(
+			is.na(total_mis) ~ NA_real_,
+			season_mis_max > season_mis_min ~ ((total_mis - season_mis_min) / (season_mis_max - season_mis_min)) * 100,
+			TRUE ~ 0
+		),
+		mis_index = round(mis_index, 1)
+	) %>%
+	ungroup() %>%
 	select(-prior_points_team_code, -league_prior_season_points_pct) %>%
+	select(-season_mis_min, -season_mis_max) %>%
 	arrange(season_year, teamTriCode)
 
 key_analysis_columns <- c(
