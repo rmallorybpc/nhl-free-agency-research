@@ -72,8 +72,8 @@
         <h1 class="tmg-page-title">Two questions. Nine seasons. Here is what the data shows.</h1>
         <p class="tmg-page-desc">
           1,648 UFA movement events across 252 NHL team-seasons, 2018–2025.
-          Two research questions examined through regression analysis with
-          COVID-season sensitivity checks.
+          Three research questions examined through regression analysis and
+          descriptive comparison, with COVID-season sensitivity checks.
         </p>
       </div>
 
@@ -168,6 +168,48 @@
           in the analysis window.
         </p>
       </section>
+
+      <div class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Does where a player comes from change the result?</h2>
+        <p class="tmg-body">
+          The question comes from the same behavioral economics framing as the
+          mean reversion finding. Hengchen Dai's research suggested that the more
+          a player's environment changes, the larger the reset effect should be.
+          Applied to NHL free agency: does signing a player from across the
+          conference produce a different outcome than signing a player from your
+          own division?
+        </p>
+
+        <p id="finding3Plain" class="tmg-body"
+          style="border-left:3px solid var(--tmg-sage); padding-left:16px; margin:20px 0">
+          Loading finding...
+        </p>
+
+        <h3 class="tmg-h3" style="margin-top:24px">Performance change by player origin</h3>
+        <p class="tmg-body-sm tmg-text-muted">
+          Mean season-over-season points percentage change attributed to each
+          signing, grouped by where the player came from.
+        </p>
+
+        <table class="tmg-table" id="geographyOverallTable">
+          <thead>
+            <tr>
+              <th scope="col">Player came from</th>
+              <th scope="col">Avg points % change</th>
+              <th scope="col">Standard deviation</th>
+              <th scope="col">Signings analyzed</th>
+              <th scope="col">Seasons ranked highest</th>
+            </tr>
+          </thead>
+          <tbody id="geographyOverallBody">
+            <tr><td colspan="5">Loading geography data...</td></tr>
+          </tbody>
+        </table>
+
+        <p class="tmg-body-sm tmg-text-muted" style="margin-top:16px">
+          Signings where the previous team is unknown are excluded from this comparison.
+        </p>
+      </div>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">Does offseason UFA spending predict team improvement?</h2>
@@ -387,8 +429,12 @@
       const fallbackHtml = '<em>Finding language temporarily unavailable — review the data tables below for the underlying numbers.</em>';
       const f1 = document.getElementById('finding1Plain');
       const f2 = document.getElementById('finding2Plain');
+      const f3 = document.getElementById('finding3Plain');
+      const geographyBody = document.getElementById('geographyOverallBody');
       if (f1) f1.innerHTML = fallbackHtml;
       if (f2) f2.innerHTML = fallbackHtml;
+      if (f3) f3.innerHTML = fallbackHtml;
+      if (geographyBody) geographyBody.innerHTML = '<tr><td colspan="5"><em>Geography table temporarily unavailable.</em></td></tr>';
     }
 
     function renderModelComparison(modelComparisonRows) {
@@ -513,6 +559,128 @@
       if (container) container.innerHTML = sentence;
     }
 
+    function renderFinding3Plain(overallSummary, seasonsRanked, regressionCoefs) {
+      const within = overallSummary.find(r => r.movement_geography === 'within_division');
+      const crossD = overallSummary.find(r => r.movement_geography === 'cross_division_same_conference');
+      const crossC = overallSummary.find(r => r.movement_geography === 'cross_conference');
+
+      if (!within || !crossD || !crossC) {
+        setFindingsFallback();
+        return;
+      }
+
+      const withinMean = toNumber(within.mean_change);
+      const crossDMean = toNumber(crossD.mean_change);
+      const crossCMean = toNumber(crossC.mean_change);
+      const withinSD = toNumber(within.sd_change);
+      const crossDSD = toNumber(crossD.sd_change);
+      const crossCSD = toNumber(crossC.sd_change);
+
+      if (!Number.isFinite(withinMean) || !Number.isFinite(crossDMean) || !Number.isFinite(crossCMean)
+          || !Number.isFinite(withinSD) || !Number.isFinite(crossDSD) || !Number.isFinite(crossCSD)) {
+        setFindingsFallback();
+        return;
+      }
+
+      const means = [withinMean, crossDMean, crossCMean];
+      const spread = Math.max(...means) - Math.min(...means);
+      const maxSD = Math.max(withinSD, crossDSD, crossCSD);
+
+      const crossCRow = seasonsRanked.find(r => r.category === 'cross_conference');
+      const crossCSeasons = crossCRow ? Number(crossCRow.seasons_ranked_first) : 0;
+      const totalSeasons = crossCRow ? Number(crossCRow.total_seasons) : 8;
+
+      // Supplementary regression p-value is read for completeness/reporting parity.
+      const regPval = toNumber((regressionCoefs || []).find(r => r.term === 'pct_cross_conference')?.p_value);
+      const regText = Number.isFinite(regPval)
+        ? ` Supplementary regression p-value for cross-conference share: ${regPval.toFixed(3)}.`
+        : '';
+
+      let sentence;
+
+      if (spread < 0.010) {
+        sentence = `
+          <strong>No — not in this data.</strong>
+          Whether a team signs a player from within their own division, from
+          across the division line in the same conference, or from the other
+          conference entirely, the average performance outcome is nearly
+          identical. The three groups differ by less than
+          ${(spread * 100).toFixed(1)} percentage points, against a within-group
+          standard deviation of ${(maxSD * 100).toFixed(1)} percentage points.
+          Cross-conference signings ranked highest in ${crossCSeasons} of
+          ${totalSeasons} seasons. Where a player came from does not reliably
+          predict how much a team improves.${regText}
+        `;
+      } else if (spread < 0.025) {
+        sentence = `
+          <strong>Suggestive — but small.</strong>
+          There is a measurable difference in average outcomes across geography
+          categories, but the spread is modest at
+          ${(spread * 100).toFixed(1)} percentage points. The within-group
+          variation of ${(maxSD * 100).toFixed(1)} percentage points means
+          individual signings vary far more than the group averages. Cross-conference
+          signings ranked highest in ${crossCSeasons} of ${totalSeasons} seasons.${regText}
+        `;
+      } else {
+        const highest = means.indexOf(Math.max(...means));
+        const categoryNames = ['within-division', 'cross-division', 'cross-conference'];
+        sentence = `
+          <strong>Yes — meaningfully.</strong>
+          Signings from ${categoryNames[highest]} produce the highest average
+          performance gains, leading the lowest category by
+          ${(spread * 100).toFixed(1)} percentage points. Cross-conference
+          signings ranked highest in ${crossCSeasons} of ${totalSeasons} seasons.${regText}
+        `;
+      }
+
+      const container = document.getElementById('finding3Plain');
+      if (container) container.innerHTML = sentence;
+    }
+
+    function renderGeographyTable(overallSummary, seasonsRanked) {
+      const displayName = {
+        within_division: 'Same division',
+        cross_division_same_conference: 'Different division, same conference',
+        cross_conference: 'Other conference'
+      };
+
+      const seasonsMap = {};
+      seasonsRanked.forEach(r => {
+        seasonsMap[r.category] = Number(r.seasons_ranked_first) || 0;
+      });
+      const totalSeasons = Number(seasonsRanked[0]?.total_seasons) || 8;
+
+      const sorted = [...overallSummary].sort(
+        (a, b) => toNumber(b.mean_change) - toNumber(a.mean_change)
+      );
+
+      const rows = sorted.map(r => {
+        const change = toNumber(r.mean_change);
+        const sd = toNumber(r.sd_change);
+        const count = Number(r.signing_count) || 0;
+        const seasonsTop = seasonsMap[r.movement_geography] || 0;
+
+        const changeFormatted = `${change >= 0 ? '+' : ''}${(change * 100).toFixed(2)} pp`;
+        const sdFormatted = `${(sd * 100).toFixed(2)} pp`;
+        const changeColor = change > 0.005 ? 'var(--tmg-success)'
+          : change < -0.005 ? 'var(--tmg-error)'
+          : 'var(--tmg-text-muted)';
+
+        return `
+          <tr>
+            <td>${displayName[r.movement_geography] || r.movement_geography}</td>
+            <td style="color:${changeColor}; font-weight:500">${changeFormatted}</td>
+            <td>${sdFormatted}</td>
+            <td>${count}</td>
+            <td>${seasonsTop} of ${totalSeasons}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const tbody = document.getElementById('geographyOverallBody');
+      if (tbody) tbody.innerHTML = rows;
+    }
+
     function fetchCsvSafe(urlCandidates, label) {
       const urls = Array.isArray(urlCandidates) ? urlCandidates : [urlCandidates];
 
@@ -553,8 +721,20 @@
       fetchCsvSafe(coefficientUrlCandidates('model_a_full_coefficients.csv'), 'model_a_full_coefficients.csv'),
       fetchCsvSafe(coefficientUrlCandidates('model_b_full_coefficients.csv'), 'model_b_full_coefficients.csv'),
       fetchCsvSafe(coefficientUrlCandidates('model_a_restricted_coefficients.csv'), 'model_a_restricted_coefficients.csv'),
-      fetchCsvSafe(coefficientUrlCandidates('model_b_restricted_coefficients.csv'), 'model_b_restricted_coefficients.csv')
-    ]).then(([comparisonCsv, modelAFullCsv, modelBFullCsv, modelARestrictedCsv, modelBRestrictedCsv]) => {
+      fetchCsvSafe(coefficientUrlCandidates('model_b_restricted_coefficients.csv'), 'model_b_restricted_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('geography_overall_summary.csv'), 'geography_overall_summary.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('geography_seasons_ranked_first.csv'), 'geography_seasons_ranked_first.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('geography_regression.csv'), 'geography_regression.csv')
+    ]).then(([
+      comparisonCsv,
+      modelAFullCsv,
+      modelBFullCsv,
+      modelARestrictedCsv,
+      modelBRestrictedCsv,
+      geoOverallCsv,
+      geoSeasonsCsv,
+      geoRegCsv
+    ]) => {
       const modelComparisonRows = comparisonCsv ? parseCsv(comparisonCsv) : [];
       renderModelComparison(modelComparisonRows);
 
@@ -576,6 +756,16 @@
         modelBRestrictedRows,
         modelComparisonRows
       );
+
+      if (geoOverallCsv && geoSeasonsCsv && geoRegCsv) {
+        const overallParsed = parseCsv(geoOverallCsv);
+        const seasonsParsed = parseCsv(geoSeasonsCsv);
+        const regressionParsed = parseCsv(geoRegCsv);
+        renderFinding3Plain(overallParsed, seasonsParsed, regressionParsed);
+        renderGeographyTable(overallParsed, seasonsParsed);
+      } else {
+        setFindingsFallback();
+      }
     });
   </script>
 </body>
