@@ -414,7 +414,30 @@
         }))
       );
 
-      masterData = parseCSV(masterText);
+      masterData = parseCSV(masterText).map(row => {
+        const pointsPercentage = toNumber(row.points_percentage);
+        const priorSeasonPointsPct = toNumber(row.prior_season_points_pct);
+
+        return {
+          ...row,
+          points_percentage: pointsPercentage,
+          prior_season_points_pct: priorSeasonPointsPct,
+          points_pct_change: pointsPercentage - priorSeasonPointsPct
+        };
+      });
+
+      if (masterData.length > 0) {
+        console.log('[Overview] Parsed first team row:', {
+          teamTriCode: masterData[0].teamTriCode,
+          season_year: masterData[0].season_year,
+          points_percentage: masterData[0].points_percentage,
+          prior_season_points_pct: masterData[0].prior_season_points_pct,
+          points_pct_change: masterData[0].points_pct_change,
+          points_percentage_type: typeof masterData[0].points_percentage,
+          prior_season_points_pct_type: typeof masterData[0].prior_season_points_pct
+        });
+      }
+
       misData = parseCSV(misText);
       modelData = parseCSV(modelText);
       geoData = parseCSV(geoText);
@@ -505,7 +528,7 @@
 
     function formatChangePP(value, options) {
       const n = toNumber(value);
-      const abs = Math.abs(n).toFixed(options.decimals || 1);
+      const abs = Math.abs(n * 100).toFixed(options.decimals || 1);
       if (n > options.neutralThreshold) {
         return options.withArrows ? '▲ +' + abs + ' pp' : '+' + abs + ' pp';
       }
@@ -641,20 +664,18 @@
       const tbody = sortedRows.map((row, idx) => {
         const change = toNumber(row.points_pct_change);
         let changeColor = 'var(--tmg-text-muted, rgba(45,52,54,0.55))';
-        let changePrefix = '→';
 
         if (change > 0.01) {
           changeColor = 'var(--tmg-success)';
-          changePrefix = '▲';
         } else if (change < -0.01) {
           changeColor = 'var(--tmg-error)';
-          changePrefix = '▼';
         }
 
-        const changeMagnitude = Math.abs(change).toFixed(1);
-        const changeText = change > 0.01
-          ? changePrefix + ' +' + changeMagnitude + ' pp'
-          : (change < -0.01 ? changePrefix + ' -' + changeMagnitude + ' pp' : changePrefix + ' ' + changeMagnitude + ' pp');
+        const changeText = formatChangePP(change, {
+          decimals: 1,
+          neutralThreshold: 0.01,
+          withArrows: true
+        });
 
         return [
           '<tr class="row-clickable" data-team="' + row.teamTriCode + '" data-season="' + row.season_year + '">',
@@ -736,7 +757,7 @@
         '  <div class="dist-segment flat" style="width:' + flatPct.toFixed(4) + '%; background: rgba(45,52,54,0.24);">' + (flatPct >= 12 ? flat : '') + '</div>',
         '  <div class="dist-segment" style="width:' + declinedPct.toFixed(4) + '%; background: var(--tmg-error);">' + (declinedPct >= 12 ? declined : '') + '</div>',
         '</div>',
-        '<p class="tmg-body-sm tmg-text-muted" style="margin: 0;">Mean change: ' + mean.toFixed(3) + ' pp  |  Std dev: ' + stdDev.toFixed(3) + ' pp</p>'
+        '<p class="tmg-body-sm tmg-text-muted" style="margin: 0;">Mean change: ' + (mean * 100).toFixed(3) + ' pp  |  Std dev: ' + (stdDev * 100).toFixed(3) + ' pp</p>'
       ].join('');
     }
 
