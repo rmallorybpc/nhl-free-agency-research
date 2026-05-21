@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NHL Free Agency Research — The Mallory Group</title>
+  <meta name="description" content="Nine seasons of NHL UFA data examined through behavioral economics. Does offseason spending predict team improvement? The data says mean reversion dominates.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://rmallorybpc.github.io/tmg-brand-guide/dist/tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px; border-radius: var(--tmg-nav-radius);
+      font-size: 13px; font-weight: 500; color: var(--tmg-charcoal);
+      text-decoration: none; transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] {
+      background: rgba(132,169,140,0.15); color: var(--tmg-sage-hover);
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html" aria-current="page">Welcome</a>
+      <a href="./findings.html">Key Findings</a>
+      <a href="./index.html">Overview</a>
+      <a href="./team.html">Team Detail</a>
+      <a href="./explorer.html">All Signings</a>
+    </div>
+    <div class="tmg-dropdown-wrap">
+      <button class="tmg-dropdown-btn" id="tmgDdBtn"
+              aria-haspopup="true" aria-expanded="false" aria-controls="tmgDdMenu">
+        TMG Tool Suite
+        <svg class="tmg-chevron" viewBox="0 0 12 12" fill="none"
+             width="12" height="12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tmg-dropdown-menu" id="tmgDdMenu" role="menu">
+        <a href="https://rmallorybpc.github.io/pdf-multi-agent-analysis/"
+           target="_blank" rel="noreferrer" role="menuitem">PDF Multi-Agent Analysis</a>
+        <a href="https://rmallorybpc.github.io/housing-market-intel/"
+           target="_blank" rel="noreferrer" role="menuitem">Housing Market Intel</a>
+        <a href="https://rmallorybpc.github.io/real-estate-report/"
+           target="_blank" rel="noreferrer" role="menuitem">Real Estate Report</a>
+        <a href="https://rmallorybpc.github.io/nflanalysis/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NFL Analysis</a>
+        <a href="https://rmallorybpc.github.io/nhl-free-agency-research/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NHL Analysis</a>
+        <a href="https://rmallorybpc.github.io/recipes/"
+           target="_blank" rel="noreferrer" role="menuitem">Recipe Book</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow">NHL Free Agency Research</p>
+        <h1 class="tmg-page-title">Does offseason spending predict team improvement?</h1>
+        <p class="tmg-page-desc">
+          Nine seasons of NHL UFA data — 1,648 player moves from 2017 through 2025 —
+          examined through the lens of behavioral economics and team performance change.
+        </p>
+      </div>
+      <div style="margin-bottom: var(--tmg-gap);">
+        <a href="./index.html" class="tmg-btn">Explore the data →</a>
+        <a href="./findings.html" class="tmg-btn-ghost" style="margin-left: 8px;">Read the findings</a>
+      </div>
+
+      <div class="tmg-bento-grid" style="margin-bottom: var(--tmg-gap);">
+        <article class="tmg-card">
+          <p class="tmg-card-label">SEASONS COVERED</p>
+          <p class="tmg-card-value">2017 – 2025</p>
+          <p class="tmg-card-sub">NHL regular season and playoffs</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">UFA MOVEMENT EVENTS</p>
+          <p class="tmg-card-value">1,648</p>
+          <p class="tmg-card-sub">Genuine player movement, re-signings excluded</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">TEAM-SEASONS ANALYZED</p>
+          <p class="tmg-card-value">252</p>
+          <p class="tmg-card-sub">2018 – 2025 outcome window</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">MEAN REVERSION SLOPE</p>
+          <p class="tmg-card-value">−0.42</p>
+          <p class="tmg-card-sub">Prior season points % coefficient (p &lt; 0.001)</p>
+        </article>
+      </div>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">What this research shows</h2>
+        <p class="tmg-body">
+          The strongest predictor of whether an NHL team improves or declines next season is how well they performed this season. Teams that finished near the top tend to fall back. Teams that finished near the bottom tend to improve. This mean reversion effect has a slope of −0.42 and is significant at p &lt; 0.001 across all model specifications.
+        </p>
+        <p class="tmg-body">
+          Offseason UFA spending — measured in total dollars or through a position-weighted Movement Impact Score — does not significantly predict season-over-season performance change after controlling for prior season performance. This holds in both the full 2018–2025 sample and when the COVID-affected 2020 and 2021 seasons are excluded.
+        </p>
+        <p class="tmg-body">
+          This study covers unrestricted free agent signings only. Restricted free agents, trade deadline acquisitions, AHL call-ups, and entry-level signings are out of scope for Version 1 and are documented in the methodology. The 2026 season will be added after the offseason window closes in July 2026.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">The research behind it</h2>
+        <p class="tmg-body">
+          This project is grounded in behavioral economics research on how disruption and roster change affect performance. The primary inspiration is Hengchen Dai's research on the reset effect in Major League Baseball, featured in the Freakonomics Radio episode
+          <a href="https://freakonomics.com/podcast/are-you-ready-for-a-fresh-start-update/"
+             target="_blank" rel="noreferrer">Are You Ready for a Fresh Start?</a>
+        </p>
+        <p class="tmg-body">
+          Dai found that when a struggling player is traded — triggering a statistical reset — their performance improves significantly. This project applies that framing to the team level: does offseason roster movement produce a measurable reset effect in NHL team performance?
+        </p>
+        <p class="tmg-body">
+          The answer from nine seasons of data: mean reversion dominates. Where a team starts predicts where they end up far more reliably than what they spent in the offseason.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">How to use this site</h2>
+        <h3 class="tmg-h3">📊 Key Findings</h3>
+        <p class="tmg-body">
+          Two research questions answered with data tables and plain-language interpretations. Start here for the headline results.
+        </p>
+        <h3 class="tmg-h3">🏒 Overview</h3>
+        <p class="tmg-body">
+          All 32 teams ranked by Movement Impact Score for each season. See which teams invested most heavily and how that correlated with performance change.
+        </p>
+        <h3 class="tmg-h3">🏟 Team Detail</h3>
+        <p class="tmg-body">
+          Jump to any team and season to see their specific UFA signings, MIS breakdown by position tier, and season-over-season performance delta.
+        </p>
+        <h3 class="tmg-h3">🔍 All Signings</h3>
+        <p class="tmg-body">
+          Browse and filter all 1,648 UFA movement events by year, position, team, geography, and contract value.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="tmg-footer">
+    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
+    movement events, Spotrac contract data, and NHL API game results via
+    nhlscraper. &nbsp;·&nbsp;
+    <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+       target="_blank" rel="noreferrer">View the source on GitHub →</a>
+  </footer>
+
+  <script>
+    const btn  = document.getElementById('tmgDdBtn');
+    const menu = document.getElementById('tmgDdMenu');
+    btn.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+</body>
+</html>
