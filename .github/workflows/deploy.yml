@@ -37,7 +37,16 @@ jobs:
           mkdir -p _site/output/tables
 
           cp data/processed/nhl_master_analysis_panel.csv _site/data/processed/
-          cp data/processed/nhl_signed_free_agents_clean.csv _site/data/processed/
+
+          # Signings file may be generated locally and not committed; keep deploy running
+          # with a valid empty CSV so Team Detail still loads without hard failure.
+          if [ -f data/processed/nhl_signed_free_agents_clean.csv ]; then
+            cp data/processed/nhl_signed_free_agents_clean.csv _site/data/processed/
+          else
+            echo "Warning: data/processed/nhl_signed_free_agents_clean.csv not found in repository."
+            echo "player_name,position,signing_team,previous_team,contract_value,aav,contract_years,ufa_rfa_type,spotrac_year,position_filter,transaction_type,same_team_resign,division_change,conference_change,aav_imputed,data_quality_note,movement_geography" > _site/data/processed/nhl_signed_free_agents_clean.csv
+          fi
+
           cp data/processed/nhl_team_mis_scores.csv _site/data/processed/
           cp data/processed/nhl_team_geography_variables.csv _site/data/processed/
           cp output/tables/model_comparison_summary.csv _site/output/tables/
