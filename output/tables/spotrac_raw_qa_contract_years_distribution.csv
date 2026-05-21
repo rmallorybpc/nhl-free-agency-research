@@ -1,0 +1,10 @@
+contract_years,rows,contract_years_na_count,non_positive_count,has_non_positive
+0,12,0,12,TRUE
+1,1566,0,12,TRUE
+2,587,0,12,TRUE
+3,145,0,12,TRUE
+4,84,0,12,TRUE
+5,38,0,12,TRUE
+6,27,0,12,TRUE
+7,29,0,12,TRUE
+8,5,0,12,TRUE

@@ -1,0 +1,4 @@
+category,rows,expected_rows
+UFA,1878,1878
+RFA,615,615
+OTHER_OR_MISSING,0,0

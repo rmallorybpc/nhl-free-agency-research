@@ -2,7 +2,10 @@ field,missing_rows,missing_pct
 player_name,0,0
 position,0,0
 signing_team,0,0
+previous_team,0,0
 contract_value,0,0
+aav,12,0.48
 contract_years,0,0
+ufa_rfa_type,0,0
 spotrac_year,0,0
 position_filter,0,0
