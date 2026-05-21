@@ -17,6 +17,12 @@ output_path <- here::here("data", "processed", "nhl_signed_free_agents_clean.csv
 raw_df <- readr::read_csv(input_path, show_col_types = FALSE)
 input_rows <- nrow(raw_df)
 
+# Out-of-scope exclusion: remove minor-league contract rows identified by
+# player_name containing the word "Minor".
+minor_excluded_rows <- raw_df |>
+	filter(stringr::str_detect(player_name, regex("\\bMinor\\b", ignore_case = TRUE))) |>
+	nrow()
+
 normalize_ufa_rfa <- function(x) {
 	x_chr <- x |>
 		as.character() |>
@@ -49,6 +55,8 @@ clean_df <- raw_df |>
 	# market choice and make them analytically different from UFAs. RFA rows remain
 	# in the raw extract for transparency; this is documented in README and scope docs.
 	filter(ufa_rfa_type == "UFA") |>
+	# Remove minor-league contracts from study scope.
+	filter(!stringr::str_detect(player_name, regex("\\bMinor\\b", ignore_case = TRUE))) |>
 	# Reserved for future integration with trade transactions (transaction_type = "trade").
 	mutate(
 		transaction_type = "UFA_signing",
@@ -86,10 +94,25 @@ clean_df <- raw_df |>
 		same_team_resign = signing_team == previous_team,
 		# Placeholder fields are populated in R/03_feature_engineering/03_build_geography.R.
 		division_change = NA,
-		conference_change = NA
-	)
+		conference_change = NA,
+		aav_imputed = FALSE
+	) |>
+	mutate(
+		impute_aav_condition = (is.na(aav) | aav == 0) & contract_value > 0 & contract_years > 0,
+		aav = if_else(impute_aav_condition, contract_value / contract_years, aav),
+		aav_imputed = if_else(impute_aav_condition, TRUE, aav_imputed)
+	) |>
+	select(-impute_aav_condition)
 
-rows_after_ufa <- nrow(clean_df)
+imputed_aav_count <- sum(clean_df$aav_imputed, na.rm = TRUE)
+rows_after_scope_filters <- nrow(clean_df)
+
+rows_after_ufa <- raw_df |>
+	mutate(ufa_rfa_type = normalize_ufa_rfa(ufa_rfa_type)) |>
+	filter(ufa_rfa_type == "UFA") |>
+	nrow()
+
+rows_removed_minor_after_ufa <- rows_after_ufa - rows_after_scope_filters
 
 year_counts <- tibble(spotrac_year = expected_years) |>
 	left_join(
@@ -136,7 +159,10 @@ if (!is.finite(aav_max)) {
 }
 
 cat("\n=== Spotrac Clean QA ===\n")
-cat(sprintf("Total rows after UFA filter: %s (expected: %s)\n", rows_after_ufa, expected_ufa_rows))
+cat(sprintf("Total rows after UFA filter: %s (expected pre-Minor exclusion: %s)\n", rows_after_ufa, expected_ufa_rows))
+cat(sprintf("Rows removed for Minor scope exclusion (post-UFA): %s\n", rows_removed_minor_after_ufa))
+cat(sprintf("Rows after UFA + Minor exclusion: %s\n", rows_after_scope_filters))
+cat(sprintf("AAV values imputed from contract_value/contract_years: %s\n", imputed_aav_count))
 
 cat("\nRow count by spotrac_year:\n")
 print(year_counts)
@@ -174,7 +200,10 @@ readr::write_csv(clean_df, output_path)
 
 cat("\n=== Cleaning Complete ===\n")
 cat(sprintf("Input rows: %s (expected: %s)\n", input_rows, expected_input_rows))
-cat(sprintf("Rows after UFA filter: %s (expected: %s)\n", rows_after_ufa, expected_ufa_rows))
+cat(sprintf("Rows after UFA filter (pre-Minor exclusion): %s (expected: %s)\n", rows_after_ufa, expected_ufa_rows))
+cat(sprintf("Minor rows removed from UFA set: %s\n", rows_removed_minor_after_ufa))
+cat(sprintf("Rows after scope exclusions: %s\n", rows_after_scope_filters))
 cat(sprintf("Same-team re-signs: %s | Genuine movement events: %s\n", same_team_true, movement_false))
-cat(sprintf("Output rows written: %s (expected: %s)\n", nrow(clean_df), expected_ufa_rows))
+cat(sprintf("AAV imputed rows flagged TRUE: %s\n", imputed_aav_count))
+cat(sprintf("Output rows written: %s\n", nrow(clean_df)))
 cat(sprintf("Output file: %s\n", output_path))
