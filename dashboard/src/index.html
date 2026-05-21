@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview — NHL Free Agency Research</title>
+  <meta name="description" content="League-wide NHL team MIS rankings by season. See which teams spent the most in free agency and how that correlated with performance change.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <!-- CDN to restore when published:
+  <link rel="stylesheet" href="https://rmallorybpc.github.io/tmg-brand-guide/dist/tmg.css">
+  -->
+  <link rel="stylesheet" href="./tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px;
+      border-radius: var(--tmg-nav-radius);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tmg-charcoal);
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] {
+      background: rgba(132,169,140,0.15);
+      color: var(--tmg-sage-hover);
+    }
+
+    .overview-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .table-sort {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      background: transparent;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      text-transform: inherit;
+      letter-spacing: inherit;
+      padding: 0;
+    }
+
+    .table-sort-indicator {
+      font-size: 10px;
+      color: rgba(45, 52, 54, 0.7);
+      min-width: 10px;
+    }
+
+    .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .team-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      padding: 2px 6px;
+      border: 1px solid rgba(45, 52, 54, 0.2);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.2;
+      background: rgba(132, 169, 140, 0.1);
+    }
+
+    .row-clickable {
+      cursor: pointer;
+    }
+
+    .dist-stack {
+      display: flex;
+      width: 100%;
+      height: 22px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(45, 52, 54, 0.08);
+      border: 1px solid rgba(45, 52, 54, 0.12);
+      margin: 12px 0;
+    }
+
+    .dist-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .dist-segment.flat {
+      color: var(--tmg-charcoal);
+    }
+
+    .dist-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      font-size: 13px;
+      color: rgba(45, 52, 54, 0.8);
+      margin: 0 0 10px;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .geo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .scope-dl {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 8px 12px;
+      margin: 0;
+    }
+
+    .scope-dl dt {
+      font-weight: 500;
+      color: rgba(45, 52, 54, 0.85);
+    }
+
+    .scope-dl dd {
+      margin: 0;
+      color: rgba(45, 52, 54, 0.72);
+    }
+
+    @media (max-width: 900px) {
+      .geo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .scope-dl {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .scope-dl dd {
+        margin-bottom: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html">Welcome</a>
+      <a href="./findings.html">Key Findings</a>
+      <a href="./index.html" aria-current="page">Overview</a>
+      <a href="./team.html">Team Detail</a>
+      <a href="./explorer.html">All Signings</a>
+    </div>
+    <div class="tmg-dropdown-wrap">
+      <button class="tmg-dropdown-btn" id="tmgDdBtn"
+              aria-haspopup="true" aria-expanded="false" aria-controls="tmgDdMenu">
+        TMG Tool Suite
+        <svg class="tmg-chevron" viewBox="0 0 12 12" fill="none"
+             width="12" height="12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tmg-dropdown-menu" id="tmgDdMenu" role="menu">
+        <a href="https://rmallorybpc.github.io/pdf-multi-agent-analysis/"
+           target="_blank" rel="noreferrer" role="menuitem">PDF Multi-Agent Analysis</a>
+        <a href="https://rmallorybpc.github.io/housing-market-intel/"
+           target="_blank" rel="noreferrer" role="menuitem">Housing Market Intel</a>
+        <a href="https://rmallorybpc.github.io/real-estate-report/"
+           target="_blank" rel="noreferrer" role="menuitem">Real Estate Report</a>
+        <a href="https://rmallorybpc.github.io/nflanalysis/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NFL Analysis</a>
+        <a href="https://rmallorybpc.github.io/nhl-free-agency-research/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NHL Analysis</a>
+        <a href="https://rmallorybpc.github.io/recipes/"
+           target="_blank" rel="noreferrer" role="menuitem">Recipe Book</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow">League Overview</p>
+        <h1 class="tmg-page-title">NHL team MIS rankings by season</h1>
+        <p class="tmg-page-desc">
+          Select a season to see all teams ranked by Movement Impact Score
+          alongside their season-over-season performance change.
+        </p>
+      </div>
+
+      <div class="overview-controls">
+        <div>
+          <label class="tmg-field-label" for="seasonSelect">Season</label>
+          <select class="tmg-select" id="seasonSelect" style="width:140px" disabled>
+            <option>Loading...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="tmg-field-label" for="confSelect">Conference</label>
+          <select class="tmg-select" id="confSelect" style="width:140px" disabled>
+            <option value="all">All</option>
+            <option value="E">Eastern</option>
+            <option value="W">Western</option>
+          </select>
+        </div>
+
+        <div style="display:flex; align-items:flex-end">
+          <button class="tmg-btn" id="refreshBtn" disabled>Refresh</button>
+        </div>
+      </div>
+
+      <section class="tmg-bento-grid" id="summaryTiles" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <article class="tmg-card">
+          <p class="tmg-card-label">SEASON</p>
+          <p class="tmg-card-value">Loading...</p>
+          <p class="tmg-card-sub">NHL season ending this year</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">AVG MIS (SELECTED SEASON)</p>
+          <p class="tmg-card-value">Loading...</p>
+          <p class="tmg-card-sub">Average weighted offseason investment</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">TOP SPENDER</p>
+          <p class="tmg-card-value">Loading...</p>
+          <p class="tmg-card-sub">Loading...</p>
+        </article>
+        <article class="tmg-card">
+          <p class="tmg-card-label">LARGEST IMPROVEMENT</p>
+          <p class="tmg-card-value">Loading...</p>
+          <p class="tmg-card-sub">Loading...</p>
+        </article>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">League ranking — ordered by Movement Impact Score</h2>
+        <p class="tmg-body-sm tmg-text-muted">Click any row to open Team Detail for that team and season</p>
+        <div class="table-wrap" id="leagueTableWrap" aria-live="polite">
+          <table class="tmg-table" aria-label="League rankings table">
+            <thead>
+              <tr><th>Loading table...</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Loading team data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="tmg-body-sm tmg-text-muted" id="rowCountText" style="margin-top: 10px;">Loading...</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <h2 class="tmg-h2">Performance change distribution</h2>
+        <p class="tmg-body-sm tmg-text-muted">How many teams improved, stayed flat, or declined in the selected season</p>
+        <div id="outcomeDistribution">
+          <p class="tmg-body-sm">Loading distribution...</p>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <h2 class="tmg-h2">Movement geography for selected season</h2>
+        <div id="geographyTiles" class="geo-grid">
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">WITHIN DIVISION</p>
+            <p class="tmg-card-value">Loading...</p>
+            <p class="tmg-card-sub">Loading...</p>
+          </article>
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">CROSS DIVISION</p>
+            <p class="tmg-card-value">Loading...</p>
+            <p class="tmg-card-sub">Loading...</p>
+          </article>
+          <article class="tmg-card" style="padding: 16px;">
+            <p class="tmg-card-label">CROSS CONFERENCE</p>
+            <p class="tmg-card-value">Loading...</p>
+            <p class="tmg-card-sub">Loading...</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" aria-live="polite">
+        <h2 class="tmg-h2">Study scope</h2>
+        <dl class="scope-dl tmg-body-sm" id="scopeCoverage">
+          <dt>Season range</dt>
+          <dd>2017–2025 (extraction) / 2018–2025 (outcome window)</dd>
+
+          <dt>Teams</dt>
+          <dd>30–32 per season (historically accurate)</dd>
+
+          <dt>Movement events</dt>
+          <dd>1,648 UFA signings (re-signings excluded)</dd>
+
+          <dt>Positions tracked</dt>
+          <dd>G, D, C, LW, RW</dd>
+
+          <dt>Outcome metric</dt>
+          <dd>season-over-season points % change</dd>
+
+          <dt>COVID seasons</dt>
+          <dd>2020 and 2021 flagged — sensitivity check confirmed</dd>
+
+          <dt>Out of scope V1</dt>
+          <dd>RFA signings, trade deadline, AHL, ELC</dd>
+        </dl>
+        <p class="tmg-body-sm tmg-text-muted" id="scopeModelInfo" style="margin-top: 10px;">Loading model summary...</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="tmg-footer">
+    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
+    movement events, Spotrac contract data, and NHL API game results via
+    nhlscraper. &nbsp;·&nbsp;
+    <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+       target="_blank" rel="noreferrer">View the source on GitHub →</a>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('tmgDdBtn');
+    const menu = document.getElementById('tmgDdMenu');
+    btn.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script>
+    // 1. State
+    let masterData = [];
+    let misData = [];
+    let geoData = [];
+    let modelData = [];
+    let currentSeason = null;
+    let currentConf = 'all';
+    let sortCol = 'total_mis';
+    let sortDir = 'desc';
+
+    const dataStore = {
+      masterData: [],
+      misData: [],
+      geoData: [],
+      modelData: []
+    };
+
+    const els = {
+      seasonSelect: document.getElementById('seasonSelect'),
+      confSelect: document.getElementById('confSelect'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      summaryTiles: document.getElementById('summaryTiles'),
+      leagueTableWrap: document.getElementById('leagueTableWrap'),
+      rowCountText: document.getElementById('rowCountText'),
+      outcomeDistribution: document.getElementById('outcomeDistribution'),
+      geographyTiles: document.getElementById('geographyTiles'),
+      scopeModelInfo: document.getElementById('scopeModelInfo')
+    };
+
+    // 2. Data loading — fetch all CSVs in parallel using Promise.all
+    async function loadData() {
+      const paths = [
+        '../../data/processed/nhl_master_analysis_panel.csv',
+        '../../data/processed/nhl_team_mis_scores.csv',
+        '../../output/tables/model_comparison_summary.csv',
+        '../../data/processed/nhl_team_geography_variables.csv'
+      ];
+
+      const [masterText, misText, modelText, geoText] = await Promise.all(
+        paths.map(path => fetch(path).then(resp => {
+          if (!resp.ok) {
+            throw new Error('Failed to load ' + path + ' (' + resp.status + ')');
+          }
+          return resp.text();
+        }))
+      );
+
+      masterData = parseCSV(masterText);
+      misData = parseCSV(misText);
+      modelData = parseCSV(modelText);
+      geoData = parseCSV(geoText);
+
+      dataStore.masterData = masterData;
+      dataStore.misData = misData;
+      dataStore.modelData = modelData;
+      dataStore.geoData = geoData;
+    }
+
+    // 3. parseCSV(text) — returns array of objects with header keys
+    function parseCSV(text) {
+      const lines = text.split('\n').map(line => line.replace(/\r$/, ''));
+      if (!lines.length) {
+        return [];
+      }
+
+      const headerLine = lines.find(line => line.trim().length > 0) || '';
+      if (!headerLine) {
+        return [];
+      }
+
+      const headers = parseCSVLine(headerLine).map(h => h.trim());
+      const rows = [];
+
+      for (let i = lines.indexOf(headerLine) + 1; i < lines.length; i += 1) {
+        const line = lines[i];
+        if (!line || line.trim().length === 0) {
+          continue;
+        }
+        const values = parseCSVLine(line);
+        const row = {};
+        for (let c = 0; c < headers.length; c += 1) {
+          row[headers[c]] = (values[c] || '').trim();
+        }
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function parseCSVLine(line) {
+      const values = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i += 1) {
+        const ch = line[i];
+        const next = line[i + 1];
+
+        if (ch === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+          continue;
+        }
+
+        if (ch === ',' && !inQuotes) {
+          values.push(current);
+          current = '';
+          continue;
+        }
+
+        current += ch;
+      }
+
+      values.push(current);
+      return values;
+    }
+
+    function toNumber(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatCurrencyMillions(value, decimals) {
+      const n = toNumber(value) / 1000000;
+      return '$' + n.toFixed(decimals) + 'M';
+    }
+
+    function formatPointsPct(value) {
+      const n = toNumber(value);
+      return n.toFixed(3);
+    }
+
+    function formatChangePP(value, options) {
+      const n = toNumber(value);
+      const abs = Math.abs(n).toFixed(options.decimals || 1);
+      if (n > options.neutralThreshold) {
+        return options.withArrows ? '▲ +' + abs + ' pp' : '+' + abs + ' pp';
+      }
+      if (n < -options.neutralThreshold) {
+        return options.withArrows ? '▼ -' + abs + ' pp' : '-' + abs + ' pp';
+      }
+      return options.withArrows ? '→ ' + abs + ' pp' : abs + ' pp';
+    }
+
+    function getSeasonRows() {
+      return dataStore.masterData.filter(row => Number(row.season_year) === Number(currentSeason));
+    }
+
+    function getFilteredRows() {
+      const seasonRows = getSeasonRows();
+      if (currentConf === 'all') {
+        return seasonRows;
+      }
+      return seasonRows.filter(row => row.conferenceAbbrev === currentConf);
+    }
+
+    function getSortedRows(rows) {
+      const sorted = [...rows];
+      sorted.sort((a, b) => {
+        const av = a[sortCol] || '';
+        const bv = b[sortCol] || '';
+        const avNum = Number(av);
+        const bvNum = Number(bv);
+
+        let cmp = 0;
+        if (Number.isFinite(avNum) && Number.isFinite(bvNum) && av !== '' && bv !== '') {
+          cmp = avNum - bvNum;
+        } else {
+          cmp = String(av).localeCompare(String(bv));
+        }
+
+        return sortDir === 'asc' ? cmp : -cmp;
+      });
+
+      return sorted;
+    }
+
+    // 4. initSeasonSelector() — populate select from data
+    function initSeasonSelector() {
+      const years = [...new Set(dataStore.masterData.map(row => Number(row.season_year)))]
+        .filter(year => Number.isFinite(year))
+        .sort((a, b) => b - a);
+
+      els.seasonSelect.innerHTML = years
+        .map(year => '<option value="' + year + '">' + year + '</option>')
+        .join('');
+
+      currentSeason = years[0] || null;
+      els.seasonSelect.value = String(currentSeason);
+      els.seasonSelect.disabled = false;
+      els.confSelect.disabled = false;
+      els.refreshBtn.disabled = false;
+    }
+
+    // 5. renderTiles() — update four summary metric tiles
+    function renderTiles() {
+      const rows = getFilteredRows();
+      if (!rows.length) {
+        els.summaryTiles.innerHTML = '<article class="tmg-card"><p class="tmg-card-value">No data for current filters.</p></article>';
+        return;
+      }
+
+      const avgMis = rows.reduce((sum, row) => sum + toNumber(row.total_mis), 0) / rows.length;
+      const topSpender = [...rows].sort((a, b) => toNumber(b.total_aav_spent) - toNumber(a.total_aav_spent))[0];
+      const topImprover = [...rows].sort((a, b) => toNumber(b.points_pct_change) - toNumber(a.points_pct_change))[0];
+
+      els.summaryTiles.innerHTML = [
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">SEASON</p>',
+        '  <p class="tmg-card-value">' + currentSeason + '</p>',
+        '  <p class="tmg-card-sub">NHL season ending this year</p>',
+        '</article>',
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">AVG MIS (SELECTED SEASON)</p>',
+        '  <p class="tmg-card-value">' + formatCurrencyMillions(avgMis, 2) + '</p>',
+        '  <p class="tmg-card-sub">Average weighted offseason investment</p>',
+        '</article>',
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">TOP SPENDER</p>',
+        '  <p class="tmg-card-value">' + topSpender.teamTriCode + '</p>',
+        '  <p class="tmg-card-sub">' + formatCurrencyMillions(topSpender.total_aav_spent, 0) + '</p>',
+        '</article>',
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">LARGEST IMPROVEMENT</p>',
+        '  <p class="tmg-card-value">' + topImprover.teamTriCode + '</p>',
+        '  <p class="tmg-card-sub">' + formatChangePP(topImprover.points_pct_change, { decimals: 1, neutralThreshold: 0, withArrows: false }) + '</p>',
+        '</article>'
+      ].join('');
+    }
+
+    // 6. renderTable() — build and insert league ranking table HTML
+    function renderTable() {
+      const filteredRows = getFilteredRows();
+      const sortedRows = getSortedRows(filteredRows);
+      const seasonCount = getSeasonRows().length;
+
+      const cols = [
+        { key: 'rank', label: 'Rank', sortable: false },
+        { key: 'team', label: 'Team', sortable: false },
+        { key: 'conferenceAbbrev', label: 'Conference', sortable: true },
+        { key: 'divisionAbbrev', label: 'Division', sortable: true },
+        { key: 'total_mis', label: 'MIS', sortable: true },
+        { key: 'total_aav_spent', label: 'AAV Spent', sortable: true },
+        { key: 'signing_count', label: 'Signings', sortable: true },
+        { key: 'has_goalie_signing', label: 'Goalie signed', sortable: true },
+        { key: 'prior_season_points_pct', label: 'Prior pts%', sortable: true },
+        { key: 'points_percentage', label: 'Current pts%', sortable: true },
+        { key: 'points_pct_change', label: 'Change', sortable: true }
+      ];
+
+      const thead = cols.map(col => {
+        if (!col.sortable) {
+          return '<th>' + col.label + '</th>';
+        }
+
+        const active = sortCol === col.key;
+        const indicator = active ? (sortDir === 'asc' ? '▲' : '▼') : '';
+        return [
+          '<th>',
+          '  <button class="table-sort" data-sort="' + col.key + '">',
+          '    <span>' + col.label + '</span>',
+          '    <span class="table-sort-indicator">' + indicator + '</span>',
+          '  </button>',
+          '</th>'
+        ].join('');
+      }).join('');
+
+      const tbody = sortedRows.map((row, idx) => {
+        const change = toNumber(row.points_pct_change);
+        let changeColor = 'var(--tmg-text-muted, rgba(45,52,54,0.55))';
+        let changePrefix = '→';
+
+        if (change > 0.01) {
+          changeColor = 'var(--tmg-success)';
+          changePrefix = '▲';
+        } else if (change < -0.01) {
+          changeColor = 'var(--tmg-error)';
+          changePrefix = '▼';
+        }
+
+        const changeMagnitude = Math.abs(change).toFixed(1);
+        const changeText = change > 0.01
+          ? changePrefix + ' +' + changeMagnitude + ' pp'
+          : (change < -0.01 ? changePrefix + ' -' + changeMagnitude + ' pp' : changePrefix + ' ' + changeMagnitude + ' pp');
+
+        return [
+          '<tr class="row-clickable" data-team="' + row.teamTriCode + '" data-season="' + row.season_year + '">',
+          '  <td>' + (idx + 1) + '</td>',
+          '  <td>',
+          '    <div class="team-cell">',
+          '      <span>' + row.teamCommonName + '</span>',
+          '      <span class="team-badge">' + row.teamTriCode + '</span>',
+          '    </div>',
+          '  </td>',
+          '  <td>' + row.conferenceAbbrev + '</td>',
+          '  <td>' + row.divisionAbbrev + '</td>',
+          '  <td>' + formatCurrencyMillions(row.total_mis, 2) + '</td>',
+          '  <td>' + formatCurrencyMillions(row.total_aav_spent, 0) + '</td>',
+          '  <td>' + toNumber(row.signing_count) + '</td>',
+          '  <td>' + (String(row.has_goalie_signing).toUpperCase() === 'TRUE' ? '✓' : '—') + '</td>',
+          '  <td>' + formatPointsPct(row.prior_season_points_pct) + '</td>',
+          '  <td>' + formatPointsPct(row.points_percentage) + '</td>',
+          '  <td style="color:' + changeColor + '; font-weight:500;">' + changeText + '</td>',
+          '</tr>'
+        ].join('');
+      }).join('');
+
+      const tableHtml = [
+        '<table class="tmg-table" aria-label="League rankings table">',
+        '  <thead><tr>' + thead + '</tr></thead>',
+        '  <tbody>' + (tbody || '<tr><td colspan="11">No rows for this filter.</td></tr>') + '</tbody>',
+        '</table>'
+      ].join('');
+
+      els.leagueTableWrap.innerHTML = tableHtml;
+      els.rowCountText.textContent = 'Showing ' + filteredRows.length + ' of ' + seasonCount + ' teams for season ' + currentSeason;
+
+      els.leagueTableWrap.querySelectorAll('tr.row-clickable').forEach(tr => {
+        tr.addEventListener('click', () => {
+          const team = tr.getAttribute('data-team');
+          const season = tr.getAttribute('data-season');
+          window.location.href = './team.html?team=' + encodeURIComponent(team) + '&season=' + encodeURIComponent(season);
+        });
+      });
+
+      els.leagueTableWrap.querySelectorAll('button.table-sort').forEach(btnEl => {
+        btnEl.addEventListener('click', () => {
+          handleSort(btnEl.getAttribute('data-sort'));
+        });
+      });
+    }
+
+    // 7. renderOutcomeDistribution() — update outcome bar
+    function renderOutcomeDistribution() {
+      const rows = getSeasonRows();
+      if (!rows.length) {
+        els.outcomeDistribution.innerHTML = '<p class="tmg-body-sm">No outcome data for this season.</p>';
+        return;
+      }
+
+      const improved = rows.filter(r => toNumber(r.points_pct_change) > 0.01).length;
+      const flat = rows.filter(r => Math.abs(toNumber(r.points_pct_change)) <= 0.01).length;
+      const declined = rows.filter(r => toNumber(r.points_pct_change) < -0.01).length;
+      const total = rows.length;
+
+      const improvedPct = total ? (improved / total) * 100 : 0;
+      const flatPct = total ? (flat / total) * 100 : 0;
+      const declinedPct = total ? (declined / total) * 100 : 0;
+
+      const changes = rows.map(r => toNumber(r.points_pct_change));
+      const mean = changes.reduce((sum, v) => sum + v, 0) / changes.length;
+      const variance = changes.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / changes.length;
+      const stdDev = Math.sqrt(variance);
+
+      els.outcomeDistribution.innerHTML = [
+        '<div class="dist-legend">',
+        '  <span><span class="legend-dot" style="background: var(--tmg-success);"></span>Improved: ' + improved + ' (' + improvedPct.toFixed(1) + '%)</span>',
+        '  <span><span class="legend-dot" style="background: rgba(45, 52, 54, 0.35);"></span>Flat: ' + flat + ' (' + flatPct.toFixed(1) + '%)</span>',
+        '  <span><span class="legend-dot" style="background: var(--tmg-error);"></span>Declined: ' + declined + ' (' + declinedPct.toFixed(1) + '%)</span>',
+        '</div>',
+        '<div class="dist-stack" role="img" aria-label="Improved ' + improved + ', flat ' + flat + ', declined ' + declined + ' teams">',
+        '  <div class="dist-segment" style="width:' + improvedPct.toFixed(4) + '%; background: var(--tmg-success);">' + (improvedPct >= 12 ? improved : '') + '</div>',
+        '  <div class="dist-segment flat" style="width:' + flatPct.toFixed(4) + '%; background: rgba(45,52,54,0.24);">' + (flatPct >= 12 ? flat : '') + '</div>',
+        '  <div class="dist-segment" style="width:' + declinedPct.toFixed(4) + '%; background: var(--tmg-error);">' + (declinedPct >= 12 ? declined : '') + '</div>',
+        '</div>',
+        '<p class="tmg-body-sm tmg-text-muted" style="margin: 0;">Mean change: ' + mean.toFixed(3) + ' pp  |  Std dev: ' + stdDev.toFixed(3) + ' pp</p>'
+      ].join('');
+    }
+
+    // 8. renderGeography() — update geography tiles
+    function renderGeography() {
+      const rows = dataStore.geoData.filter(row => Number(row.season_year) === Number(currentSeason));
+      if (!rows.length) {
+        els.geographyTiles.innerHTML = '<article class="tmg-card"><p class="tmg-card-value">No geography data for this season.</p></article>';
+        return;
+      }
+
+      const within = rows.reduce((sum, row) => sum + toNumber(row.count_within_division), 0);
+      const crossDivision = rows.reduce((sum, row) => sum + toNumber(row.count_cross_division), 0);
+      const crossConference = rows.reduce((sum, row) => sum + toNumber(row.count_cross_conference), 0);
+      const allSignings = within + crossDivision + crossConference;
+
+      const withinPct = allSignings ? (within / allSignings) * 100 : 0;
+      const crossDivPct = allSignings ? (crossDivision / allSignings) * 100 : 0;
+      const crossConfPct = allSignings ? (crossConference / allSignings) * 100 : 0;
+
+      els.geographyTiles.innerHTML = [
+        '<article class="tmg-card" style="padding: 16px;">',
+        '  <p class="tmg-card-label">WITHIN DIVISION</p>',
+        '  <p class="tmg-card-value">' + within + '</p>',
+        '  <p class="tmg-card-sub">' + withinPct.toFixed(1) + '% of all signings</p>',
+        '</article>',
+        '<article class="tmg-card" style="padding: 16px;">',
+        '  <p class="tmg-card-label">CROSS DIVISION</p>',
+        '  <p class="tmg-card-value">' + crossDivision + '</p>',
+        '  <p class="tmg-card-sub">' + crossDivPct.toFixed(1) + '% of all signings</p>',
+        '</article>',
+        '<article class="tmg-card" style="padding: 16px;">',
+        '  <p class="tmg-card-label">CROSS CONFERENCE</p>',
+        '  <p class="tmg-card-value">' + crossConference + '</p>',
+        '  <p class="tmg-card-sub">' + crossConfPct.toFixed(1) + '% of all signings</p>',
+        '</article>'
+      ].join('');
+    }
+
+    function renderScopeModelInfo() {
+      if (!dataStore.modelData.length) {
+        els.scopeModelInfo.textContent = 'Model summary unavailable.';
+        return;
+      }
+
+      const sampleInfo = dataStore.modelData
+        .map(row => row.model_name + ': n=' + row.nobs)
+        .join(' | ');
+      els.scopeModelInfo.textContent = 'Model comparison loaded: ' + sampleInfo;
+    }
+
+    // 9. handleSort(col) — toggle sort direction, re-render table
+    function handleSort(col) {
+      if (sortCol === col) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortCol = col;
+        sortDir = 'desc';
+      }
+      renderTable();
+    }
+
+    function renderAll() {
+      renderTiles();
+      renderTable();
+      renderOutcomeDistribution();
+      renderGeography();
+      renderScopeModelInfo();
+    }
+
+    // 10. Event listeners
+    function bindEvents() {
+      els.seasonSelect.addEventListener('change', e => {
+        currentSeason = Number(e.target.value);
+        renderAll();
+      });
+
+      els.confSelect.addEventListener('change', e => {
+        currentConf = e.target.value;
+        renderAll();
+      });
+
+      els.refreshBtn.addEventListener('click', () => {
+        renderAll();
+      });
+    }
+
+    // 11. init() — called on DOMContentLoaded, loads data then renders
+    async function init() {
+      try {
+        await loadData();
+        initSeasonSelector();
+        bindEvents();
+        renderAll();
+      } catch (err) {
+        const msg = 'Error loading data: ' + (err && err.message ? err.message : String(err));
+        els.summaryTiles.innerHTML = '<article class="tmg-card"><p class="tmg-card-value">' + msg + '</p></article>';
+        els.leagueTableWrap.innerHTML = '<p class="tmg-body-sm" style="color:var(--tmg-error);">' + msg + '</p>';
+        els.outcomeDistribution.innerHTML = '<p class="tmg-body-sm" style="color:var(--tmg-error);">' + msg + '</p>';
+        els.geographyTiles.innerHTML = '<article class="tmg-card"><p class="tmg-card-value" style="color:var(--tmg-error);">' + msg + '</p></article>';
+        els.scopeModelInfo.textContent = msg;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
