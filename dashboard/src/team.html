@@ -289,6 +289,25 @@
       { key: 'other', label: 'Other', color: 'rgba(132,169,140,0.20)', weight: 0.05 }
     ];
 
+    function fetchCSVWithFallback(basePath) {
+      return fetch(basePath).then(resp => {
+        if (resp.ok) return resp.text();
+
+        // Allow local root-hosted previews where /repo-name prefix is not present.
+        const fallbackPath = basePath.replace(`${BASE}/`, '/');
+        if (fallbackPath === basePath) {
+          throw new Error(`Failed to load ${basePath} (${resp.status})`);
+        }
+
+        return fetch(fallbackPath).then(fallbackResp => {
+          if (!fallbackResp.ok) {
+            throw new Error(`Failed to load ${basePath} (${resp.status}) and ${fallbackPath} (${fallbackResp.status})`);
+          }
+          return fallbackResp.text();
+        });
+      });
+    }
+
     // loadAllData() — Promise.all four CSVs
     async function loadAllData() {
       const paths = [
@@ -299,12 +318,7 @@
       ];
 
       const [masterText, signingsText, geographyText, misText] = await Promise.all(
-        paths.map(path => fetch(path).then(resp => {
-          if (!resp.ok) {
-            throw new Error(`Failed to load ${path} (${resp.status})`);
-          }
-          return resp.text();
-        }))
+        paths.map(path => fetchCSVWithFallback(path))
       );
 
       allData = {
@@ -913,54 +927,52 @@
     }
 
     // init() — on DOMContentLoaded
-    async function init() {
-      try {
-        await loadAllData();
-      } catch (error) {
+    function init() {
+      loadAllData().then(() => {
+        populateTeamSelector();
+
+        const firstTeam = els.teamSelect.options[1]?.value || '';
+        if (firstTeam) {
+          els.teamSelect.value = firstTeam;
+          populateSeasonSelector(firstTeam);
+          els.teamSelect.value = '';
+          els.seasonSelect.innerHTML = '<option value="">Select season</option>';
+        }
+
+        applySelectionFromURL();
+
+        els.teamSelect.addEventListener('change', () => {
+          const team = els.teamSelect.value;
+          if (!team) {
+            els.seasonSelect.innerHTML = '<option value="">Select season</option>';
+            renderSelectionPrompt();
+            return;
+          }
+
+          populateSeasonSelector(team);
+        });
+
+        els.loadTeamBtn.addEventListener('click', () => {
+          const team = els.teamSelect.value;
+          const season = Number.parseInt(els.seasonSelect.value || '', 10);
+
+          if (!team || !Number.isFinite(season)) {
+            renderSelectionPrompt();
+            return;
+          }
+
+          updateURL(team, season);
+          renderPage(team, season);
+        });
+
+        window.addEventListener('popstate', () => {
+          applySelectionFromURL();
+        });
+      }).catch(error => {
+        console.error('Team detail init error:', error);
         els.teamTitle.textContent = 'Unable to load team detail data';
         els.teamDesc.textContent = error.message;
         els.selectorHint.textContent = 'Check CSV file availability and try again.';
-        return;
-      }
-
-      populateTeamSelector();
-
-      const firstTeam = els.teamSelect.options[1]?.value || '';
-      if (firstTeam) {
-        els.teamSelect.value = firstTeam;
-        populateSeasonSelector(firstTeam);
-        els.teamSelect.value = '';
-        els.seasonSelect.innerHTML = '<option value="">Select season</option>';
-      }
-
-      applySelectionFromURL();
-
-      els.teamSelect.addEventListener('change', () => {
-        const team = els.teamSelect.value;
-        if (!team) {
-          els.seasonSelect.innerHTML = '<option value="">Select season</option>';
-          renderSelectionPrompt();
-          return;
-        }
-
-        populateSeasonSelector(team);
-      });
-
-      els.loadTeamBtn.addEventListener('click', () => {
-        const team = els.teamSelect.value;
-        const season = Number.parseInt(els.seasonSelect.value || '', 10);
-
-        if (!team || !Number.isFinite(season)) {
-          renderSelectionPrompt();
-          return;
-        }
-
-        updateURL(team, season);
-        renderPage(team, season);
-      });
-
-      window.addEventListener('popstate', () => {
-        applySelectionFromURL();
       });
     }
 
