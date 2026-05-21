@@ -15,3 +15,8 @@ data/**/*.rds
 data/**/*.html
 data/**/*.xls
 data/**/*.xlsx
+
+# GitHub Pages dashboard dependencies (explicitly published)
+!data/processed/nhl_master_analysis_panel.csv
+!data/processed/nhl_team_mis_scores.csv
+!data/processed/nhl_team_geography_variables.csv

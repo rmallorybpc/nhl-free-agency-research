@@ -28,10 +28,23 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Prepare site artifact
+        run: |
+          mkdir -p _site
+          cp -R dashboard/src/. _site/
+
+          mkdir -p _site/data/processed
+          mkdir -p _site/output/tables
+
+          cp data/processed/nhl_master_analysis_panel.csv _site/data/processed/
+          cp data/processed/nhl_team_mis_scores.csv _site/data/processed/
+          cp data/processed/nhl_team_geography_variables.csv _site/data/processed/
+          cp output/tables/model_comparison_summary.csv _site/output/tables/
+
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dashboard/src
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
