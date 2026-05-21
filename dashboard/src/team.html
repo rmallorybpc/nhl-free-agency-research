@@ -289,22 +289,40 @@
       { key: 'other', label: 'Other', color: 'rgba(132,169,140,0.20)', weight: 0.05 }
     ];
 
+    function getPathPrefix() {
+      const marker = '/dashboard/src/';
+      const idx = window.location.pathname.indexOf(marker);
+      if (idx === -1) return '';
+      return window.location.pathname.slice(0, idx);
+    }
+
     function fetchCSVWithFallback(basePath) {
-      return fetch(basePath).then(resp => {
-        if (resp.ok) return resp.text();
+      const suffixMarker = '/data/processed/';
+      const suffixIdx = basePath.indexOf(suffixMarker);
+      const suffix = suffixIdx >= 0 ? basePath.slice(suffixIdx + suffixMarker.length) : '';
+      const pathPrefix = getPathPrefix();
 
-        // Allow local root-hosted previews where /repo-name prefix is not present.
-        const fallbackPath = basePath.replace(`${BASE}/`, '/');
-        if (fallbackPath === basePath) {
-          throw new Error(`Failed to load ${basePath} (${resp.status})`);
-        }
+      const candidatePaths = [basePath];
+      if (suffix) {
+        candidatePaths.push(`${pathPrefix}/data/processed/${suffix}`);
+        candidatePaths.push(`/data/processed/${suffix}`);
+      }
 
-        return fetch(fallbackPath).then(fallbackResp => {
-          if (!fallbackResp.ok) {
-            throw new Error(`Failed to load ${basePath} (${resp.status}) and ${fallbackPath} (${fallbackResp.status})`);
-          }
-          return fallbackResp.text();
+      const uniquePaths = [...new Set(candidatePaths.filter(Boolean))];
+
+      return uniquePaths.reduce((chain, path) => {
+        return chain.catch(errs => {
+          return fetch(path).then(resp => {
+            if (resp.ok) return resp.text();
+            return Promise.reject([...errs, { path, status: resp.status }]);
+          }).catch(fetchErr => {
+            if (Array.isArray(fetchErr)) throw fetchErr;
+            return Promise.reject([...errs, { path, status: 'network_error' }]);
+          });
         });
+      }, Promise.reject([])).catch(errs => {
+        const detail = errs.map(e => `${e.path} (${e.status})`).join(' and ');
+        throw new Error(`Failed to load ${detail}`);
       });
     }
 
