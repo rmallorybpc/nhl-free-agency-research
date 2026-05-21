@@ -102,6 +102,15 @@ clean_df <- raw_df |>
 		aav = if_else(impute_aav_condition, contract_value / contract_years, aav),
 		aav_imputed = if_else(impute_aav_condition, TRUE, aav_imputed)
 	) |>
+	# Rows with non-usable AAV values remain for transparency, and downstream analyses
+	# that require AAV should filter to data_quality_note == NA.
+	mutate(
+		data_quality_note = case_when(
+			is.na(aav) ~ "aav_unavailable",
+			aav == 0 & contract_value == 0 ~ "likely_league_minimum",
+			TRUE ~ NA_character_
+		)
+	) |>
 	select(-impute_aav_condition)
 
 imputed_aav_count <- sum(clean_df$aav_imputed, na.rm = TRUE)
@@ -147,6 +156,11 @@ na_counts <- clean_df |>
 		na_contract_years = sum(is.na(contract_years))
 	)
 
+data_quality_note_counts <- clean_df |>
+	count(data_quality_note, name = "rows", .drop = FALSE) |>
+	mutate(data_quality_note = replace_na(data_quality_note, "NA")) |>
+	arrange(data_quality_note)
+
 aav_min <- suppressWarnings(min(clean_df$aav, na.rm = TRUE))
 aav_max <- suppressWarnings(max(clean_df$aav, na.rm = TRUE))
 contract_years_non_positive <- sum(clean_df$contract_years <= 0, na.rm = TRUE)
@@ -180,6 +194,9 @@ print(same_team_counts)
 cat("\nRemaining NA/blank counts for required fields:\n")
 print(na_counts)
 
+cat("\nData quality note distribution:\n")
+print(data_quality_note_counts)
+
 cat("\nAAV sanity check:\n")
 cat(sprintf("Min AAV: %s\n", format(aav_min, big.mark = ",", scientific = FALSE)))
 cat(sprintf("Max AAV: %s\n", format(aav_max, big.mark = ",", scientific = FALSE)))
@@ -205,5 +222,7 @@ cat(sprintf("Minor rows removed from UFA set: %s\n", rows_removed_minor_after_uf
 cat(sprintf("Rows after scope exclusions: %s\n", rows_after_scope_filters))
 cat(sprintf("Same-team re-signs: %s | Genuine movement events: %s\n", same_team_true, movement_false))
 cat(sprintf("AAV imputed rows flagged TRUE: %s\n", imputed_aav_count))
+cat("Data quality note distribution (NA means usable for AAV-required analyses):\n")
+print(data_quality_note_counts)
 cat(sprintf("Output rows written: %s\n", nrow(clean_df)))
 cat(sprintf("Output file: %s\n", output_path))
