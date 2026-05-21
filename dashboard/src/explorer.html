@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Signings — NHL Free Agency Research</title>
+  <meta name="description" content="Browse and filter all 1,648 NHL UFA signings from 2017 through 2025. Sort by AAV, year, position, team, or movement geography.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <!-- CDN to restore when published:
+  <link rel="stylesheet" href="https://rmallorybpc.github.io/tmg-brand-guide/dist/tmg.css">
+  -->
+  <link rel="stylesheet" href="./tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px;
+      border-radius: var(--tmg-nav-radius);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tmg-charcoal);
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] {
+      background: rgba(132,169,140,0.15);
+      color: var(--tmg-sage-hover);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .clickable-row {
+      cursor: pointer;
+    }
+
+    .clickable-row:hover {
+      background: rgba(132,169,140,0.08);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      line-height: 1.3;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .badge-pos-g {
+      background: rgba(209, 102, 102, 0.2);
+      color: var(--tmg-charcoal);
+      border-color: rgba(209, 102, 102, 0.45);
+    }
+
+    .badge-pos-d {
+      background: rgba(132,169,140,0.2);
+      color: var(--tmg-charcoal);
+      border-color: rgba(132,169,140,0.45);
+    }
+
+    .badge-pos-c {
+      background: rgba(45, 52, 54, 0.2);
+      color: var(--tmg-charcoal);
+      border-color: rgba(45, 52, 54, 0.45);
+    }
+
+    .badge-pos-w {
+      background: rgba(132,169,140,0.5);
+      color: var(--tmg-charcoal);
+      border-color: rgba(132,169,140,0.55);
+    }
+
+    .badge-geo-within {
+      background: rgba(132,169,140,0.22);
+      border-color: rgba(132,169,140,0.45);
+      color: var(--tmg-charcoal);
+    }
+
+    .badge-geo-cross-div {
+      background: rgba(132,169,140,0.13);
+      border-color: rgba(132,169,140,0.35);
+      color: var(--tmg-charcoal);
+    }
+
+    .badge-geo-cross-conf {
+      background: var(--tmg-charcoal);
+      border-color: var(--tmg-charcoal);
+      color: var(--tmg-white);
+    }
+
+    .quick-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 680px) {
+      .quick-stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html">Welcome</a>
+      <a href="./findings.html">Key Findings</a>
+      <a href="./index.html">Overview</a>
+      <a href="./team.html">Team Detail</a>
+      <a href="./explorer.html" aria-current="page">All Signings</a>
+    </div>
+    <div class="tmg-dropdown-wrap">
+      <button class="tmg-dropdown-btn" id="tmgDdBtn"
+              aria-haspopup="true" aria-expanded="false" aria-controls="tmgDdMenu">
+        TMG Tool Suite
+        <svg class="tmg-chevron" viewBox="0 0 12 12" fill="none"
+             width="12" height="12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tmg-dropdown-menu" id="tmgDdMenu" role="menu">
+        <a href="https://rmallorybpc.github.io/pdf-multi-agent-analysis/"
+           target="_blank" rel="noreferrer" role="menuitem">PDF Multi-Agent Analysis</a>
+        <a href="https://rmallorybpc.github.io/housing-market-intel/"
+           target="_blank" rel="noreferrer" role="menuitem">Housing Market Intel</a>
+        <a href="https://rmallorybpc.github.io/real-estate-report/"
+           target="_blank" rel="noreferrer" role="menuitem">Real Estate Report</a>
+        <a href="https://rmallorybpc.github.io/nflanalysis/dashboard/src/"
+           target="_blank" rel="noreferrer" role="menuitem">NFL Analysis</a>
+        <a href="https://rmallorybpc.github.io/nhl-free-agency-research/"
+           target="_blank" rel="noreferrer" role="menuitem">NHL Analysis</a>
+        <a href="https://rmallorybpc.github.io/recipes/"
+           target="_blank" rel="noreferrer" role="menuitem">Recipe Book</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow">All Signings</p>
+        <h1 class="tmg-page-title">Browse every UFA movement event</h1>
+        <p class="tmg-page-desc">
+          Search and filter all 1,648 NHL UFA signings from 2017 through 2025.
+          Re-signings excluded. Sort by AAV, year, position, team, or
+          movement geography.
+        </p>
+      </div>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Filters</h2>
+        <div class="filters-grid">
+          <div>
+            <label class="tmg-field-label" for="filterSeason">Season</label>
+            <select class="tmg-select" id="filterSeason">
+              <option value="all">All seasons</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="tmg-field-label" for="filterTeam">Signing team</label>
+            <select class="tmg-select" id="filterTeam">
+              <option value="all">All teams</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="tmg-field-label" for="filterPosition">Position</label>
+            <select class="tmg-select" id="filterPosition">
+              <option value="all">All positions</option>
+              <option value="G">Goalie</option>
+              <option value="D">Defence</option>
+              <option value="C">Centre</option>
+              <option value="LW">Left wing</option>
+              <option value="RW">Right wing</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="tmg-field-label" for="filterGeography">Movement geography</label>
+            <select class="tmg-select" id="filterGeography">
+              <option value="all">All geographies</option>
+              <option value="within_division">Within division</option>
+              <option value="cross_division_same_conference">Cross division</option>
+              <option value="cross_conference">Cross conference</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="tmg-field-label" for="filterAAV">Minimum AAV</label>
+            <select class="tmg-select" id="filterAAV">
+              <option value="0">All AAVs</option>
+              <option value="1000000">$1M and above</option>
+              <option value="3000000">$3M and above</option>
+              <option value="5000000">$5M and above</option>
+              <option value="7000000">$7M and above</option>
+              <option value="10000000">$10M and above</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="tmg-field-label" for="sortBy">Sort by</label>
+            <select class="tmg-select" id="sortBy">
+              <option value="aav_desc">Highest AAV first</option>
+              <option value="aav_asc">Lowest AAV first</option>
+              <option value="year_desc">Most recent first</option>
+              <option value="year_asc">Oldest first</option>
+              <option value="years_desc">Longest contracts first</option>
+              <option value="player_asc">Player name A to Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <button class="tmg-btn-ghost" id="resetFilters">Reset filters</button>
+        </div>
+      </section>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;
+                  margin-bottom:var(--tmg-gap); font-size:13px;
+                  color:var(--tmg-text-muted)">
+        <span id="resultsCount">Showing 0 of 1,648 signings</span>
+        <span id="resultsContext"></span>
+      </div>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="signingsCard">
+        <h2 class="tmg-h2">Signings</h2>
+        <div id="tableContent"></div>
+        <div style="display:flex; justify-content:center; gap:12px; align-items:center;
+                    margin-top:var(--tmg-gap); font-size:13px" id="paginationWrap">
+          <button class="tmg-btn-ghost" id="prevPage">← Previous</button>
+          <span id="pageInfo">Page 1 of 1</span>
+          <button class="tmg-btn-ghost" id="nextPage">Next →</button>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Quick stats for current filter</h2>
+        <div class="quick-stats-grid">
+          <article class="tmg-card">
+            <p class="tmg-card-label">SIGNINGS SHOWN</p>
+            <p class="tmg-card-value" id="statCount">0</p>
+            <p class="tmg-card-sub">out of 1,648 total</p>
+          </article>
+          <article class="tmg-card">
+            <p class="tmg-card-label">TOTAL AAV</p>
+            <p class="tmg-card-value" id="statTotalAAV">$0M</p>
+            <p class="tmg-card-sub">combined yearly commitment</p>
+          </article>
+          <article class="tmg-card">
+            <p class="tmg-card-label">AVG AAV</p>
+            <p class="tmg-card-value" id="statAvgAAV">$0.00M</p>
+            <p class="tmg-card-sub">per signing</p>
+          </article>
+          <article class="tmg-card">
+            <p class="tmg-card-label">AVG YEARS</p>
+            <p class="tmg-card-value" id="statAvgYears">0.0</p>
+            <p class="tmg-card-sub">contract length</p>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="tmg-footer">
+    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
+    movement events, Spotrac contract data, and NHL API game results via
+    nhlscraper. &nbsp;·&nbsp;
+    <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+       target="_blank" rel="noreferrer">View the source on GitHub →</a>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('tmgDdBtn');
+    const menu = document.getElementById('tmgDdMenu');
+    btn.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script>
+    const BASE = '/nhl-free-agency-research';
+
+    // State
+    let allSignings = [];
+    let filteredSignings = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 50;
+    const TOTAL_MOVEMENT_SIGNINGS = 1648;
+    const TOTAL_MOVEMENT_SIGNINGS_LABEL = '1,648';
+
+    // Filter state
+    let filters = {
+      season: 'all',
+      team: 'all',
+      position: 'all',
+      geography: 'all',
+      aav: 0,
+      sort: 'aav_desc'
+    };
+
+    const els = {
+      filterSeason: document.getElementById('filterSeason'),
+      filterTeam: document.getElementById('filterTeam'),
+      filterPosition: document.getElementById('filterPosition'),
+      filterGeography: document.getElementById('filterGeography'),
+      filterAAV: document.getElementById('filterAAV'),
+      sortBy: document.getElementById('sortBy'),
+      resetFilters: document.getElementById('resetFilters'),
+      tableContent: document.getElementById('tableContent'),
+      resultsCount: document.getElementById('resultsCount'),
+      resultsContext: document.getElementById('resultsContext'),
+      paginationWrap: document.getElementById('paginationWrap'),
+      prevPage: document.getElementById('prevPage'),
+      nextPage: document.getElementById('nextPage'),
+      pageInfo: document.getElementById('pageInfo'),
+      statCount: document.getElementById('statCount'),
+      statTotalAAV: document.getElementById('statTotalAAV'),
+      statAvgAAV: document.getElementById('statAvgAAV'),
+      statAvgYears: document.getElementById('statAvgYears')
+    };
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let value = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            value += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+          continue;
+        }
+
+        if (char === ',' && !inQuotes) {
+          row.push(value);
+          value = '';
+          continue;
+        }
+
+        if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && next === '\n') {
+            i += 1;
+          }
+          row.push(value);
+          value = '';
+          if (row.length > 1 || row[0] !== '') {
+            rows.push(row);
+          }
+          row = [];
+          continue;
+        }
+
+        value += char;
+      }
+
+      if (value !== '' || row.length) {
+        row.push(value);
+        rows.push(row);
+      }
+
+      if (!rows.length) {
+        return [];
+      }
+
+      const headers = rows[0];
+      return rows.slice(1).map(cols => {
+        const record = {};
+        headers.forEach((header, idx) => {
+          record[header] = cols[idx] !== undefined ? cols[idx] : '';
+        });
+        return record;
+      });
+    }
+
+    function toNumber(value) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : 0;
+    }
+
+    function safeText(value, fallback = 'UNKNOWN') {
+      const text = (value || '').trim();
+      return text === '' || text.toUpperCase() === 'NA' ? fallback : text;
+    }
+
+    function formatMoneyMillions(value, decimals = 2) {
+      const millions = value / 1000000;
+      return `$${millions.toFixed(decimals)}M`;
+    }
+
+    function formatMoneyMillionsCompact(value) {
+      const millions = value / 1000000;
+      return `$${millions.toFixed(0)}M`;
+    }
+
+    function geographyLabel(value) {
+      if (value === 'within_division') return 'Within division';
+      if (value === 'cross_division_same_conference') return 'Cross division';
+      if (value === 'cross_conference') return 'Cross conference';
+      return 'Unknown';
+    }
+
+    function geographyBadgeClass(value) {
+      if (value === 'within_division') return 'badge badge-geo-within';
+      if (value === 'cross_division_same_conference') return 'badge badge-geo-cross-div';
+      if (value === 'cross_conference') return 'badge badge-geo-cross-conf';
+      return 'badge';
+    }
+
+    function positionBadgeClass(value) {
+      if (value === 'G') return 'badge badge-pos-g';
+      if (value === 'D') return 'badge badge-pos-d';
+      if (value === 'C') return 'badge badge-pos-c';
+      if (value === 'LW' || value === 'RW') return 'badge badge-pos-w';
+      return 'badge';
+    }
+
+    async function loadData() {
+      const response = await fetch(`${BASE}/data/processed/nhl_signed_free_agents_clean.csv`);
+      if (!response.ok) {
+        throw new Error(`Failed to load signings CSV: ${response.status}`);
+      }
+
+      const csvText = await response.text();
+      const rawRows = parseCSV(csvText);
+
+      // Re-signings are excluded by design to match the research scope where movement events are the unit of analysis.
+      allSignings = rawRows
+        .filter(row => String(row.same_team_resign).toUpperCase() !== 'TRUE')
+        .map(row => ({
+          player_name: safeText(row.player_name, 'Unknown player'),
+          position: (safeText(row.position_filter, '').toUpperCase() || safeText(row.position, 'UNKNOWN').split('/')[0]).replace(/\s+/g, ''),
+          signing_team: safeText(row.signing_team),
+          previous_team: safeText(row.previous_team),
+          contract_value: toNumber(row.contract_value),
+          aav: toNumber(row.aav),
+          contract_years: toNumber(row.contract_years),
+          spotrac_year: Math.trunc(toNumber(row.spotrac_year)),
+          data_quality_note: safeText(row.data_quality_note, ''),
+          movement_geography: safeText(row.movement_geography, 'unknown')
+        }));
+
+      if (allSignings.length !== TOTAL_MOVEMENT_SIGNINGS) {
+        console.warn(`Expected ${TOTAL_MOVEMENT_SIGNINGS} movement signings after filtering; loaded ${allSignings.length}.`);
+      }
+    }
+
+    function populateFilterDropdowns() {
+      const seasons = [...new Set(allSignings.map(row => row.spotrac_year))]
+        .filter(year => Number.isFinite(year))
+        .sort((a, b) => b - a);
+
+      const teams = [...new Set(allSignings.map(row => row.signing_team))]
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b));
+
+      seasons.forEach(year => {
+        const option = document.createElement('option');
+        option.value = String(year);
+        option.textContent = String(year);
+        els.filterSeason.appendChild(option);
+      });
+
+      teams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team;
+        option.textContent = team;
+        els.filterTeam.appendChild(option);
+      });
+    }
+
+    function applyFilters() {
+      filteredSignings = allSignings.filter(row => {
+        if (filters.season !== 'all' && row.spotrac_year !== Number(filters.season)) return false;
+        if (filters.team !== 'all' && row.signing_team !== filters.team) return false;
+        if (filters.position !== 'all' && row.position !== filters.position) return false;
+        if (filters.geography !== 'all' && row.movement_geography !== filters.geography) return false;
+        if (row.aav < filters.aav) return false;
+        return true;
+      });
+
+      filteredSignings.sort((a, b) => {
+        switch (filters.sort) {
+          case 'aav_asc':
+            return a.aav - b.aav || b.spotrac_year - a.spotrac_year;
+          case 'year_desc':
+            return b.spotrac_year - a.spotrac_year || b.aav - a.aav;
+          case 'year_asc':
+            return a.spotrac_year - b.spotrac_year || b.aav - a.aav;
+          case 'years_desc':
+            return b.contract_years - a.contract_years || b.aav - a.aav;
+          case 'player_asc':
+            return a.player_name.localeCompare(b.player_name) || b.aav - a.aav;
+          case 'aav_desc':
+          default:
+            return b.aav - a.aav || b.spotrac_year - a.spotrac_year;
+        }
+      });
+    }
+
+    function renderTable(pageRows) {
+      if (!pageRows.length) {
+        els.tableContent.innerHTML = `
+          <div style="text-align:center; padding:40px 20px">
+            <p class="tmg-h3" style="color:var(--tmg-text-muted)">
+              No signings match these filters
+            </p>
+            <p class="tmg-body" style="color:var(--tmg-text-muted)">
+              Try removing one or more filters or click Reset filters.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      const bodyRows = pageRows.map(row => {
+        const hasFlag = row.data_quality_note && row.data_quality_note.toUpperCase() !== 'NA';
+        const teamParam = encodeURIComponent(row.signing_team);
+        const seasonParam = encodeURIComponent(String(row.spotrac_year));
+        const targetUrl = `./team.html?team=${teamParam}&season=${seasonParam}`;
+
+        return `
+          <tr class="clickable-row" data-target="${targetUrl}">
+            <td>${row.player_name}</td>
+            <td>${row.spotrac_year}</td>
+            <td><span class="${positionBadgeClass(row.position)}">${row.position}</span></td>
+            <td>${row.signing_team}</td>
+            <td>${row.previous_team}</td>
+            <td><span class="${geographyBadgeClass(row.movement_geography)}">${geographyLabel(row.movement_geography)}</span></td>
+            <td>${formatMoneyMillions(row.aav, 2)}</td>
+            <td>${Math.trunc(row.contract_years)}</td>
+            <td>${formatMoneyMillionsCompact(row.contract_value)}</td>
+            <td>${hasFlag ? '⚠' : ''}</td>
+          </tr>
+        `;
+      }).join('');
+
+      els.tableContent.innerHTML = `
+        <div class="table-wrap">
+          <table class="tmg-table">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Season</th>
+                <th>Pos</th>
+                <th>Signing team</th>
+                <th>Previous team</th>
+                <th>Geography</th>
+                <th>AAV</th>
+                <th>Years</th>
+                <th>Total value</th>
+                <th>Flag</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bodyRows}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      els.tableContent.querySelectorAll('tr.clickable-row').forEach(rowEl => {
+        rowEl.addEventListener('click', () => {
+          const target = rowEl.getAttribute('data-target');
+          if (target) {
+            window.location.href = target;
+          }
+        });
+      });
+    }
+
+    function renderPagination() {
+      const totalRows = filteredSignings.length;
+      const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+
+      els.pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+      els.prevPage.disabled = currentPage === 1;
+      els.nextPage.disabled = currentPage === totalPages;
+      els.paginationWrap.style.display = totalRows > PAGE_SIZE ? 'flex' : 'none';
+    }
+
+    function renderQuickStats(filteredRows) {
+      const count = filteredRows.length;
+      const totalAAV = filteredRows.reduce((sum, row) => sum + row.aav, 0);
+      const avgAAV = count > 0 ? totalAAV / count : 0;
+      const avgYears = count > 0
+        ? filteredRows.reduce((sum, row) => sum + row.contract_years, 0) / count
+        : 0;
+
+      els.statCount.textContent = String(count);
+      els.statTotalAAV.textContent = formatMoneyMillionsCompact(totalAAV);
+      els.statAvgAAV.textContent = formatMoneyMillions(avgAAV, 2);
+      els.statAvgYears.textContent = avgYears.toFixed(1);
+    }
+
+    function updateResultsSummary() {
+      els.resultsCount.textContent = `Showing ${filteredSignings.length} of ${TOTAL_MOVEMENT_SIGNINGS_LABEL} signings`;
+
+      const contextParts = [];
+      if (filters.season !== 'all') contextParts.push(`${filters.season} season`);
+      if (filters.team !== 'all') contextParts.push(filters.team);
+
+      if (filters.position !== 'all') {
+        const positionMap = {
+          G: 'Goalie',
+          D: 'Defence',
+          C: 'Centre',
+          LW: 'Left wing',
+          RW: 'Right wing'
+        };
+        contextParts.push(positionMap[filters.position] || filters.position);
+      }
+
+      if (filters.geography !== 'all') {
+        contextParts.push(geographyLabel(filters.geography));
+      }
+
+      if (filters.aav > 0) {
+        contextParts.push(`${formatMoneyMillions(filters.aav, 0)}+ AAV`);
+      }
+
+      els.resultsContext.textContent = contextParts.length
+        ? `Filtered by: ${contextParts.join(', ')}`
+        : '';
+    }
+
+    function renderResults() {
+      const totalRows = filteredSignings.length;
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pageRows = filteredSignings.slice(start, end);
+
+      renderTable(pageRows);
+      renderPagination();
+      renderQuickStats(filteredSignings);
+      updateResultsSummary();
+    }
+
+    function handleFilterChange(filterKey, value) {
+      filters[filterKey] = value;
+      currentPage = 1;
+      applyFilters();
+      renderResults();
+    }
+
+    function handleSortChange(value) {
+      filters.sort = value;
+      currentPage = 1;
+      applyFilters();
+      renderResults();
+    }
+
+    function handleReset() {
+      filters = {
+        season: 'all',
+        team: 'all',
+        position: 'all',
+        geography: 'all',
+        aav: 0,
+        sort: 'aav_desc'
+      };
+
+      els.filterSeason.value = 'all';
+      els.filterTeam.value = 'all';
+      els.filterPosition.value = 'all';
+      els.filterGeography.value = 'all';
+      els.filterAAV.value = '0';
+      els.sortBy.value = 'aav_desc';
+
+      currentPage = 1;
+      applyFilters();
+      renderResults();
+    }
+
+    function attachListeners() {
+      els.filterSeason.addEventListener('change', e => handleFilterChange('season', e.target.value));
+      els.filterTeam.addEventListener('change', e => handleFilterChange('team', e.target.value));
+      els.filterPosition.addEventListener('change', e => handleFilterChange('position', e.target.value));
+      els.filterGeography.addEventListener('change', e => handleFilterChange('geography', e.target.value));
+      els.filterAAV.addEventListener('change', e => handleFilterChange('aav', Number(e.target.value)));
+      els.sortBy.addEventListener('change', e => handleSortChange(e.target.value));
+      els.resetFilters.addEventListener('click', handleReset);
+
+      els.prevPage.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage -= 1;
+          renderResults();
+        }
+      });
+
+      els.nextPage.addEventListener('click', () => {
+        const totalPages = Math.max(1, Math.ceil(filteredSignings.length / PAGE_SIZE));
+        if (currentPage < totalPages) {
+          currentPage += 1;
+          renderResults();
+        }
+      });
+    }
+
+    async function init() {
+      try {
+        await loadData();
+        populateFilterDropdowns();
+        applyFilters();
+        attachListeners();
+        renderResults();
+      } catch (err) {
+        console.error(err);
+        els.tableContent.innerHTML = '<p class="tmg-body" style="color:var(--tmg-error)">Failed to load signings data.</p>';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
