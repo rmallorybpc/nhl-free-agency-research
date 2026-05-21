@@ -513,26 +513,47 @@
       if (container) container.innerHTML = sentence;
     }
 
-    function fetchCsvSafe(url, label) {
-      return fetch(url)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          return response.text();
-        })
-        .catch(error => {
-          console.error(`Failed to load ${label}:`, error);
-          return null;
-        });
+    function fetchCsvSafe(urlCandidates, label) {
+      const urls = Array.isArray(urlCandidates) ? urlCandidates : [urlCandidates];
+
+      function tryAt(index) {
+        if (index >= urls.length) {
+          console.error(`Failed to load ${label}: exhausted all URL candidates`);
+          return Promise.resolve(null);
+        }
+
+        const url = urls[index];
+        return fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            return response.text();
+          })
+          .catch(error => {
+            console.error(`Failed to load ${label} from ${url}:`, error);
+            return tryAt(index + 1);
+          });
+      }
+
+      return tryAt(0);
+    }
+
+    function coefficientUrlCandidates(filename) {
+      return [
+        `${BASE}/output/tables/${filename}`,
+        `../../output/tables/${filename}`,
+        `/output/tables/${filename}`,
+        `https://raw.githubusercontent.com/rmallorybpc/nhl-free-agency-research/main/output/tables/${filename}`
+      ];
     }
 
     Promise.all([
-      fetchCsvSafe(`${BASE}/output/tables/model_comparison_summary.csv`, 'model_comparison_summary.csv'),
-      fetchCsvSafe(`${BASE}/output/tables/model_a_full_coefficients.csv`, 'model_a_full_coefficients.csv'),
-      fetchCsvSafe(`${BASE}/output/tables/model_b_full_coefficients.csv`, 'model_b_full_coefficients.csv'),
-      fetchCsvSafe(`${BASE}/output/tables/model_a_restricted_coefficients.csv`, 'model_a_restricted_coefficients.csv'),
-      fetchCsvSafe(`${BASE}/output/tables/model_b_restricted_coefficients.csv`, 'model_b_restricted_coefficients.csv')
+      fetchCsvSafe(coefficientUrlCandidates('model_comparison_summary.csv'), 'model_comparison_summary.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_a_full_coefficients.csv'), 'model_a_full_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_b_full_coefficients.csv'), 'model_b_full_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_a_restricted_coefficients.csv'), 'model_a_restricted_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_b_restricted_coefficients.csv'), 'model_b_restricted_coefficients.csv')
     ]).then(([comparisonCsv, modelAFullCsv, modelBFullCsv, modelARestrictedCsv, modelBRestrictedCsv]) => {
       const modelComparisonRows = comparisonCsv ? parseCsv(comparisonCsv) : [];
       renderModelComparison(modelComparisonRows);
