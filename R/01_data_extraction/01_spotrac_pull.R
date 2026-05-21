@@ -82,6 +82,107 @@ for (yr in years) {
 		# Parse stage error handling
 		parsed_tbl <- tryCatch(
 			{
+				extract_type_map <- function(type_value) {
+					type_url <- sprintf(
+						"https://www.spotrac.com/nhl/free-agents/signed/_/year/%s/position/%s/type/%s",
+						yr,
+						pos,
+						type_value
+					)
+
+					type_resp <- tryCatch(
+						{
+							httr::GET(url = type_url, spotrac_ua)
+						},
+						error = function(e) {
+							warning(sprintf(
+								"GET failed for type map year=%s, position=%s, type=%s. Error: %s",
+								yr,
+								pos,
+								type_value,
+								conditionMessage(e)
+							))
+							NULL
+						}
+					)
+
+					if (is.null(type_resp) || httr::status_code(type_resp) != 200) {
+						return(tibble(
+							player_name = character(),
+							signing_team = character(),
+							previous_team = character(),
+							ufa_rfa_type = character()
+						))
+					}
+
+					type_page <- httr::content(type_resp, as = "text", encoding = "UTF-8") |>
+						read_html()
+
+					type_tables <- type_page |>
+						html_elements("table") |>
+						html_table(fill = TRUE)
+
+					if (length(type_tables) == 0) {
+						return(tibble(
+							player_name = character(),
+							signing_team = character(),
+							previous_team = character(),
+							ufa_rfa_type = character()
+						))
+					}
+
+					type_idx <- which(map_lgl(type_tables, function(x) {
+						nms <- names(x) |>
+							stringr::str_to_lower() |>
+							stringr::str_replace_all("[^a-z0-9]", "")
+
+						has_player <- any(stringr::str_detect(nms, "player|name"))
+						has_from <- any(stringr::str_detect(nms, "^from$"))
+						has_to <- any(stringr::str_detect(nms, "^to$"))
+
+						has_player && has_from && has_to
+					}))
+
+					if (length(type_idx) == 0) {
+						return(tibble(
+							player_name = character(),
+							signing_team = character(),
+							previous_team = character(),
+							ufa_rfa_type = character()
+						))
+					}
+
+					type_tbl <- type_tables[[type_idx[1]]]
+					type_nms <- clean_colnames(names(type_tbl))
+					type_blank_idx <- which(is.na(type_nms) | type_nms == "")
+					if (length(type_blank_idx) > 0) {
+						type_nms[type_blank_idx] <- paste0("col_", type_blank_idx)
+					}
+					names(type_tbl) <- make.unique(type_nms, sep = "_")
+
+					player_type_col <- pick_col(type_tbl, "player|name")
+					signing_type_col <- pick_col(type_tbl, "^to$")
+					previous_type_col <- pick_col(type_tbl, "^from$")
+
+					if (is.na(player_type_col) || is.na(signing_type_col) || is.na(previous_type_col)) {
+						return(tibble(
+							player_name = character(),
+							signing_team = character(),
+							previous_team = character(),
+							ufa_rfa_type = character()
+						))
+					}
+
+					tibble(
+						player_name = type_tbl[[player_type_col]],
+						signing_team = type_tbl[[signing_type_col]],
+						previous_team = type_tbl[[previous_type_col]],
+						ufa_rfa_type = stringr::str_to_upper(type_value)
+					) |>
+						mutate(across(everything(), ~ stringr::str_squish(as.character(.x)))) |>
+						filter(!is.na(player_name), player_name != "")
+				}
+
 				page <- httr::content(resp, as = "text", encoding = "UTF-8") |>
 					read_html()
 
@@ -140,14 +241,17 @@ for (yr in years) {
 					html_text2() |>
 					clean_colnames()
 
+				row_nodes <- tbl_node |>
+					html_elements("tbody tr")
+
 				years_col_idx <- which(stringr::str_detect(headers_clean, "^yrs$|year|term"))
+				aav_col_idx <- which(stringr::str_detect(headers_clean, "^aav"))
 
 				years_from_data_sort <- rep(NA_character_, nrow(tbl))
+				aav_from_data_sort <- rep(NA_character_, nrow(tbl))
+				ufa_rfa_from_row_html <- rep(NA_character_, nrow(tbl))
 
 				if (length(years_col_idx) > 0) {
-					row_nodes <- tbl_node |>
-						html_elements("tbody tr")
-
 					years_from_data_sort <- purrr::map_chr(row_nodes, function(rn) {
 						tds <- rn |>
 							html_elements("td")
@@ -179,6 +283,58 @@ for (yr in years) {
 					}
 				}
 
+				if (length(aav_col_idx) > 0) {
+					aav_from_data_sort <- purrr::map_chr(row_nodes, function(rn) {
+						tds <- rn |>
+							html_elements("td")
+
+						if (length(tds) < aav_col_idx[1]) {
+							return(NA_character_)
+						}
+
+						aav_td <- tds[[aav_col_idx[1]]]
+						aav_attr <- aav_td |>
+							html_attr("data-sort")
+						aav_text <- aav_td |>
+							html_text2() |>
+							stringr::str_squish()
+
+						if (!is.na(aav_attr) && aav_attr != "") {
+							return(aav_attr)
+						}
+
+						if (aav_text == "") {
+							return(NA_character_)
+						}
+
+						aav_text
+					})
+
+					if (length(aav_from_data_sort) != nrow(tbl)) {
+						aav_from_data_sort <- rep(NA_character_, nrow(tbl))
+					}
+				}
+
+				ufa_rfa_from_row_html <- purrr::map_chr(row_nodes, function(rn) {
+					status_txt <- rn |>
+						html_element("td.contract-free_agent_type .pill-start") |>
+						html_text2()
+
+					status_txt <- status_txt |>
+						stringr::str_squish() |>
+						stringr::str_to_upper()
+
+					if (is.na(status_txt) || status_txt == "") {
+						return(NA_character_)
+					}
+
+					status_txt
+				})
+
+				if (length(ufa_rfa_from_row_html) != nrow(tbl)) {
+					ufa_rfa_from_row_html <- rep(NA_character_, nrow(tbl))
+				}
+
 				# Skip effectively empty pulls.
 				if (nrow(tbl) == 0 || all(tbl == "" | is.na(tbl))) {
 					warning(sprintf(
@@ -204,7 +360,13 @@ for (yr in years) {
 					signing_team = if (!is.na(signing_team_col)) tbl[[signing_team_col]] else NA_character_,
 					previous_team = if (!is.na(previous_team_col)) tbl[[previous_team_col]] else NA_character_,
 					contract_value = if (!is.na(contract_value_col)) tbl[[contract_value_col]] else NA_character_,
-					aav = if (!is.na(aav_col)) tbl[[aav_col]] else NA_character_,
+					aav = if (any(!is.na(aav_from_data_sort) & aav_from_data_sort != "")) {
+						aav_from_data_sort
+					} else if (!is.na(aav_col)) {
+						tbl[[aav_col]]
+					} else {
+						NA_character_
+					},
 					contract_years = if (any(!is.na(years_from_data_sort) & years_from_data_sort != "")) {
 						years_from_data_sort
 					} else if (!is.na(contract_years_col)) {
@@ -212,8 +374,41 @@ for (yr in years) {
 					} else {
 						NA_character_
 					},
-					ufa_rfa_type = if (!is.na(ufa_rfa_col)) tbl[[ufa_rfa_col]] else NA_character_
+					ufa_rfa_type = if (any(!is.na(ufa_rfa_from_row_html) & ufa_rfa_from_row_html != "")) {
+						ufa_rfa_from_row_html
+					} else if (!is.na(ufa_rfa_col)) {
+						tbl[[ufa_rfa_col]]
+					} else {
+						NA_character_
+					}
 				)
+
+				type_map <- bind_rows(
+					extract_type_map("ufa"),
+					extract_type_map("rfa")
+				) |>
+					distinct(player_name, signing_team, previous_team, .keep_all = TRUE)
+
+				if (nrow(type_map) > 0) {
+					out_tbl <- out_tbl |>
+						mutate(
+							player_name_key = stringr::str_to_upper(stringr::str_squish(player_name)),
+							signing_team_key = stringr::str_to_upper(stringr::str_squish(signing_team)),
+							previous_team_key = stringr::str_to_upper(stringr::str_squish(previous_team))
+						) |>
+						left_join(
+							type_map |>
+								mutate(
+									player_name_key = stringr::str_to_upper(stringr::str_squish(player_name)),
+									signing_team_key = stringr::str_to_upper(stringr::str_squish(signing_team)),
+									previous_team_key = stringr::str_to_upper(stringr::str_squish(previous_team))
+								) |>
+								select(player_name_key, signing_team_key, previous_team_key, ufa_rfa_type_join = ufa_rfa_type),
+							by = c("player_name_key", "signing_team_key", "previous_team_key")
+						) |>
+						mutate(ufa_rfa_type = coalesce(ufa_rfa_type_join, ufa_rfa_type)) |>
+						select(-player_name_key, -signing_team_key, -previous_team_key, -ufa_rfa_type_join)
+				}
 
 				if (nrow(out_tbl) == 0 || all(out_tbl$player_name == "" | is.na(out_tbl$player_name))) {
 					warning(sprintf(
