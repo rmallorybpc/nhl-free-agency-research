@@ -87,6 +87,15 @@ cap_change_by_season <- cap_output %>%
 	arrange(season_year)
 
 cap_change_na_count <- sum(is.na(cap_output$cap_ceiling_change))
+expected_cap_change_na_count <- sum(cap_output$season_year == 2017)
+cap_change_2025 <- cap_change_by_season %>%
+	filter(season_year == 2025) %>%
+	pull(cap_ceiling_change)
+cap_change_2025_label <- ifelse(
+	length(cap_change_2025) == 1 && !is.na(cap_change_2025),
+	paste0("$", format(cap_change_2025, big.mark = ",", scientific = FALSE)),
+	"NA"
+)
 
 cat("===== CAP VARIABLES QA CHECKS =====\n")
 cat("Total rows in output:", total_rows, "(expected 282)\n")
@@ -101,12 +110,18 @@ cat(
 )
 cat("Count of near_cap_floor TRUE:", near_cap_floor_count, "\n")
 cat("Count of heavy_spender TRUE:", heavy_spender_count, "\n")
-cat("cap_ceiling_change values by season_year:\n")
+cat(
+	"cap_ceiling_change values by season_year (2025 jump computed as",
+	cap_change_2025_label,
+	"):\n"
+)
 print(cap_change_by_season)
 cat(
 	"Count of NA values in cap_ceiling_change:",
 	cap_change_na_count,
-	"(expected 32 for 2017)\n"
+	"(expected",
+	expected_cap_change_na_count,
+	"for 2017 rows)\n"
 )
 
 write_csv(
