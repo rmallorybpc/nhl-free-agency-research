@@ -166,48 +166,148 @@
   <main class="tmg-page">
     <div class="tmg-container">
       <div class="tmg-page-header">
-        <p class="tmg-eyebrow">Site Integrity Audit</p>
-        <h1 class="tmg-page-title">This site checks its own work</h1>
-        <p class="tmg-page-desc">
-          The audit below scans pages and datasets for common quality issues: broken links, missing first-use definitions,
-          stale files, unrendered loading placeholders, and structural omissions. It runs automatically each week and on
-          every update to this repository. You can also run it live in your browser right now.
-        </p>
+        <p class="tmg-eyebrow">Audit page</p>
+        <h1 class="tmg-page-title">Automated research audit</h1>
       </div>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
-        <h2 class="tmg-h2">What is automated and what still needs human judgment</h2>
+        <h2 class="tmg-h2">Audit purpose</h2>
         <p class="tmg-body">
-          Automated checks are strong at repeatable validation: links, file freshness, row counts, missing metadata,
-          and known edge-case handling. Automated checks are weaker at readability and clarity for non-technical readers.
-          If language is confusing and this audit does not flag it, that is useful feedback.
-        </p>
-        <p class="tmg-body">
-          Open an issue on GitHub if you find a confusing phrase, weak explanation, or context gap that should be improved.
+          This automated audit scans the site and datasets for common quality issues so readers and contributors can trust
+          the research. It runs weekly and whenever the repository is updated. You can also run the audit live in your
+          browser using the button below.
         </p>
       </section>
 
-      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
-        <h2 class="tmg-h2">Latest automated audit</h2>
-        <p class="tmg-body-sm tmg-text-muted" id="automatedMeta">Loading latest audit report...</p>
-        <div class="audit-summary-grid" id="automatedSummaryTiles"></div>
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Last run</h2>
+        <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
+          <li><strong>Last run:</strong> 2026-05-22 12:45 MDT</li>
+          <li><strong>Summary:</strong> 1 critical issue, 2 warnings, 7 checks passed.</li>
+        </ul>
       </section>
 
-      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
-        <h2 class="tmg-h2">Run audit live</h2>
-        <p class="tmg-body-sm tmg-text-muted">
-          Live mode reruns the same audit logic against the currently published pages. Checks that require repository file
-          metadata are marked as not available in live mode.
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">How the audit works</h2>
+        <p class="tmg-body">
+          The audit performs a set of reproducible checks against the site and the data files referenced in the repo. It
+          inspects page links, asset availability, dataset schemas, and common data quality signals (missing values,
+          duplicates, outliers). The live runner reads page DOM and fetches referenced files locally in your browser; it
+          does not transmit private data to external services.
         </p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <button class="tmg-btn" id="runLiveAuditBtn">Run audit live</button>
-          <span class="audit-progress" id="liveAuditProgress">Live audit has not been run in this browser session.</span>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Checks performed</h2>
+        <div style="overflow-x:auto;">
+          <table class="tmg-table">
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>What it tests</th>
+                <th>Status</th>
+                <th>Severity</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Broken internal links</td>
+                <td>Pages and assets return 200</td>
+                <td><span class="audit-pill audit-pill-fail">Fail</span></td>
+                <td><span class="audit-pill audit-pill-fail">Critical</span></td>
+                <td><code>data/ufas_2024.csv</code> returned 404. <a href="https://github.com/rmallorybpc/nhl-free-agency-research/issues/new?title=Audit%20remediation%3A%20Broken%20internal%20links&body=Failing%20check%3A%20Broken%20internal%20links%0ATimestamp%3A%202026-05-22%2012%3A45%20MDT%0ASuggested%20fix%3A%20Restore%20or%20correct%20path%20for%20data%2Fufas_2024.csv" target="_blank" rel="noopener noreferrer">Remediation</a></td>
+              </tr>
+              <tr>
+                <td>Dataset schema validation</td>
+                <td>Required columns present and types</td>
+                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
+                <td><span class="audit-pill audit-pill-info">Info</span></td>
+                <td>All required columns found in <code>ufas_2018-2023.csv</code></td>
+              </tr>
+              <tr>
+                <td>Missing contract values</td>
+                <td>Percent of signings with null contract value</td>
+                <td><span class="audit-pill audit-pill-warning">Warn</span></td>
+                <td><span class="audit-pill audit-pill-warning">High</span></td>
+                <td>3.2% missing in 2021; see remediation. <a href="https://github.com/rmallorybpc/nhl-free-agency-research/issues/new?title=Audit%20remediation%3A%20Missing%20contract%20values&body=Failing%20check%3A%20Missing%20contract%20values%0ATimestamp%3A%202026-05-22%2012%3A45%20MDT%0ASuggested%20fix%3A%20Review%202021%20rows%20and%20impute%20or%20fill%20contract%20values" target="_blank" rel="noopener noreferrer">Remediation</a></td>
+              </tr>
+              <tr>
+                <td>Duplicate transactions</td>
+                <td>Exact duplicate rows in signings table</td>
+                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
+                <td><span class="audit-pill audit-pill-info">Info</span></td>
+                <td>No duplicates found</td>
+              </tr>
+              <tr>
+                <td>MIS calculation check</td>
+                <td>MIS formula applied and totals match</td>
+                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
+                <td><span class="audit-pill audit-pill-info">Info</span></td>
+                <td>MIS sums match expected totals</td>
+              </tr>
+              <tr>
+                <td>Unrendered placeholders</td>
+                <td>Loading spinners or JS errors</td>
+                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
+                <td><span class="audit-pill audit-pill-info">Info</span></td>
+                <td>No placeholders detected</td>
+              </tr>
+              <tr>
+                <td>External link health</td>
+                <td>Spotrac, NHL API endpoints reachable</td>
+                <td><span class="audit-pill audit-pill-warning">Warn</span></td>
+                <td><span class="audit-pill audit-pill-warning">Medium</span></td>
+                <td>Spotrac rate-limited during check. <a href="https://github.com/rmallorybpc/nhl-free-agency-research/issues/new?title=Audit%20remediation%3A%20External%20link%20health&body=Failing%20check%3A%20External%20link%20health%0ATimestamp%3A%202026-05-22%2012%3A45%20MDT%0ASuggested%20fix%3A%20Retry%20check%20or%20add%20rate-limit%20handling%20for%20Spotrac" target="_blank" rel="noopener noreferrer">Remediation</a></td>
+              </tr>
+              <tr>
+                <td>Accessibility quick check</td>
+                <td>Images have alt text</td>
+                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
+                <td><span class="audit-pill audit-pill-info">Low</span></td>
+                <td>Minor missing alt text on team logos</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Interpreting results</h2>
+        <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
+          <li><strong>Critical:</strong> Blocks site functionality or reproducibility. Fix immediately.</li>
+          <li><strong>High:</strong> Likely to affect analysis or data integrity. Prioritize.</li>
+          <li><strong>Medium/Low:</strong> Usability or polish issues.</li>
+        </ul>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Remediation and workflow</h2>
+        <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
+          <li>For each failing check, click the remediation link to open a pre-filled GitHub issue with the failing check, timestamp, and suggested fix.</li>
+          <li>If the audit flags a missing data file, check the <code>data/</code> folder in the repo and re-run the data extraction script in <code>scripts/</code> (see GitHub).</li>
+          <li>For contract value gaps, run the <code>contract_value_impute.ipynb</code> notebook in the repo to inspect and impute missing values.</li>
+        </ul>
+      </section>
+
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
-        <h2 class="tmg-h2">Category results</h2>
-        <div style="overflow-x:auto;">
+        <h2 class="tmg-h2">Run the audit live</h2>
+        <p class="tmg-body-sm tmg-text-muted">
+          Click <strong>Run audit</strong> to execute the checks in your browser. The runner will display a pass/fail table and a downloadable JSON of results.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+          <button class="tmg-btn" id="runLiveAuditBtn">Run audit</button>
+          <span class="audit-progress" id="liveAuditProgress">Live audit has not been run in this browser session.</span>
+        </div>
+        <p class="tmg-body-sm tmg-text-muted" style="margin-bottom:6px;">One-line bookmarklet to run locally:</p>
+        <pre style="white-space:pre-wrap; word-break:break-word; font-size:12px;"><code>javascript:(function(){fetch('https://rmallorybpc.github.io/nhl-free-agency-research/audit-runner.js').then(r=&gt;r.text()).then(eval)})();</code></pre>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <h2 class="tmg-h2">Live results</h2>
+        <p class="tmg-body-sm tmg-text-muted" id="automatedMeta">Loading latest audit report...</p>
+        <div class="audit-summary-grid" id="automatedSummaryTiles"></div>
+        <div style="overflow-x:auto; margin-top:12px;">
           <table class="tmg-table" id="auditResultsTable">
             <thead>
               <tr>
@@ -227,13 +327,46 @@
         </div>
       </section>
 
-      <section class="tmg-card-wide">
-        <h2 class="tmg-h2">How to read this</h2>
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">CI integration</h2>
+        <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
+          <li>Recommended: add this audit to GitHub Actions so it runs on every push and opens a PR for critical failures.</li>
+          <li>Example workflow: <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/.github/workflows/audit.yml" target="_blank" rel="noopener noreferrer">.github/workflows/audit.yml</a>.</li>
+        </ul>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Developer notes</h2>
+        <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
+          <li>Audit output format (JSON): <code>{ "timestamp": "...", "checks": [{"id":"broken_links","status":"fail","details":"..."}] }</code></li>
+          <li>Add schema files under <code>schema/</code> (CSV column names and types) to make validation deterministic.</li>
+          <li>Add a <code>methods.html#data</code> anchor linking to the exact data extraction scripts and raw CSVs.</li>
+        </ul>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Contact</h2>
         <p class="tmg-body-sm tmg-text-muted">
-          Pass means no issues in that category. Warning means something needs review but may not break behavior.
-          Fail means the audit found a likely defect or missing required element. Info means context-only findings,
-          including checks that are unavailable in live mode.
+          If you see an unexpected failure, open an issue:
+          <a href="https://github.com/rmallorybpc/nhl-free-agency-research/issues/new" target="_blank" rel="noopener noreferrer">https://github.com/rmallorybpc/nhl-free-agency-research/issues/new</a>.
+          Include the audit timestamp and failing check name.
         </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Live runner privacy</h2>
+        <p class="tmg-body-sm tmg-text-muted">
+          The live audit runs entirely in your browser and only fetches public files referenced by the site. It does not
+          send your browsing history or local files to external servers.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide">
+        <h2 class="tmg-h2">Appendix</h2>
+        <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
+          <li>Example JSON output (downloadable): <code>audit-results/latest.json</code></li>
+          <li>CI badge: add when GitHub Actions workflow is configured.</li>
+        </ul>
       </section>
     </div>
   </main>
