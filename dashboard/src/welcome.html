@@ -76,10 +76,77 @@
       margin-top: 10px;
       margin-bottom: 10px;
     }
+    .overview-card-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--tmg-gap);
+      margin-bottom: var(--tmg-gap);
+    }
+    .ufa-spend-wrap { max-width: 980px; margin: 0 auto; }
+    .ufa-spend-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .ufa-spend-controls label,
+    .ufa-spend-controls legend {
+      font-size: 14px;
+      color: var(--tmg-charcoal);
+    }
+    .ufa-spend-check,
+    .ufa-spend-radio {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      border: none;
+      padding: 0;
+      min-height: 34px;
+    }
+    .ufa-spend-radio {
+      flex-wrap: wrap;
+    }
+    .ufa-spend-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .ufa-spend-plot {
+      width: 100%;
+      min-height: 420px;
+    }
+    .ufa-spend-caption {
+      margin-top: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: var(--tmg-muted);
+    }
+    .ufa-spend-status {
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: var(--tmg-muted);
+    }
+    .ufa-spend-error {
+      border: 1px solid rgba(170, 35, 54, 0.2);
+      border-radius: 8px;
+      background: rgba(170, 35, 54, 0.05);
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      color: #6b1b2a;
+      font-size: 14px;
+    }
     @media (max-width: 768px) {
       .mean-reversion-controls {
         align-items: flex-start;
         flex-direction: column;
+      }
+      .ufa-spend-controls {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -169,9 +236,10 @@
         </p>
       </section>
 
-      <section style="margin-bottom: var(--tmg-gap);" aria-label="Mean reversion visualization section">
+      <section class="overview-card-grid" aria-label="Overview visualization section">
         <!-- Mean-reversion chart reads ./data/team_seasons.json and renders via ./js/mean_reversion_chart.js -->
         <div id="meanReversionChartContainer"></div>
+        <div id="ufaSpendChartCard" class="ufa-spend-wrap"></div>
       </section>
 
       <div style="margin-bottom: var(--tmg-gap);">
@@ -262,6 +330,7 @@
 
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <script src="./js/mean_reversion_chart.js" defer></script>
+  <script src="./js/ufa_spend_chart.js" defer></script>
   <script>
     const btn  = document.getElementById('tmgDdBtn');
     const menu = document.getElementById('tmgDdMenu');
