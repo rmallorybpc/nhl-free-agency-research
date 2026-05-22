@@ -691,14 +691,16 @@
           ? current : worst;
       });
 
-      const priorSeason = parseInt(worstFall.season_year, 10) - 1;
+      const outcomeYear = parseInt(worstFall.season_year);
+      const priorStartYear = outcomeYear - 2;
+      const priorEndYearShort = (outcomeYear - 1).toString().slice(2).padStart(2, '0');
       const fallPP = Math.abs(parseFloat(worstFall.points_pct_change) * 100).toFixed(1);
       const priorPct = parseFloat(worstFall.prior_season_points_pct).toFixed(3);
       const currentPct = parseFloat(worstFall.points_percentage).toFixed(3);
 
       const sentence = `
         Take the <strong>${worstFall.teamCommonName}</strong>. They finished
-        the ${priorSeason}-${parseInt(worstFall.season_year, 10).toString().slice(2)}
+        the ${priorStartYear}-${priorEndYearShort}
         season with a points percentage of ${priorPct}, near the top of the league.
         The next season they fell to ${currentPct} - a drop of ${fallPP} percentage
         points. That fall happened without any major change in roster strategy.
