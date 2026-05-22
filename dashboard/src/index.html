@@ -535,6 +535,58 @@
       els.faChartR2.textContent = fit.r2.toFixed(3);
     }
 
+    function buildNonOverlappingLabels(dataRows, xValues, yValues) {
+      const isMobile = window.innerWidth < 640;
+      const labels = new Array(dataRows.length).fill('');
+      const positions = new Array(dataRows.length).fill('top center');
+
+      if (isMobile || dataRows.length === 0) {
+        return { labels, positions, showText: false };
+      }
+
+      const minX = Math.min(...xValues);
+      const maxX = Math.max(...xValues);
+      const minY = Math.min(...yValues);
+      const maxY = Math.max(...yValues);
+      const xRange = Math.max(maxX - minX, 1e-6);
+      const yRange = Math.max(maxY - minY, 1e-6);
+      const yMean = yValues.reduce((sum, v) => sum + v, 0) / yValues.length;
+      const maxLabels = window.innerWidth < 1024 ? 14 : 22;
+
+      const candidates = dataRows.map((row, idx) => {
+        const spendNorm = (xValues[idx] - minX) / xRange;
+        const deltaNorm = Math.abs(yValues[idx] - yMean) / yRange;
+        return {
+          idx,
+          priority: (0.7 * spendNorm) + (1.3 * deltaNorm)
+        };
+      }).sort((a, b) => b.priority - a.priority);
+
+      const kept = [];
+      for (const candidate of candidates) {
+        if (kept.length >= maxLabels) {
+          break;
+        }
+
+        const overlap = kept.some(otherIdx => {
+          const dx = Math.abs((xValues[candidate.idx] - xValues[otherIdx]) / xRange);
+          const dy = Math.abs((yValues[candidate.idx] - yValues[otherIdx]) / yRange);
+          return dx < 0.085 && dy < 0.11;
+        });
+
+        if (!overlap) {
+          kept.push(candidate.idx);
+        }
+      }
+
+      kept.forEach(idx => {
+        labels[idx] = dataRows[idx].team;
+        positions[idx] = yValues[idx] >= yMean ? 'top center' : 'bottom center';
+      });
+
+      return { labels, positions, showText: true };
+    }
+
     function renderFaSpendWinChangeChart() {
       if (!window.Plotly || !els.faSpendWinChangePlot) {
         return;
@@ -543,7 +595,7 @@
       const rows = getSeasonRows();
       const dataRows = rows
         .map(row => ({
-          team: row.teamTriCode || row.teamCommonName || '',
+          team: (row.teamTriCode || row.teamCommonName || '').toUpperCase(),
           season: Number(row.season_year),
           ufaSpendM: toNumber(row.total_aav_spent) / 1000000,
           misM: toNumber(row.total_mis) / 1000000,
@@ -559,7 +611,12 @@
           margin: { l: 70, r: 20, t: 20, b: 70 },
           paper_bgcolor: '#ffffff',
           plot_bgcolor: '#ffffff',
-          xaxis: { title: { text: 'Total FA spend ($M)' } },
+          xaxis: {
+            title: { text: 'Total FA spend ($M)' },
+            tickprefix: '$',
+            ticksuffix: 'M',
+            tickformat: ',.0f'
+          },
           yaxis: { title: { text: 'Win change (points % delta)' } },
           annotations: [{
             text: 'Insufficient data for regression',
@@ -575,6 +632,7 @@
 
       const x = dataRows.map(row => row.ufaSpendM);
       const y = dataRows.map(row => row.delta);
+      const labelConfig = buildNonOverlappingLabels(dataRows, x, y);
       const fit = runSimpleOls(x, y);
 
       if (!fit) {
@@ -606,11 +664,18 @@
         x,
         y,
         type: 'scatter',
-        mode: 'markers',
+        mode: labelConfig.showText ? 'markers+text' : 'markers',
+        text: labelConfig.labels,
+        textposition: labelConfig.positions,
+        textfont: {
+          size: 11,
+          color: 'rgba(23, 56, 91, 0.95)'
+        },
+        cliponaxis: false,
         marker: {
-          color: 'rgba(52, 101, 164, 0.58)',
-          size: window.innerWidth < 480 ? 6 : 9,
-          line: { color: 'rgba(43, 82, 133, 0.85)', width: 0.5 }
+          color: 'rgba(30, 113, 184, 0.72)',
+          size: window.innerWidth < 480 ? 9 : 15,
+          line: { color: 'rgba(255, 255, 255, 0.98)', width: 1.6 }
         },
         customdata: dataRows.map(row => [row.team, row.season, row.ufaSpendM, row.misM, row.priorFinish, row.delta]),
         hovertemplate:
@@ -646,27 +711,49 @@
         x: xGrid,
         y: yFit,
         mode: 'lines',
-        line: { color: 'rgba(170, 35, 54, 0.95)', width: 3 },
+        line: { color: 'rgba(186, 37, 61, 0.96)', width: 3.5 },
         hovertemplate: 'Fit: %{y:.3f}<extra></extra>',
         showlegend: false
       };
 
       Plotly.react('faSpendWinChangePlot', [upperTrace, lowerTrace, lineTrace, pointTrace], {
-        margin: { l: 70, r: 20, t: 20, b: 70 },
+        margin: { l: 76, r: 20, t: 28, b: 78 },
         paper_bgcolor: '#ffffff',
         plot_bgcolor: '#ffffff',
+        font: {
+          family: 'Inter, system-ui, sans-serif',
+          size: 12,
+          color: 'rgba(45, 52, 54, 0.92)'
+        },
+        hoverlabel: {
+          bgcolor: '#ffffff',
+          bordercolor: 'rgba(34, 79, 129, 0.25)',
+          font: { color: '#1c2733', size: 12 }
+        },
         xaxis: {
           title: { text: 'Total FA spend ($M)' },
+          tickprefix: '$',
+          ticksuffix: 'M',
+          tickformat: ',.0f',
+          tickfont: { size: 12 },
+          ticklabelposition: 'outside',
           zeroline: false,
-          gridcolor: 'rgba(0,0,0,0.08)'
+          gridcolor: 'rgba(0,0,0,0.08)',
+          showline: true,
+          linewidth: 1,
+          linecolor: 'rgba(45,52,54,0.22)'
         },
         yaxis: {
           title: { text: 'Win change (points % delta)' },
+          tickfont: { size: 12 },
           zeroline: true,
           zerolinecolor: 'rgba(0,0,0,0.2)',
-          gridcolor: 'rgba(0,0,0,0.08)'
+          gridcolor: 'rgba(0,0,0,0.08)',
+          showline: true,
+          linewidth: 1,
+          linecolor: 'rgba(45,52,54,0.22)'
         }
-      }, { responsive: true, displayModeBar: false });
+      }, { responsive: true, displayModeBar: true, displaylogo: false });
 
       updateFaChartStats(fit, dataRows.length);
       els.faChartCaption.textContent = 'Season ' + currentSeason + ': slope ' + fit.slope.toFixed(3) + ', p-value ' + formatPValue(fit.pValue) + ', N = ' + fit.n + '.';
