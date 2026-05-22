@@ -1,5 +1,5 @@
 {
-  "audit_timestamp": "2026-05-22T18:54:37.161Z",
+  "audit_timestamp": "2026-05-22T20:25:33.565Z",
   "audit_version": "1.0",
   "site_base_url": "https://rmallorybpc.github.io/nhl-free-agency-research",
   "mode": "ci",
@@ -14,7 +14,7 @@
       "name": "Plain language compliance",
       "status": "warning",
       "checks_run": 162,
-      "issues_found": 19,
+      "issues_found": 20,
       "details": [
         {
           "page": "welcome.html",
@@ -167,6 +167,14 @@
           "context": "define as average annual value on first use",
           "term": "AAV",
           "suggestion": "define as average annual value on first use"
+        },
+        {
+          "page": "audit.html",
+          "severity": "warning",
+          "message": "Acronym 'MIS' appears without first-use definition",
+          "context": "define as Movement Impact Score on first use",
+          "term": "MIS",
+          "suggestion": "define as Movement Impact Score on first use"
         }
       ],
       "notes": [
@@ -262,7 +270,7 @@
         {
           "page": "audit.html",
           "severity": "warning",
-          "message": "Loading placeholder text detected: 'loading placeholders'",
+          "message": "Loading placeholder text detected: 'Loading spinners'",
           "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
         },
         {
