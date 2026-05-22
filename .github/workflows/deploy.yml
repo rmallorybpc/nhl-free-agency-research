@@ -30,6 +30,16 @@ jobs:
 
       - name: Prepare site artifact
         run: |
+          copy_or_warn() {
+            src="$1"
+            dest_dir="$2"
+            if [ -f "$src" ]; then
+              cp "$src" "$dest_dir/"
+            else
+              echo "Warning: $src not found; skipping copy."
+            fi
+          }
+
           mkdir -p _site
           cp -R dashboard/src/. _site/
 
@@ -37,7 +47,14 @@ jobs:
           mkdir -p _site/output/tables
 
           cp data/processed/nhl_master_analysis_panel.csv _site/data/processed/
-          cp data/processed/nhl_team_season_performance_clean.csv _site/data/processed/
+
+          # Performance file is useful for audit/data checks but may be absent in some branches.
+          if [ -f data/processed/nhl_team_season_performance_clean.csv ]; then
+            cp data/processed/nhl_team_season_performance_clean.csv _site/data/processed/
+          else
+            echo "Warning: data/processed/nhl_team_season_performance_clean.csv not found in repository."
+            echo "teamTriCode,season_year,gamesPlayed,wins,losses,otLosses,points,pointPctg,goalsFor,goalsAgainst,goalDifferential,goalsForPctg,xGoalsPctg,conferenceAbbrev,divisionAbbrev,season_type" > _site/data/processed/nhl_team_season_performance_clean.csv
+          fi
 
           # Signings file may be generated locally and not committed; keep deploy running
           # with a valid empty CSV so Team Detail still loads without hard failure.
@@ -48,12 +65,13 @@ jobs:
             echo "player_name,position,signing_team,previous_team,contract_value,aav,contract_years,ufa_rfa_type,spotrac_year,position_filter,transaction_type,same_team_resign,division_change,conference_change,aav_imputed,data_quality_note,movement_geography" > _site/data/processed/nhl_signed_free_agents_clean.csv
           fi
 
-          cp data/processed/nhl_team_mis_scores.csv _site/data/processed/
-          cp data/processed/nhl_team_geography_variables.csv _site/data/processed/
-          cp output/tables/model_comparison_summary.csv _site/output/tables/
-          cp output/tables/quartile_summary.csv _site/output/tables/
-          cp output/tables/quartile_examples.csv _site/output/tables/
-          cp output/tables/geography_overall_summary.csv _site/output/tables/
+          copy_or_warn data/processed/nhl_team_mis_scores.csv _site/data/processed
+          copy_or_warn data/processed/nhl_team_geography_variables.csv _site/data/processed
+
+          copy_or_warn output/tables/model_comparison_summary.csv _site/output/tables
+          copy_or_warn output/tables/quartile_summary.csv _site/output/tables
+          copy_or_warn output/tables/quartile_examples.csv _site/output/tables
+          copy_or_warn output/tables/geography_overall_summary.csv _site/output/tables
 
           if [ -f output/tables/audit_report.json ]; then
             cp output/tables/audit_report.json _site/output/tables/

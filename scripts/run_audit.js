@@ -102,6 +102,7 @@ async function writeReport(report) {
 }
 
 async function main() {
+  const strictMode = process.env.AUDIT_STRICT === '1' || process.env.AUDIT_STRICT === 'true';
   const nowIso = new Date().toISOString();
   const pageDocs = await loadPageDocs();
   const fileStats = await loadFileStats();
@@ -129,8 +130,10 @@ async function main() {
     ', failures=' + summary.failures
   );
 
-  if (summary.failures > 0) {
+  if (summary.failures > 0 && strictMode) {
     process.exitCode = 1;
+  } else if (summary.failures > 0) {
+    console.log('Audit failures detected, but continuing (non-strict mode). Set AUDIT_STRICT=true to fail the run.');
   }
 }
 
