@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit - NHL Free Agency Research</title>
+  <meta name="description" content="Automated self-audit for the NHL Free Agency Research site, including plain-language checks, link integrity, data freshness, and structural validation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px;
+      border-radius: var(--tmg-nav-radius);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tmg-charcoal);
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] {
+      background: rgba(132,169,140,0.15);
+      color: var(--tmg-sage-hover);
+    }
+
+    .audit-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .audit-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 12px;
+      border: 1px solid transparent;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .audit-pill-pass {
+      color: var(--tmg-success);
+      background: rgba(46, 133, 64, 0.12);
+      border-color: rgba(46, 133, 64, 0.35);
+    }
+
+    .audit-pill-warning {
+      color: var(--tmg-warning);
+      background: rgba(196, 127, 0, 0.12);
+      border-color: rgba(196, 127, 0, 0.35);
+    }
+
+    .audit-pill-fail {
+      color: var(--tmg-error);
+      background: rgba(176, 0, 32, 0.10);
+      border-color: rgba(176, 0, 32, 0.30);
+    }
+
+    .audit-pill-info {
+      color: var(--tmg-text-muted);
+      background: rgba(45, 52, 54, 0.08);
+      border-color: rgba(45, 52, 54, 0.2);
+    }
+
+    .audit-progress {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--tmg-text-muted);
+    }
+
+    .audit-details {
+      margin: 0;
+      border-top: 1px solid rgba(45, 52, 54, 0.08);
+      padding-top: 10px;
+    }
+
+    .audit-details summary {
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--tmg-charcoal);
+      font-weight: 500;
+      list-style: none;
+    }
+
+    .audit-details summary::-webkit-details-marker { display: none; }
+
+    .audit-detail-list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .audit-detail-item {
+      border: 1px solid rgba(45, 52, 54, 0.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(45, 52, 54, 0.02);
+    }
+
+    .audit-detail-meta {
+      font-size: 12px;
+      color: var(--tmg-text-muted);
+      margin: 4px 0 0;
+    }
+
+    @media (max-width: 900px) {
+      .tmg-page-links {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html">Welcome</a>
+      <a href="./findings.html">Key Findings</a>
+      <a href="./index.html">Overview</a>
+      <a href="./team.html">Team Detail</a>
+      <a href="./explorer.html">All Signings</a>
+      <a href="./audit.html" aria-current="page">Audit</a>
+    </div>
+    <div class="tmg-dropdown-wrap">
+      <button class="tmg-dropdown-btn" id="tmgDdBtn"
+              aria-haspopup="true" aria-expanded="false" aria-controls="tmgDdMenu">
+        TMG Tool Suite
+        <svg class="tmg-chevron" viewBox="0 0 12 12" fill="none"
+             width="12" height="12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tmg-dropdown-menu" id="tmgDdMenu" role="menu">
+        <a href="https://rmallorybpc.github.io/pdf-multi-agent-analysis/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">PDF Multi-Agent Analysis</a>
+        <a href="https://rmallorybpc.github.io/housing-market-intel/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">Housing Market Intel</a>
+        <a href="https://rmallorybpc.github.io/real-estate-report/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">Real Estate Report</a>
+        <a href="https://rmallorybpc.github.io/nflanalysis/dashboard/src/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">NFL Analysis</a>
+        <a href="https://rmallorybpc.github.io/nhl-free-agency-research/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">NHL Analysis</a>
+        <a href="https://rmallorybpc.github.io/recipes/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">Recipe Book</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow">Site Integrity Audit</p>
+        <h1 class="tmg-page-title">This site checks its own work</h1>
+        <p class="tmg-page-desc">
+          The audit below scans pages and datasets for common quality issues: broken links, missing first-use definitions,
+          stale files, unrendered loading placeholders, and structural omissions. It runs automatically each week and on
+          every update to this repository. You can also run it live in your browser right now.
+        </p>
+      </div>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">What is automated and what still needs human judgment</h2>
+        <p class="tmg-body">
+          Automated checks are strong at repeatable validation: links, file freshness, row counts, missing metadata,
+          and known edge-case handling. Automated checks are weaker at readability and clarity for non-technical readers.
+          If language is confusing and this audit does not flag it, that is useful feedback.
+        </p>
+        <p class="tmg-body">
+          Open an issue on GitHub if you find a confusing phrase, weak explanation, or context gap that should be improved.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <h2 class="tmg-h2">Latest automated audit</h2>
+        <p class="tmg-body-sm tmg-text-muted" id="automatedMeta">Loading latest audit report...</p>
+        <div class="audit-summary-grid" id="automatedSummaryTiles"></div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <h2 class="tmg-h2">Run audit live</h2>
+        <p class="tmg-body-sm tmg-text-muted">
+          Live mode reruns the same audit logic against the currently published pages. Checks that require repository file
+          metadata are marked as not available in live mode.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <button class="tmg-btn" id="runLiveAuditBtn">Run audit live</button>
+          <span class="audit-progress" id="liveAuditProgress">Live audit has not been run in this browser session.</span>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <h2 class="tmg-h2">Category results</h2>
+        <div style="overflow-x:auto;">
+          <table class="tmg-table" id="auditResultsTable">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Checks run</th>
+                <th>Issues found</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="5">Waiting for automated report...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide">
+        <h2 class="tmg-h2">How to read this</h2>
+        <p class="tmg-body-sm tmg-text-muted">
+          Pass means no issues in that category. Warning means something needs review but may not break behavior.
+          Fail means the audit found a likely defect or missing required element. Info means context-only findings,
+          including checks that are unavailable in live mode.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="tmg-footer">
+    Built on nine seasons of NHL transaction data (2017-2025), 1,648 UFA
+    movement events, Spotrac contract data, and NHL API game results via
+    nhlscraper. &nbsp;·&nbsp;
+    <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+       target="_blank" rel="noopener noreferrer">View the source on GitHub -></a>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('tmgDdBtn');
+    const menu = document.getElementById('tmgDdMenu');
+    btn.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script src="./audit_core.js"></script>
+  <script>
+    const REPORT_PATH = './output/tables/audit_report.json';
+    const LIVE_RUN_BTN = document.getElementById('runLiveAuditBtn');
+    const LIVE_PROGRESS = document.getElementById('liveAuditProgress');
+    const AUTO_META = document.getElementById('automatedMeta');
+    const AUTO_SUMMARY = document.getElementById('automatedSummaryTiles');
+    const RESULTS_TABLE = document.getElementById('auditResultsTable').querySelector('tbody');
+
+    function statusPill(status) {
+      if (status === 'pass') return '<span class="audit-pill audit-pill-pass">Pass</span>';
+      if (status === 'warning') return '<span class="audit-pill audit-pill-warning">Warning</span>';
+      if (status === 'fail') return '<span class="audit-pill audit-pill-fail">Fail</span>';
+      return '<span class="audit-pill audit-pill-info">Info</span>';
+    }
+
+    function severityPill(severity) {
+      if (severity === 'error') return '<span class="audit-pill audit-pill-fail">Error</span>';
+      if (severity === 'warning') return '<span class="audit-pill audit-pill-warning">Warning</span>';
+      return '<span class="audit-pill audit-pill-info">Info</span>';
+    }
+
+    function formatDate(iso) {
+      if (!iso) return 'Unknown';
+      const dt = new Date(iso);
+      if (Number.isNaN(dt.getTime())) return iso;
+      return dt.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function renderSummary(summary) {
+      AUTO_SUMMARY.innerHTML = [
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">TOTAL CHECKS</p>',
+        '  <p class="tmg-card-value">' + (summary.total_checks || 0) + '</p>',
+        '</article>',
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">PASSING CATEGORIES</p>',
+        '  <p class="tmg-card-value" style="color:var(--tmg-success)">' + (summary.passed || 0) + '</p>',
+        '</article>',
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">WARNINGS</p>',
+        '  <p class="tmg-card-value" style="color:var(--tmg-warning)">' + (summary.warnings || 0) + '</p>',
+        '</article>',
+        '<article class="tmg-card">',
+        '  <p class="tmg-card-label">FAILURES</p>',
+        '  <p class="tmg-card-value" style="color:var(--tmg-error)">' + (summary.failures || 0) + '</p>',
+        '</article>'
+      ].join('');
+    }
+
+    function renderCategoryDetails(category) {
+      if (!category.details || !category.details.length) {
+        return '<span class="tmg-text-muted">No issues</span>';
+      }
+
+      const detailItems = category.details.slice(0, 40).map(issue => {
+        const page = issue.page || 'n/a';
+        const context = issue.context || '';
+        return [
+          '<li class="audit-detail-item">',
+          severityPill(issue.severity || 'info') +
+            '<p style="margin:8px 0 0; font-size:13px; color:var(--tmg-charcoal);">' + (issue.message || 'Issue') + '</p>' +
+            '<p class="audit-detail-meta">Page/target: ' + page + '</p>' +
+            (context ? '<p class="audit-detail-meta">Context: ' + context + '</p>' : ''),
+          '</li>'
+        ].join('');
+      }).join('');
+
+      return [
+        '<details class="audit-details">',
+        '  <summary>View details (' + category.details.length + ')</summary>',
+        '  <ul class="audit-detail-list">' + detailItems + '</ul>',
+        '</details>'
+      ].join('');
+    }
+
+    function renderCategories(categories) {
+      if (!categories || !categories.length) {
+        RESULTS_TABLE.innerHTML = '<tr><td colspan="5">No category results found.</td></tr>';
+        return;
+      }
+
+      const rows = categories.map(category => {
+        return [
+          '<tr>',
+          '  <td><strong>' + category.name + '</strong></td>',
+          '  <td>' + statusPill(category.status) + '</td>',
+          '  <td>' + category.checks_run + '</td>',
+          '  <td>' + category.issues_found + '</td>',
+          '  <td>' + renderCategoryDetails(category) + '</td>',
+          '</tr>'
+        ].join('');
+      }).join('');
+
+      RESULTS_TABLE.innerHTML = rows;
+    }
+
+    async function fetchWithFallback(paths) {
+      let lastError = null;
+      for (const p of paths) {
+        try {
+          const resp = await fetch(p, { cache: 'no-store' });
+          if (resp.ok) {
+            return await resp.text();
+          }
+          lastError = new Error('HTTP ' + resp.status + ' for ' + p);
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error('Unable to fetch any path');
+    }
+
+    function getBasePrefix() {
+      const marker = '/dashboard/src/';
+      const path = window.location.pathname;
+      if (path.includes(marker)) {
+        return path.slice(0, path.indexOf(marker));
+      }
+      const slash = path.lastIndexOf('/');
+      if (slash <= 0) return '';
+      return path.slice(0, slash);
+    }
+
+    function getSiteBaseUrl() {
+      const marker = '/dashboard/src/';
+      const pathname = window.location.pathname;
+      if (pathname.includes(marker)) {
+        return window.location.origin + pathname.slice(0, pathname.indexOf(marker));
+      }
+      const withoutPage = pathname.replace(/\/[^/]*$/, '');
+      return window.location.origin + withoutPage;
+    }
+
+    function getAuditReportPaths() {
+      const prefix = getBasePrefix();
+      return [
+        REPORT_PATH,
+        prefix + '/output/tables/audit_report.json',
+        '/output/tables/audit_report.json'
+      ];
+    }
+
+    async function loadAutomatedReport() {
+      try {
+        const text = await fetchWithFallback(getAuditReportPaths());
+        const report = JSON.parse(text);
+        AUTO_META.textContent = 'Last automated run: ' + formatDate(report.audit_timestamp) + ' | Version ' + (report.audit_version || 'n/a');
+        renderSummary(report.summary || {});
+        renderCategories(report.categories || []);
+      } catch (err) {
+        AUTO_META.textContent = 'Automated audit report unavailable: ' + (err && err.message ? err.message : 'unknown error');
+        AUTO_SUMMARY.innerHTML = '<article class="tmg-card"><p class="tmg-card-value" style="color:var(--tmg-warning)">Unavailable</p></article>';
+        RESULTS_TABLE.innerHTML = '<tr><td colspan="5">Could not load output/tables/audit_report.json.</td></tr>';
+      }
+    }
+
+    async function fetchPageDocsForLive(siteBaseUrl) {
+      const docs = [];
+      for (const page of AuditCore.PAGE_PATHS) {
+        const url = siteBaseUrl.replace(/\/+$/, '') + '/' + page;
+        try {
+          const resp = await fetch(url, { cache: 'no-store' });
+          if (!resp.ok) {
+            docs.push({ path: page, html: '', url: url });
+            continue;
+          }
+          docs.push({ path: page, html: await resp.text(), url: url });
+        } catch (_err) {
+          docs.push({ path: page, html: '', url: url });
+        }
+      }
+      return docs;
+    }
+
+    async function resolveInternalStatusFactory(siteBaseUrl) {
+      return async function resolveInternalPathStatus(target) {
+        const cleanTarget = (target || '').replace(/^\/+/, '');
+        const url = siteBaseUrl.replace(/\/+$/, '') + '/' + cleanTarget;
+        try {
+          const resp = await fetch(url, { cache: 'no-store' });
+          return { ok: resp.ok, status: resp.status };
+        } catch (_err) {
+          return { ok: false, status: 'network_error' };
+        }
+      };
+    }
+
+    async function loadLiveCsvMap(siteBaseUrl) {
+      const csvMap = {};
+      for (const cfg of AuditCore.CSV_EXPECTATIONS) {
+        const url = siteBaseUrl.replace(/\/+$/, '') + '/' + cfg.file;
+        try {
+          const resp = await fetch(url, { cache: 'no-store' });
+          if (resp.ok) {
+            csvMap[cfg.file] = await resp.text();
+          }
+        } catch (_err) {
+          // best effort in live mode
+        }
+      }
+      return csvMap;
+    }
+
+    async function runLiveAudit() {
+      LIVE_RUN_BTN.disabled = true;
+      LIVE_PROGRESS.textContent = 'Preparing live audit...';
+
+      try {
+        const siteBaseUrl = getSiteBaseUrl();
+        LIVE_PROGRESS.textContent = 'Fetching live pages...';
+        const pageDocs = await fetchPageDocsForLive(siteBaseUrl);
+
+        LIVE_PROGRESS.textContent = 'Fetching live CSVs...';
+        const csvMap = await loadLiveCsvMap(siteBaseUrl);
+        const resolveInternalPathStatus = await resolveInternalStatusFactory(siteBaseUrl);
+
+        const nowIso = new Date().toISOString();
+        const liveReport = await AuditCore.runAudit({
+          mode: 'live',
+          now_iso: nowIso,
+          site_base_url: siteBaseUrl,
+          page_docs: pageDocs,
+          csv_map: csvMap,
+          file_stats: {},
+          resolve_internal_path_status: resolveInternalPathStatus,
+          on_progress: step => {
+            if (!step) return;
+            if (step.status === 'running') {
+              LIVE_PROGRESS.textContent = 'Running ' + step.category + ' (' + step.index + '/' + step.total + ')...';
+            }
+            if (step.status === 'completed') {
+              LIVE_PROGRESS.textContent = 'Completed ' + step.category + ' (' + step.index + '/' + step.total + ').';
+            }
+          }
+        });
+
+        AUTO_META.textContent = 'Live run complete: ' + formatDate(liveReport.audit_timestamp) + ' | Mode: live browser audit';
+        renderSummary(liveReport.summary || {});
+        renderCategories(liveReport.categories || []);
+        LIVE_PROGRESS.textContent = 'Live audit finished.';
+      } catch (err) {
+        LIVE_PROGRESS.textContent = 'Live audit failed: ' + (err && err.message ? err.message : 'unknown error');
+      } finally {
+        LIVE_RUN_BTN.disabled = false;
+      }
+    }
+
+    LIVE_RUN_BTN.addEventListener('click', runLiveAudit);
+    loadAutomatedReport();
+  </script>
+</body>
+</html>

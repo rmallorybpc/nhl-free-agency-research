@@ -1,0 +1,315 @@
+{
+  "audit_timestamp": "2026-05-22T17:37:47.024Z",
+  "audit_version": "1.0",
+  "site_base_url": "https://rmallorybpc.github.io/nhl-free-agency-research",
+  "mode": "ci",
+  "summary": {
+    "total_checks": 315,
+    "passed": 4,
+    "warnings": 3,
+    "failures": 0
+  },
+  "categories": [
+    {
+      "name": "Plain language compliance",
+      "status": "warning",
+      "checks_run": 162,
+      "issues_found": 18,
+      "details": [
+        {
+          "page": "welcome.html",
+          "severity": "warning",
+          "message": "Acronym 'UFA' appears without first-use definition",
+          "context": "define as unrestricted free agent on first use",
+          "term": "UFA",
+          "suggestion": "define as unrestricted free agent on first use"
+        },
+        {
+          "page": "welcome.html",
+          "severity": "warning",
+          "message": "Acronym 'MIS' appears without first-use definition",
+          "context": "define as Movement Impact Score on first use",
+          "term": "MIS",
+          "suggestion": "define as Movement Impact Score on first use"
+        },
+        {
+          "page": "welcome.html",
+          "severity": "warning",
+          "message": "Acronym 'AHL' appears without first-use definition",
+          "context": "define as American Hockey League on first use",
+          "term": "AHL",
+          "suggestion": "define as American Hockey League on first use"
+        },
+        {
+          "page": "welcome.html",
+          "severity": "info",
+          "message": "Jargon term 'tier' detected in user-facing content",
+          "context": "group",
+          "term": "tier",
+          "suggestion": "group"
+        },
+        {
+          "page": "welcome.html",
+          "severity": "warning",
+          "message": "Jargon term 'season-over-season' detected in user-facing content",
+          "context": "year over year (2 occurrences)",
+          "term": "season-over-season",
+          "suggestion": "year over year"
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Acronym 'UFA' appears without first-use definition",
+          "context": "define as unrestricted free agent on first use",
+          "term": "UFA",
+          "suggestion": "define as unrestricted free agent on first use"
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Acronym 'RFA' appears without first-use definition",
+          "context": "define as restricted free agent on first use",
+          "term": "RFA",
+          "suggestion": "define as restricted free agent on first use"
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Acronym 'MIS' appears without first-use definition",
+          "context": "define as Movement Impact Score on first use",
+          "term": "MIS",
+          "suggestion": "define as Movement Impact Score on first use"
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Acronym 'AAV' appears without first-use definition",
+          "context": "define as average annual value on first use",
+          "term": "AAV",
+          "suggestion": "define as average annual value on first use"
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Jargon term 'coefficient' detected in user-facing content",
+          "context": "effect size (2 occurrences)",
+          "term": "coefficient",
+          "suggestion": "effect size"
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Jargon term 'regression' detected in user-facing content",
+          "context": "model (3 occurrences); exempted 1 methodology-section occurrences",
+          "term": "regression",
+          "suggestion": "model"
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Jargon term 'season-over-season' detected in user-facing content",
+          "context": "year over year (3 occurrences); exempted 1 methodology-section occurrences",
+          "term": "season-over-season",
+          "suggestion": "year over year"
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Acronym 'UFA' appears without first-use definition",
+          "context": "define as unrestricted free agent on first use",
+          "term": "UFA",
+          "suggestion": "define as unrestricted free agent on first use"
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Acronym 'RFA' appears without first-use definition",
+          "context": "define as restricted free agent on first use",
+          "term": "RFA",
+          "suggestion": "define as restricted free agent on first use"
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Acronym 'ELC' appears without first-use definition",
+          "context": "define as entry level contract on first use",
+          "term": "ELC",
+          "suggestion": "define as entry level contract on first use"
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Acronym 'AHL' appears without first-use definition",
+          "context": "define as American Hockey League on first use",
+          "term": "AHL",
+          "suggestion": "define as American Hockey League on first use"
+        },
+        {
+          "page": "explorer.html",
+          "severity": "warning",
+          "message": "Acronym 'UFA' appears without first-use definition",
+          "context": "define as unrestricted free agent on first use",
+          "term": "UFA",
+          "suggestion": "define as unrestricted free agent on first use"
+        },
+        {
+          "page": "explorer.html",
+          "severity": "warning",
+          "message": "Acronym 'AAV' appears without first-use definition",
+          "context": "define as average annual value on first use",
+          "term": "AAV",
+          "suggestion": "define as average annual value on first use"
+        }
+      ],
+      "notes": [
+        "Methodology-heavy terms are tolerated in methodology-focused sections."
+      ]
+    },
+    {
+      "name": "Link integrity",
+      "status": "pass",
+      "checks_run": 57,
+      "issues_found": 0,
+      "details": [],
+      "notes": []
+    },
+    {
+      "name": "Loading state remnants",
+      "status": "warning",
+      "checks_run": 6,
+      "issues_found": 14,
+      "details": [
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading finding...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading example...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading quartile'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading interpretation...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "findings.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading finding...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "index.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "team.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading...'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "team.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading team'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "audit.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'loading placeholders'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        },
+        {
+          "page": "audit.html",
+          "severity": "warning",
+          "message": "Loading placeholder text detected: 'Loading latest'",
+          "context": "CI mode checks static HTML and cannot fully verify post-render replacement."
+        }
+      ],
+      "notes": [
+        "Static CI mode cannot execute dashboard JavaScript."
+      ]
+    },
+    {
+      "name": "Data freshness",
+      "status": "pass",
+      "checks_run": 7,
+      "issues_found": 0,
+      "details": [],
+      "notes": [
+        "Staleness threshold: 183 days."
+      ]
+    },
+    {
+      "name": "Empty state and edge case handling",
+      "status": "pass",
+      "checks_run": 5,
+      "issues_found": 0,
+      "details": [],
+      "notes": []
+    },
+    {
+      "name": "Page structure integrity",
+      "status": "pass",
+      "checks_run": 42,
+      "issues_found": 0,
+      "details": [],
+      "notes": []
+    },
+    {
+      "name": "CSV data integrity",
+      "status": "warning",
+      "checks_run": 36,
+      "issues_found": 1,
+      "details": [
+        {
+          "page": "data/processed/nhl_signed_free_agents_clean.csv",
+          "severity": "warning",
+          "message": "Missing values found in key column 'aav'",
+          "context": "2 rows are blank/NA in key column."
+        }
+      ],
+      "notes": [
+        "Expected row counts are based on current project documentation and v1 audit baseline."
+      ]
+    }
+  ]
+}

@@ -23,3 +23,9 @@ Data is not committed to this repository and must be extracted separately using 
 ## UX Audit Checklist
 
 - Non-data user browser audit checklist: [docs/audit/non-data-user-audit-checklist.md](docs/audit/non-data-user-audit-checklist.md)
+
+## Automated Site Audit
+
+- A repository-level audit runner now lives at `scripts/run_audit.js` and writes results to `output/tables/audit_report.json`.
+- GitHub Actions runs the audit on push to `main`, on weekly schedule (Sunday 06:00 UTC), and on manual dispatch via `.github/workflows/audit.yml`.
+- The dashboard audit page is available at `dashboard/src/audit.html` and can both render the latest automated report and run a live in-browser recheck.

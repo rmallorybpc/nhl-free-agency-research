@@ -37,6 +37,7 @@ jobs:
           mkdir -p _site/output/tables
 
           cp data/processed/nhl_master_analysis_panel.csv _site/data/processed/
+          cp data/processed/nhl_team_season_performance_clean.csv _site/data/processed/
 
           # Signings file may be generated locally and not committed; keep deploy running
           # with a valid empty CSV so Team Detail still loads without hard failure.
@@ -50,6 +51,15 @@ jobs:
           cp data/processed/nhl_team_mis_scores.csv _site/data/processed/
           cp data/processed/nhl_team_geography_variables.csv _site/data/processed/
           cp output/tables/model_comparison_summary.csv _site/output/tables/
+          cp output/tables/quartile_summary.csv _site/output/tables/
+          cp output/tables/quartile_examples.csv _site/output/tables/
+          cp output/tables/geography_overall_summary.csv _site/output/tables/
+
+          if [ -f output/tables/audit_report.json ]; then
+            cp output/tables/audit_report.json _site/output/tables/
+          else
+            echo "Warning: output/tables/audit_report.json not found; audit page will show unavailable state."
+          fi
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v3

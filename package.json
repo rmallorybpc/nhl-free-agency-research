@@ -1,0 +1,9 @@
+{
+  "name": "nhl-free-agency-research",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NHL free agency research dashboard audit tooling",
+  "scripts": {
+    "audit": "node scripts/run_audit.js"
+  }
+}
