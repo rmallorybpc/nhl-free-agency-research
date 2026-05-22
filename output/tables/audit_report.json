@@ -1,10 +1,10 @@
 {
-  "audit_timestamp": "2026-05-22T18:49:08.307Z",
+  "audit_timestamp": "2026-05-22T18:54:37.161Z",
   "audit_version": "1.0",
   "site_base_url": "https://rmallorybpc.github.io/nhl-free-agency-research",
   "mode": "ci",
   "summary": {
-    "total_checks": 312,
+    "total_checks": 313,
     "passed": 3,
     "warnings": 2,
     "failures": 2
@@ -60,7 +60,7 @@
           "page": "welcome.html",
           "severity": "warning",
           "message": "Jargon term 'season-over-season' detected in user-facing content",
-          "context": "year over year (2 occurrences)",
+          "context": "year over year (2 occurrences); exempted 1 methodology-section occurrences",
           "term": "season-over-season",
           "suggestion": "year over year"
         },
@@ -176,7 +176,7 @@
     {
       "name": "Link integrity",
       "status": "pass",
-      "checks_run": 59,
+      "checks_run": 60,
       "issues_found": 0,
       "details": [],
       "notes": []
