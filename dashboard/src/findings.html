@@ -212,56 +212,44 @@
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
-        <h2 class="tmg-h2">Model A vs Model B — does positional weighting help?</h2>
+        <h2 class="tmg-h2">Does spending on the right positions matter more than spending in total?</h2>
         <p class="tmg-body">
-          Model A uses total AAV spent. Model B uses the weighted Movement Impact Score. If positional weighting improved predictive power, Model B would show a higher adjusted R-squared.
+          We tested two ways of measuring offseason spending. The first simply
+          adds up every dollar a team committed to UFAs. The second weights those
+          dollars by position - a dollar spent on a goalie counts more than a
+          dollar spent on a fourth-line winger, reflecting how much each position
+          is generally believed to affect team performance.
+        </p>
+        <p class="tmg-body">
+          If position matters as much as front offices say it does, the
+          position-weighted measure should predict team improvement better than
+          raw dollars. We tested both, with and without the COVID-affected
+          2020 and 2021 seasons.
         </p>
         <div style="overflow-x: auto; margin-top: 12px;">
-          <table class="tmg-table" aria-label="Model comparison table">
+          <table class="tmg-table" id="modelComparisonTable">
             <thead>
               <tr>
-                <th>Model</th>
-                <th>Sample</th>
-                <th>Primary variable</th>
-                <th>Adj. R-squared</th>
-                <th>Primary variable p-value</th>
+                <th scope="col">Approach</th>
+                <th scope="col">Seasons included</th>
+                <th scope="col">What it measures</th>
+                <th scope="col">Prediction strength</th>
+                <th scope="col">Statistical confidence</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>Model A</td>
-                <td>Full 2018–2025</td>
-                <td>Total AAV spent</td>
-                <td data-model="model_a_full" aria-live="polite">Loading...</td>
-                <td>0.573</td>
-              </tr>
-              <tr>
-                <td>Model B</td>
-                <td>Full 2018–2025</td>
-                <td>Movement Impact Score</td>
-                <td data-model="model_b_full" aria-live="polite">Loading...</td>
-                <td>0.822</td>
-              </tr>
-              <tr>
-                <td>Model A</td>
-                <td>COVID-restricted</td>
-                <td>Total AAV spent</td>
-                <td data-model="model_a_restricted" aria-live="polite">Loading...</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td>Model B</td>
-                <td>COVID-restricted</td>
-                <td>Movement Impact Score</td>
-                <td data-model="model_b_restricted" aria-live="polite">Loading...</td>
-                <td>—</td>
-              </tr>
+            <tbody id="modelComparisonBody">
+              <tr><td colspan="5">Loading model comparison...</td></tr>
             </tbody>
           </table>
+          <p class="tmg-body-sm tmg-text-muted" style="margin-top:8px">
+            Prediction strength shows how much of the team-to-team variation in
+            performance change the approach can explain. The remaining variation
+            comes from factors not in the model.
+          </p>
         </div>
-        <p class="tmg-body" style="margin-top: 14px;">
-          Model B did not outperform Model A in any specification. Positional weighting via MIS does not improve prediction over raw spending volume. This suggests either that the position tier weights (35/25/20/15/5) require empirical calibration, or that single-season team performance is too noisy for the weighting signal to be detectable at this sample size. Both are documented as Version 2 directions.
-        </p>
+        <div id="modelVerdict" class="tmg-body" style="margin-top:20px">
+          Loading verdict...
+        </div>
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
@@ -415,6 +403,20 @@
       return rows.find(row => row.term === term) || null;
     }
 
+    function getModelRow(modelSummary, keys) {
+      return modelSummary.find(r => keys.includes(r.model_name)) || null;
+    }
+
+    function getAdjR2(row) {
+      if (!row) return NaN;
+      return toNumber(row.adj_r_squared ?? row['adj.r.squared']);
+    }
+
+    function getPValue(row) {
+      if (!row) return NaN;
+      return toNumber(row.p_value ?? row['p.value']);
+    }
+
     function setFindingsFallback() {
       const fallbackHtml = '<em>Finding language temporarily unavailable — review the data tables below for the underlying numbers.</em>';
       const f1 = document.getElementById('finding1Plain');
@@ -423,6 +425,8 @@
       const quartileAnecdote = document.getElementById('quartileAnecdote');
       const quartileClosing = document.getElementById('quartileClosing');
       const quartileBody = document.getElementById('quartileTableBody');
+      const modelComparisonBody = document.getElementById('modelComparisonBody');
+      const modelVerdict = document.getElementById('modelVerdict');
       const geographyBody = document.getElementById('geographyOverallBody');
       if (f1) f1.innerHTML = fallbackHtml;
       if (f2) f2.innerHTML = fallbackHtml;
@@ -430,36 +434,155 @@
       if (quartileAnecdote) quartileAnecdote.innerHTML = fallbackHtml;
       if (quartileClosing) quartileClosing.innerHTML = fallbackHtml;
       if (quartileBody) quartileBody.innerHTML = '<tr><td colspan="4"><em>Quartile table temporarily unavailable.</em></td></tr>';
+      if (modelComparisonBody) modelComparisonBody.innerHTML = '<tr><td colspan="5"><em>Model comparison table temporarily unavailable.</em></td></tr>';
+      if (modelVerdict) modelVerdict.innerHTML = fallbackHtml;
       if (geographyBody) geographyBody.innerHTML = '<tr><td colspan="5"><em>Geography table temporarily unavailable.</em></td></tr>';
     }
 
-    function renderModelComparison(modelComparisonRows) {
-      const targets = {
-        model_a_full: document.querySelector('[data-model="model_a_full"]'),
-        model_b_full: document.querySelector('[data-model="model_b_full"]'),
-        model_a_restricted: document.querySelector('[data-model="model_a_restricted"]'),
-        model_b_restricted: document.querySelector('[data-model="model_b_restricted"]')
-      };
+    function renderModelComparisonTable(modelSummary, mAFull, mBFull, mARest, mBRest) {
+      // modelSummary has adj.r.squared for each of the four model runs
+      // Match by model_name field
 
-      const modelKeyMap = {
-        'Model A Full': 'model_a_full',
-        'Model B Full': 'model_b_full',
-        'Model A Restricted': 'model_a_restricted',
-        'Model B Restricted': 'model_b_restricted'
-      };
+      const rawFull = getModelRow(modelSummary, ['model_a_full', 'Model A Full']);
+      const weightedFull = getModelRow(modelSummary, ['model_b_full', 'Model B Full']);
+      const rawRest = getModelRow(modelSummary, ['model_a_restricted', 'Model A Restricted']);
+      const weightedRest = getModelRow(modelSummary, ['model_b_restricted', 'Model B Restricted']);
 
-      Object.values(targets).forEach(cell => {
-        if (cell) cell.textContent = '--';
-      });
+      if (!rawFull || !weightedFull || !rawRest || !weightedRest) {
+        setFindingsFallback();
+        return;
+      }
 
-      modelComparisonRows.forEach(row => {
-        const modelKey = modelKeyMap[row.model_name];
-        const cell = targets[modelKey];
-        if (!cell) return;
+      // Get p-values from the four coefficient files
+      const rawFullP = getPValue(mAFull.find(c => c.term === 'total_aav_spent'));
+      const weightedFullP = getPValue(mBFull.find(c => c.term === 'total_mis'));
 
-        const value = toNumber(row['adj.r.squared']);
-        cell.textContent = Number.isFinite(value) ? value.toFixed(3) : '--';
-      });
+      // Build a row formatter
+      function formatRow(approach, seasons, measure, adjR2, pvalue, showPValue) {
+        const r2Pct = (toNumber(adjR2) * 100).toFixed(1);
+        const strengthText = `${r2Pct}% of variation explained`;
+
+        let pCell = '—';
+        if (showPValue && Number.isFinite(toNumber(pvalue))) {
+          const p = toNumber(pvalue);
+          let label;
+          let color;
+          if (p < 0.05) {
+            label = 'Statistically meaningful';
+            color = 'var(--tmg-success)';
+          } else if (p < 0.10) {
+            label = 'Suggestive';
+            color = 'var(--tmg-warning)';
+          } else {
+            label = 'Not meaningful';
+            color = 'var(--tmg-text-muted)';
+          }
+          pCell = `<span style="color:${color}">${label}</span><br>
+                   <span style="color:var(--tmg-text-muted); font-size:11px">
+                     (p = ${p.toFixed(3)})
+                   </span>`;
+        }
+
+        return `
+          <tr>
+            <td><strong>${approach}</strong></td>
+            <td>${seasons}</td>
+            <td>${measure}</td>
+            <td>${strengthText}</td>
+            <td>${pCell}</td>
+          </tr>
+        `;
+      }
+
+      const rows = [
+        formatRow(
+          'Raw dollars',
+          'All 2018-2025',
+          'Total UFA spending',
+          getAdjR2(rawFull), rawFullP, true
+        ),
+        formatRow(
+          'Position-weighted',
+          'All 2018-2025',
+          'Weighted by position importance',
+          getAdjR2(weightedFull), weightedFullP, true
+        ),
+        formatRow(
+          'Raw dollars',
+          'Excluding COVID seasons',
+          'Total UFA spending',
+          getAdjR2(rawRest), null, false
+        ),
+        formatRow(
+          'Position-weighted',
+          'Excluding COVID seasons',
+          'Weighted by position importance',
+          getAdjR2(weightedRest), null, false
+        )
+      ].join('');
+
+      document.getElementById('modelComparisonBody').innerHTML = rows;
+    }
+
+    function renderModelComparisonVerdict(modelSummary) {
+      const rawFull = getAdjR2(getModelRow(modelSummary, ['model_a_full', 'Model A Full']));
+      const weightedFull = getAdjR2(getModelRow(modelSummary, ['model_b_full', 'Model B Full']));
+      const rawRest = getAdjR2(getModelRow(modelSummary, ['model_a_restricted', 'Model A Restricted']));
+      const weightedRest = getAdjR2(getModelRow(modelSummary, ['model_b_restricted', 'Model B Restricted']));
+
+      if (!Number.isFinite(rawFull) || !Number.isFinite(weightedFull)
+          || !Number.isFinite(rawRest) || !Number.isFinite(weightedRest)) {
+        setFindingsFallback();
+        return;
+      }
+
+      const fullDiff = weightedFull - rawFull;
+      const restrictedDiff = weightedRest - rawRest;
+
+      let verdict;
+
+      if (Math.abs(fullDiff) < 0.005 && Math.abs(restrictedDiff) < 0.005) {
+        // Tie - the null finding
+        const r2Avg = (((rawFull + weightedFull) / 2) * 100).toFixed(0);
+        verdict = `
+          <p><strong>The two approaches are essentially tied.</strong>
+          Weighting by position does not improve the prediction over simply
+          adding up the dollars. Both approaches explain about ${r2Avg}% of
+          the variation in team performance change - and both fail to find
+          that spending itself reliably predicts whether a team improves.</p>
+
+          <p>This does not mean position does not matter in hockey. It means
+          our specific weights - chosen as starting assumptions of 0.35 for
+          goalies, 0.25 for defencemen, 0.20 for centres, 0.15 for wingers,
+          and 0.05 for everyone else - do not improve on raw dollars in
+          predicting team-level performance change. Two things could explain
+          this: the weights may need to be calibrated from the data rather
+          than chosen up front, or a single season of team performance may
+          be too noisy to detect the position effect even if it exists.</p>
+        `;
+      } else if (fullDiff > 0.005) {
+        // Weighted wins
+        const diffPP = (fullDiff * 100).toFixed(1);
+        verdict = `
+          <p><strong>Position-weighting outperforms raw dollars.</strong>
+          Weighting offseason spending by position explains about ${diffPP}
+          percentage points more of the variation in team performance change
+          than simply adding up the dollars. This supports the front-office
+          intuition that where you spend matters, not just how much.</p>
+        `;
+      } else {
+        // Raw wins
+        const diffPP = Math.abs(fullDiff * 100).toFixed(1);
+        verdict = `
+          <p><strong>Raw spending predicts better than position-weighting.</strong>
+          Adding up total UFA dollars without weighting by position actually
+          predicts team performance change ${diffPP} percentage points better
+          than the weighted approach. This suggests our position weights are
+          not capturing something the raw spending captures naturally.</p>
+        `;
+      }
+
+      document.getElementById('modelVerdict').innerHTML = verdict;
     }
 
     function renderFinding1Plain(modelBFullRows, modelBRestrictedRows) {
@@ -504,8 +627,8 @@
       const aavRestrictedRow = getRowByTerm(modelARestrictedRows, 'total_aav_spent');
       const misRestrictedRow = getRowByTerm(modelBRestrictedRows, 'total_mis');
 
-      const modelAFull = modelComparisonRows.find(row => row.model_name === 'Model A Full') || null;
-      const modelBFull = modelComparisonRows.find(row => row.model_name === 'Model B Full') || null;
+      const modelAFull = getModelRow(modelComparisonRows, ['model_a_full', 'Model A Full']);
+      const modelBFull = getModelRow(modelComparisonRows, ['model_b_full', 'Model B Full']);
 
       if (!aavFullRow || !misFullRow || !aavRestrictedRow || !misRestrictedRow || !modelAFull || !modelBFull) {
         setFindingsFallback();
@@ -514,8 +637,8 @@
 
       const aavPval = toNumber(aavFullRow['p.value']);
       const misPval = toNumber(misFullRow['p.value']);
-      const modelADiff = toNumber(modelAFull['adj.r.squared']);
-      const modelBDiff = toNumber(modelBFull['adj.r.squared']);
+      const modelADiff = getAdjR2(modelAFull);
+      const modelBDiff = getAdjR2(modelBFull);
       const rDiff = modelBDiff - modelADiff;
       const aavPvalR = toNumber(aavRestrictedRow['p.value']);
       const misPvalR = toNumber(misRestrictedRow['p.value']);
@@ -850,8 +973,6 @@
       geoRegCsv
     ]) => {
       const modelComparisonRows = comparisonCsv ? parseCsv(comparisonCsv) : [];
-      renderModelComparison(modelComparisonRows);
-
       if (!modelAFullCsv || !modelBFullCsv || !modelARestrictedCsv || !modelBRestrictedCsv) {
         setFindingsFallback();
         return;
@@ -861,6 +982,15 @@
       const modelBFullRows = parseCsv(modelBFullCsv);
       const modelARestrictedRows = parseCsv(modelARestrictedCsv);
       const modelBRestrictedRows = parseCsv(modelBRestrictedCsv);
+
+      renderModelComparisonTable(
+        modelComparisonRows,
+        modelAFullRows,
+        modelBFullRows,
+        modelARestrictedRows,
+        modelBRestrictedRows
+      );
+      renderModelComparisonVerdict(modelComparisonRows);
 
       renderFinding1Plain(modelBFullRows, modelBRestrictedRows);
       renderFinding2Plain(
