@@ -19,3 +19,7 @@ This is an offseason-only study covering UFAs and trades. Trade deadline activit
 ## Data Handling Note
 
 Data is not committed to this repository and must be extracted separately using the scripts in `R/01_data_extraction`.
+
+## UX Audit Checklist
+
+- Non-data user browser audit checklist: [docs/audit/non-data-user-audit-checklist.md](docs/audit/non-data-user-audit-checklist.md)
