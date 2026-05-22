@@ -152,6 +152,34 @@
       color: rgba(45, 52, 54, 0.72);
     }
 
+    .fa-chart-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .fa-chart-stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: var(--tmg-charcoal);
+      margin-bottom: 10px;
+    }
+
+    .fa-chart-plot {
+      width: 100%;
+      min-height: 400px;
+    }
+
+    .fa-chart-caption {
+      margin: 10px 0 8px;
+      font-size: 13px;
+      color: rgba(45, 52, 54, 0.72);
+    }
+
     @media (max-width: 900px) {
       .geo-grid {
         grid-template-columns: 1fr;
@@ -284,6 +312,22 @@
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
+        <h2 class="tmg-h2">FA Spending vs Win Change</h2>
+        <p class="tmg-body-sm tmg-text-muted">Season-specific scatter using the current Season selector</p>
+        <div class="fa-chart-controls">
+          <button class="tmg-btn-ghost" id="faChartDownloadBtn" type="button" aria-label="Download FA spending versus win change chart as PNG">Download PNG</button>
+        </div>
+        <div class="fa-chart-stats" id="faChartStats" aria-live="polite">
+          <span><strong>Slope:</strong> <span id="faChartSlope">n/a</span></span>
+          <span><strong>p-value:</strong> <span id="faChartPValue">n/a</span></span>
+          <span><strong>N:</strong> <span id="faChartN">0</span></span>
+          <span><strong>R²:</strong> <span id="faChartR2">n/a</span></span>
+        </div>
+        <div id="faSpendWinChangePlot" class="fa-chart-plot" role="img" aria-label="Scatter plot of free agency spending versus win change"></div>
+        <p class="fa-chart-caption" id="faChartCaption">Loading chart...</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
         <h2 class="tmg-h2">Performance change distribution</h2>
         <p class="tmg-body-sm tmg-text-muted">How many teams improved, stayed flat, or declined in the selected season</p>
         <div id="outcomeDistribution">
@@ -367,6 +411,11 @@
   </script>
 
   <script>
+    window.PlotlyConfig = { MathJaxConfig: 'local' };
+  </script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <script>
     const BASE = '/nhl-free-agency-research';
 
     // 1. State
@@ -395,8 +444,233 @@
       rowCountText: document.getElementById('rowCountText'),
       outcomeDistribution: document.getElementById('outcomeDistribution'),
       geographyTiles: document.getElementById('geographyTiles'),
-      scopeModelInfo: document.getElementById('scopeModelInfo')
+      scopeModelInfo: document.getElementById('scopeModelInfo'),
+      faChartDownloadBtn: document.getElementById('faChartDownloadBtn'),
+      faSpendWinChangePlot: document.getElementById('faSpendWinChangePlot'),
+      faChartSlope: document.getElementById('faChartSlope'),
+      faChartPValue: document.getElementById('faChartPValue'),
+      faChartN: document.getElementById('faChartN'),
+      faChartR2: document.getElementById('faChartR2'),
+      faChartCaption: document.getElementById('faChartCaption')
     };
+
+    function normalCdf(x) {
+      const t = 1 / (1 + 0.2316419 * Math.abs(x));
+      const d = 0.3989423 * Math.exp((-x * x) / 2);
+      let p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+      if (x > 0) {
+        p = 1 - p;
+      }
+      return p;
+    }
+
+    function formatPValue(pValue) {
+      if (!Number.isFinite(pValue)) {
+        return 'n/a';
+      }
+      if (pValue < 0.001) {
+        return '< 0.001';
+      }
+      return pValue.toFixed(3);
+    }
+
+    function runSimpleOls(x, y) {
+      const n = x.length;
+      if (n < 3) {
+        return null;
+      }
+
+      const xBar = x.reduce((sum, v) => sum + v, 0) / n;
+      const yBar = y.reduce((sum, v) => sum + v, 0) / n;
+
+      let sxx = 0;
+      let sxy = 0;
+      let tss = 0;
+      for (let i = 0; i < n; i += 1) {
+        const dx = x[i] - xBar;
+        sxx += dx * dx;
+        sxy += dx * (y[i] - yBar);
+        tss += (y[i] - yBar) * (y[i] - yBar);
+      }
+
+      if (sxx <= 0) {
+        return null;
+      }
+
+      const slope = sxy / sxx;
+      const intercept = yBar - slope * xBar;
+
+      let rss = 0;
+      for (let i = 0; i < n; i += 1) {
+        const resid = y[i] - (intercept + slope * x[i]);
+        rss += resid * resid;
+      }
+
+      const dof = n - 2;
+      if (dof <= 0) {
+        return null;
+      }
+
+      const sigma2 = rss / dof;
+      const seSlope = Math.sqrt(sigma2 / sxx);
+      const tStat = slope / seSlope;
+      const pValue = 2 * (1 - normalCdf(Math.abs(tStat)));
+      const r2 = tss > 0 ? 1 - (rss / tss) : 0;
+
+      return { n, xBar, sxx, slope, intercept, sigma2, pValue, r2 };
+    }
+
+    function updateFaChartStats(fit, n) {
+      if (!fit) {
+        els.faChartSlope.textContent = 'n/a';
+        els.faChartPValue.textContent = 'n/a';
+        els.faChartN.textContent = String(n);
+        els.faChartR2.textContent = 'n/a';
+        return;
+      }
+
+      els.faChartSlope.textContent = fit.slope.toFixed(3);
+      els.faChartPValue.textContent = formatPValue(fit.pValue);
+      els.faChartN.textContent = String(fit.n);
+      els.faChartR2.textContent = fit.r2.toFixed(3);
+    }
+
+    function renderFaSpendWinChangeChart() {
+      if (!window.Plotly || !els.faSpendWinChangePlot) {
+        return;
+      }
+
+      const rows = getSeasonRows();
+      const dataRows = rows
+        .map(row => ({
+          team: row.teamTriCode || row.teamCommonName || '',
+          season: Number(row.season_year),
+          ufaSpendM: toNumber(row.total_aav_spent) / 1000000,
+          misM: toNumber(row.total_mis) / 1000000,
+          priorFinish: toNumber(row.prior_season_points_pct),
+          delta: toNumber(row.points_pct_change)
+        }))
+        .filter(row => Number.isFinite(row.season) && Number.isFinite(row.ufaSpendM) && Number.isFinite(row.delta));
+
+      if (dataRows.length < 3) {
+        updateFaChartStats(null, dataRows.length);
+        els.faChartCaption.textContent = 'Insufficient data to fit regression for this season.';
+        Plotly.react('faSpendWinChangePlot', [], {
+          margin: { l: 70, r: 20, t: 20, b: 70 },
+          paper_bgcolor: '#ffffff',
+          plot_bgcolor: '#ffffff',
+          xaxis: { title: { text: 'Total FA spend ($M)' } },
+          yaxis: { title: { text: 'Win change (points % delta)' } },
+          annotations: [{
+            text: 'Insufficient data for regression',
+            x: 0.5,
+            y: 0.5,
+            xref: 'paper',
+            yref: 'paper',
+            showarrow: false
+          }]
+        }, { responsive: true, displayModeBar: false });
+        return;
+      }
+
+      const x = dataRows.map(row => row.ufaSpendM);
+      const y = dataRows.map(row => row.delta);
+      const fit = runSimpleOls(x, y);
+
+      if (!fit) {
+        updateFaChartStats(null, dataRows.length);
+        els.faChartCaption.textContent = 'Unable to fit regression due to low x-variance in this season.';
+        return;
+      }
+
+      const minX = Math.min(...x);
+      const maxX = Math.max(...x);
+      const gridCount = 120;
+      const step = (maxX - minX) / (gridCount - 1 || 1);
+      const xGrid = Array.from({ length: gridCount }, (_, i) => minX + i * step);
+      const sigma = Math.sqrt(fit.sigma2);
+
+      const yFit = [];
+      const yUpper = [];
+      const yLower = [];
+      xGrid.forEach(x0 => {
+        const y0 = fit.intercept + fit.slope * x0;
+        const seMean = sigma * Math.sqrt((1 / fit.n) + ((x0 - fit.xBar) * (x0 - fit.xBar)) / fit.sxx);
+        const margin = 1.96 * seMean;
+        yFit.push(y0);
+        yUpper.push(y0 + margin);
+        yLower.push(y0 - margin);
+      });
+
+      const pointTrace = {
+        x,
+        y,
+        type: 'scatter',
+        mode: 'markers',
+        marker: {
+          color: 'rgba(52, 101, 164, 0.58)',
+          size: window.innerWidth < 480 ? 6 : 9,
+          line: { color: 'rgba(43, 82, 133, 0.85)', width: 0.5 }
+        },
+        customdata: dataRows.map(row => [row.team, row.season, row.ufaSpendM, row.misM, row.priorFinish, row.delta]),
+        hovertemplate:
+          '<b>%{customdata[0]}</b><br>' +
+          'Season: %{customdata[1]}<br>' +
+          'UFA spend: $%{customdata[2]:.2f}M<br>' +
+          'MIS: $%{customdata[3]:.2f}M<br>' +
+          'Prior finish: %{customdata[4]:.3f}<br>' +
+          'Win change: %{customdata[5]:.3f}<extra></extra>'
+      };
+
+      const upperTrace = {
+        x: xGrid,
+        y: yUpper,
+        mode: 'lines',
+        line: { color: 'rgba(170, 35, 54, 0)' },
+        hoverinfo: 'skip',
+        showlegend: false
+      };
+
+      const lowerTrace = {
+        x: xGrid,
+        y: yLower,
+        mode: 'lines',
+        fill: 'tonexty',
+        fillcolor: 'rgba(170, 35, 54, 0.15)',
+        line: { color: 'rgba(170, 35, 54, 0)' },
+        hoverinfo: 'skip',
+        showlegend: false
+      };
+
+      const lineTrace = {
+        x: xGrid,
+        y: yFit,
+        mode: 'lines',
+        line: { color: 'rgba(170, 35, 54, 0.95)', width: 3 },
+        hovertemplate: 'Fit: %{y:.3f}<extra></extra>',
+        showlegend: false
+      };
+
+      Plotly.react('faSpendWinChangePlot', [upperTrace, lowerTrace, lineTrace, pointTrace], {
+        margin: { l: 70, r: 20, t: 20, b: 70 },
+        paper_bgcolor: '#ffffff',
+        plot_bgcolor: '#ffffff',
+        xaxis: {
+          title: { text: 'Total FA spend ($M)' },
+          zeroline: false,
+          gridcolor: 'rgba(0,0,0,0.08)'
+        },
+        yaxis: {
+          title: { text: 'Win change (points % delta)' },
+          zeroline: true,
+          zerolinecolor: 'rgba(0,0,0,0.2)',
+          gridcolor: 'rgba(0,0,0,0.08)'
+        }
+      }, { responsive: true, displayModeBar: false });
+
+      updateFaChartStats(fit, dataRows.length);
+      els.faChartCaption.textContent = 'Season ' + currentSeason + ': slope ' + fit.slope.toFixed(3) + ', p-value ' + formatPValue(fit.pValue) + ', N = ' + fit.n + '.';
+    }
 
     // 2. Data loading — fetch all CSVs in parallel using Promise.all
     async function loadData() {
@@ -825,6 +1099,7 @@
     function renderAll() {
       renderTiles();
       renderTable();
+      renderFaSpendWinChangeChart();
       renderOutcomeDistribution();
       renderGeography();
       renderScopeModelInfo();
@@ -844,6 +1119,26 @@
 
       els.refreshBtn.addEventListener('click', () => {
         renderAll();
+      });
+
+      if (els.faChartDownloadBtn) {
+        els.faChartDownloadBtn.addEventListener('click', () => {
+          if (!window.Plotly) {
+            return;
+          }
+          Plotly.downloadImage('faSpendWinChangePlot', {
+            format: 'png',
+            width: 1200,
+            height: 720,
+            filename: 'fa_spending_vs_win_change_' + currentSeason
+          });
+        });
+      }
+
+      window.addEventListener('resize', () => {
+        if (window.Plotly && els.faSpendWinChangePlot) {
+          Plotly.Plots.resize('faSpendWinChangePlot');
+        }
       });
     }
 
