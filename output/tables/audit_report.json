@@ -1,13 +1,13 @@
 {
-  "audit_timestamp": "2026-05-22T17:43:27.747Z",
+  "audit_timestamp": "2026-05-22T17:47:03.891Z",
   "audit_version": "1.0",
   "site_base_url": "https://rmallorybpc.github.io/nhl-free-agency-research",
   "mode": "ci",
   "summary": {
-    "total_checks": 315,
-    "passed": 4,
-    "warnings": 3,
-    "failures": 0
+    "total_checks": 310,
+    "passed": 3,
+    "warnings": 2,
+    "failures": 2
   },
   "categories": [
     {
@@ -270,10 +270,17 @@
     },
     {
       "name": "Data freshness",
-      "status": "pass",
+      "status": "fail",
       "checks_run": 7,
-      "issues_found": 0,
-      "details": [],
+      "issues_found": 1,
+      "details": [
+        {
+          "page": "data/processed/nhl_team_season_performance_clean.csv",
+          "severity": "error",
+          "message": "Missing file metadata",
+          "context": "Could not read last modified timestamp."
+        }
+      ],
       "notes": [
         "Staleness threshold: 183 days."
       ]
@@ -296,15 +303,21 @@
     },
     {
       "name": "CSV data integrity",
-      "status": "warning",
-      "checks_run": 36,
-      "issues_found": 1,
+      "status": "fail",
+      "checks_run": 31,
+      "issues_found": 2,
       "details": [
         {
           "page": "data/processed/nhl_signed_free_agents_clean.csv",
           "severity": "warning",
           "message": "Missing values found in key column 'aav'",
           "context": "2 rows are blank/NA in key column."
+        },
+        {
+          "page": "data/processed/nhl_team_season_performance_clean.csv",
+          "severity": "error",
+          "message": "CSV file missing",
+          "context": "Expected file could not be loaded."
         }
       ],
       "notes": [
