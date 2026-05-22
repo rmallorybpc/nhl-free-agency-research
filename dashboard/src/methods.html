@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NHL Free Agency Research Methods</title>
+  <meta name="description" content="Regression specifications and reproducibility details for the NHL free agency research dashboard.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px; border-radius: var(--tmg-nav-radius);
+      font-size: 13px; font-weight: 500; color: var(--tmg-charcoal);
+      text-decoration: none; transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] { background: rgba(132,169,140,0.15); color: var(--tmg-sage-hover); }
+    .methods-code {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html">Welcome</a>
+      <a href="./findings.html">Key Findings</a>
+      <a href="./index.html">Overview</a>
+      <a href="./team.html">Team Detail</a>
+      <a href="./explorer.html">All Signings</a>
+      <a href="./audit.html">Audit</a>
+      <a href="./methods.html" aria-current="page">Methods</a>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow">Methods Appendix</p>
+        <h1 class="tmg-page-title">Regression specifications and reproducibility</h1>
+        <p class="tmg-page-desc">
+          This page summarizes the exact model commands used in the analysis pipeline. Source-of-truth documentation remains in the repository methods appendix.
+        </p>
+      </div>
+
+      <section class="tmg-card-wide" id="regression-specs" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Regression specs</h2>
+        <p class="tmg-body">
+          Core analysis script: <strong>R/04_analysis/02_regression_models.R</strong>. Outcome is points percentage change: points_pct_change = points_percentage - prior_season_points_pct.
+        </p>
+        <pre class="methods-code" aria-label="Exact regression commands"><code>model_a_full <- lm(
+  points_pct_change ~ total_aav_spent + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_full
+)
+
+model_b_full <- lm(
+  points_pct_change ~ total_mis + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_full
+)
+
+model_a_restricted <- lm(
+  points_pct_change ~ total_aav_spent + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_restricted
+)
+
+model_b_restricted <- lm(
+  points_pct_change ~ total_mis + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_restricted
+)</code></pre>
+        <p class="tmg-body" style="margin-top:12px;">
+          Standard errors and p-values are the default OLS standard errors from R <strong>lm()</strong> + <strong>broom::tidy()</strong> in Version 1.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Sensitivity checks</h2>
+        <ul class="tmg-body" style="margin: 0; padding-left: 20px;">
+          <li style="margin-bottom: 10px;"><strong>Exclude COVID seasons.</strong> Restricted models remove rows where season_type is covid_shortened or covid_bubble (2020 and 2021).</li>
+          <li style="margin-bottom: 10px;"><strong>Alternate MIS weighting.</strong> Tier weights can be changed in R/03_feature_engineering/01_build_MIS.R, then all outputs are regenerated.</li>
+          <li><strong>QA checks.</strong> Script validates row counts, dependent-variable range, and non-finite values before reporting coefficients.</li>
+        </ul>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Reproduce outputs</h2>
+        <pre class="methods-code" aria-label="Reproducibility command"><code>Rscript R/06_reproducibility/01_reproduce_main_results.R</code></pre>
+        <p class="tmg-body" style="margin-top:12px; margin-bottom:0;">
+          Full documentation: <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/METHODS.md" target="_blank" rel="noopener noreferrer">METHODS.md on GitHub</a>
+          &nbsp;·&nbsp;
+          Audit checks: <a href="./audit.html">Audit page</a>
+        </p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

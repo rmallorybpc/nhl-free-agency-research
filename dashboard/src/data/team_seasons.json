@@ -1,0 +1,2018 @@
+[
+  {
+    "season": 2018,
+    "team": "Ducks",
+    "prior_finish": 0.640244,
+    "delta_performance": -0.024390000000000023,
+    "ufa_spend": 3.184943,
+    "MIS": 664569.1
+  },
+  {
+    "season": 2018,
+    "team": "Coyotes",
+    "prior_finish": 0.426829,
+    "delta_performance": 0,
+    "ufa_spend": 3.35,
+    "MIS": 502500
+  },
+  {
+    "season": 2018,
+    "team": "Bruins",
+    "prior_finish": 0.579268,
+    "delta_performance": 0.10365899999999995,
+    "ufa_spend": 8.050106,
+    "MIS": 2160015.9
+  },
+  {
+    "season": 2018,
+    "team": "Sabres",
+    "prior_finish": 0.47561,
+    "delta_performance": -0.09756099999999995,
+    "ufa_spend": 2.750705,
+    "MIS": 962746.75
+  },
+  {
+    "season": 2018,
+    "team": "Hurricanes",
+    "prior_finish": 0.530488,
+    "delta_performance": -0.024389999999999912,
+    "ufa_spend": 6.7,
+    "MIS": 1825000
+  },
+  {
+    "season": 2018,
+    "team": "Blue Jackets",
+    "prior_finish": 0.658537,
+    "delta_performance": -0.06707400000000008,
+    "ufa_spend": 8.125705,
+    "MIS": 671426.25
+  },
+  {
+    "season": 2018,
+    "team": "Flames",
+    "prior_finish": 0.573171,
+    "delta_performance": -0.06097600000000003,
+    "ufa_spend": 17.175705,
+    "MIS": 1677605.75
+  },
+  {
+    "season": 2018,
+    "team": "Blackhawks",
+    "prior_finish": 0.664634,
+    "delta_performance": -0.20121899999999993,
+    "ufa_spend": 2.900412,
+    "MIS": 725123
+  },
+  {
+    "season": 2018,
+    "team": "Avalanche",
+    "prior_finish": 0.292683,
+    "delta_performance": 0.286585,
+    "ufa_spend": 7.1,
+    "MIS": 1490000
+  },
+  {
+    "season": 2018,
+    "team": "Stars",
+    "prior_finish": 0.481707,
+    "delta_performance": 0.07926900000000003,
+    "ufa_spend": 5.125705,
+    "MIS": 1463855.75
+  },
+  {
+    "season": 2018,
+    "team": "Red Wings",
+    "prior_finish": 0.481707,
+    "delta_performance": -0.03658499999999998,
+    "ufa_spend": 2.625918,
+    "MIS": 621387.7
+  },
+  {
+    "season": 2018,
+    "team": "Oilers",
+    "prior_finish": 0.628049,
+    "delta_performance": -0.152439,
+    "ufa_spend": 2.451017,
+    "MIS": 490233.65
+  },
+  {
+    "season": 2018,
+    "team": "Panthers",
+    "prior_finish": 0.493902,
+    "delta_performance": 0.09146400000000005,
+    "ufa_spend": 2.825705,
+    "MIS": 717676.25
+  },
+  {
+    "season": 2018,
+    "team": "Kings",
+    "prior_finish": 0.52439,
+    "delta_performance": 0.07317099999999999,
+    "ufa_spend": 6.9,
+    "MIS": 1035000
+  },
+  {
+    "season": 2018,
+    "team": "Wild",
+    "prior_finish": 0.646341,
+    "delta_performance": -0.030487000000000042,
+    "ufa_spend": 3.963311,
+    "MIS": 659501.95
+  },
+  {
+    "season": 2018,
+    "team": "Canadiens",
+    "prior_finish": 0.628049,
+    "delta_performance": -0.19512199999999996,
+    "ufa_spend": 4.22641,
+    "MIS": 845282
+  },
+  {
+    "season": 2018,
+    "team": "Devils",
+    "prior_finish": 0.426829,
+    "delta_performance": 0.16463399999999995,
+    "ufa_spend": 1.950705,
+    "MIS": 357676.25
+  },
+  {
+    "season": 2018,
+    "team": "Predators",
+    "prior_finish": 0.573171,
+    "delta_performance": 0.14024400000000004,
+    "ufa_spend": 3.2,
+    "MIS": 702500
+  },
+  {
+    "season": 2018,
+    "team": "Islanders",
+    "prior_finish": 0.573171,
+    "delta_performance": -0.085366,
+    "ufa_spend": 7.076011,
+    "MIS": 1648916.95
+  },
+  {
+    "season": 2018,
+    "team": "Rangers",
+    "prior_finish": 0.621951,
+    "delta_performance": -0.15243900000000005,
+    "ufa_spend": 0.650705,
+    "MIS": 227676.25
+  },
+  {
+    "season": 2018,
+    "team": "Senators",
+    "prior_finish": 0.597561,
+    "delta_performance": -0.18902400000000003,
+    "ufa_spend": 1.30141,
+    "MIS": 260387.75
+  },
+  {
+    "season": 2018,
+    "team": "Flyers",
+    "prior_finish": 0.536585,
+    "delta_performance": 0.06097600000000003,
+    "ufa_spend": 0.001511,
+    "MIS": 307.15
+  },
+  {
+    "season": 2018,
+    "team": "Penguins",
+    "prior_finish": 0.676829,
+    "delta_performance": -0.06707300000000005,
+    "ufa_spend": 5.85,
+    "MIS": 1365000
+  },
+  {
+    "season": 2018,
+    "team": "Sharks",
+    "prior_finish": 0.603659,
+    "delta_performance": 0.006097000000000019,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2018,
+    "team": "Blues",
+    "prior_finish": 0.603659,
+    "delta_performance": -0.03048799999999996,
+    "ufa_spend": 5.026211,
+    "MIS": 976527.45
+  },
+  {
+    "season": 2018,
+    "team": "Lightning",
+    "prior_finish": 0.573171,
+    "delta_performance": 0.11585299999999998,
+    "ufa_spend": 0.65,
+    "MIS": 162500
+  },
+  {
+    "season": 2018,
+    "team": "Maple Leafs",
+    "prior_finish": 0.579268,
+    "delta_performance": 0.06097600000000003,
+    "ufa_spend": 4.550001107,
+    "MIS": 650000.2214
+  },
+  {
+    "season": 2018,
+    "team": "Canucks",
+    "prior_finish": 0.420732,
+    "delta_performance": 0.024390000000000023,
+    "ufa_spend": 1.900612,
+    "MIS": 380091.8
+  },
+  {
+    "season": 2018,
+    "team": "Golden Knights",
+    "prior_finish": 0.5587398333333333,
+    "delta_performance": 0.10589416666666662,
+    "ufa_spend": 11.5,
+    "MIS": 2432500
+  },
+  {
+    "season": 2018,
+    "team": "Jets",
+    "prior_finish": 0.530488,
+    "delta_performance": 0.16463400000000006,
+    "ufa_spend": 1.95,
+    "MIS": 552500
+  },
+  {
+    "season": 2018,
+    "team": "Capitals",
+    "prior_finish": 0.719512,
+    "delta_performance": -0.079268,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2019,
+    "team": "Ducks",
+    "prior_finish": 0.615854,
+    "delta_performance": -0.12804900000000002,
+    "ufa_spend": 2.252115,
+    "MIS": 600423
+  },
+  {
+    "season": 2019,
+    "team": "Coyotes",
+    "prior_finish": 0.426829,
+    "delta_performance": 0.09756100000000001,
+    "ufa_spend": 0.725,
+    "MIS": 181250
+  },
+  {
+    "season": 2019,
+    "team": "Bruins",
+    "prior_finish": 0.682927,
+    "delta_performance": -0.03048799999999996,
+    "ufa_spend": 1.702926,
+    "MIS": 340509.4
+  },
+  {
+    "season": 2019,
+    "team": "Sabres",
+    "prior_finish": 0.378049,
+    "delta_performance": 0.085366,
+    "ufa_spend": 13.502115,
+    "MIS": 675564
+  },
+  {
+    "season": 2019,
+    "team": "Hurricanes",
+    "prior_finish": 0.506098,
+    "delta_performance": 0.0975609999999999,
+    "ufa_spend": 11.52641,
+    "MIS": 1459032
+  },
+  {
+    "season": 2019,
+    "team": "Blue Jackets",
+    "prior_finish": 0.591463,
+    "delta_performance": 0.006098000000000048,
+    "ufa_spend": 17.227415,
+    "MIS": 933870.75
+  },
+  {
+    "season": 2019,
+    "team": "Flames",
+    "prior_finish": 0.512195,
+    "delta_performance": 0.14024400000000004,
+    "ufa_spend": 2.75282,
+    "MIS": 963028.75
+  },
+  {
+    "season": 2019,
+    "team": "Blackhawks",
+    "prior_finish": 0.463415,
+    "delta_performance": 0.048779999999999935,
+    "ufa_spend": 0.000612,
+    "MIS": 198.3
+  },
+  {
+    "season": 2019,
+    "team": "Avalanche",
+    "prior_finish": 0.579268,
+    "delta_performance": -0.03048799999999996,
+    "ufa_spend": 7.352115,
+    "MIS": 842958.25
+  },
+  {
+    "season": 2019,
+    "team": "Stars",
+    "prior_finish": 0.560976,
+    "delta_performance": 0.006097000000000019,
+    "ufa_spend": 2.239118,
+    "MIS": 372622.1
+  },
+  {
+    "season": 2019,
+    "team": "Red Wings",
+    "prior_finish": 0.445122,
+    "delta_performance": 0.006097999999999992,
+    "ufa_spend": 0.750612,
+    "MIS": 262637.7
+  },
+  {
+    "season": 2019,
+    "team": "Oilers",
+    "prior_finish": 0.47561,
+    "delta_performance": 0.006097000000000019,
+    "ufa_spend": 1.301217,
+    "MIS": 260223.75
+  },
+  {
+    "season": 2019,
+    "team": "Panthers",
+    "prior_finish": 0.585366,
+    "delta_performance": -0.06097600000000003,
+    "ufa_spend": 18.347479,
+    "MIS": 2685117.6
+  },
+  {
+    "season": 2019,
+    "team": "Kings",
+    "prior_finish": 0.597561,
+    "delta_performance": -0.164634,
+    "ufa_spend": 2.22641,
+    "MIS": 556461.5
+  },
+  {
+    "season": 2019,
+    "team": "Wild",
+    "prior_finish": 0.615854,
+    "delta_performance": -0.10975599999999996,
+    "ufa_spend": 1.902622,
+    "MIS": 285342.6
+  },
+  {
+    "season": 2019,
+    "team": "Canadiens",
+    "prior_finish": 0.432927,
+    "delta_performance": 0.15243900000000005,
+    "ufa_spend": 5.252327,
+    "MIS": 1487863.1
+  },
+  {
+    "season": 2019,
+    "team": "Devils",
+    "prior_finish": 0.591463,
+    "delta_performance": -0.15243899999999994,
+    "ufa_spend": 0.753127,
+    "MIS": 113079.35
+  },
+  {
+    "season": 2019,
+    "team": "Predators",
+    "prior_finish": 0.713415,
+    "delta_performance": -0.10365900000000006,
+    "ufa_spend": 0.752317,
+    "MIS": 150186.35
+  },
+  {
+    "season": 2019,
+    "team": "Islanders",
+    "prior_finish": 0.487805,
+    "delta_performance": 0.14024399999999998,
+    "ufa_spend": 0.001916,
+    "MIS": 529.5999999999999
+  },
+  {
+    "season": 2019,
+    "team": "Rangers",
+    "prior_finish": 0.469512,
+    "delta_performance": 0.006097999999999992,
+    "ufa_spend": 12.394267,
+    "MIS": 1896675.3
+  },
+  {
+    "season": 2019,
+    "team": "Senators",
+    "prior_finish": 0.408537,
+    "delta_performance": -0.018293000000000004,
+    "ufa_spend": 3.50322,
+    "MIS": 875241.5
+  },
+  {
+    "season": 2019,
+    "team": "Flyers",
+    "prior_finish": 0.597561,
+    "delta_performance": -0.09756100000000001,
+    "ufa_spend": 1.503525,
+    "MIS": 300881.25
+  },
+  {
+    "season": 2019,
+    "team": "Penguins",
+    "prior_finish": 0.609756,
+    "delta_performance": 0,
+    "ufa_spend": 10.50141,
+    "MIS": 525282
+  },
+  {
+    "season": 2019,
+    "team": "Sharks",
+    "prior_finish": 0.609756,
+    "delta_performance": 0.006098000000000048,
+    "ufa_spend": 0.00292,
+    "MIS": 412.75
+  },
+  {
+    "season": 2019,
+    "team": "Blues",
+    "prior_finish": 0.573171,
+    "delta_performance": 0.03048799999999996,
+    "ufa_spend": 0.753525,
+    "MIS": 113205
+  },
+  {
+    "season": 2019,
+    "team": "Lightning",
+    "prior_finish": 0.689024,
+    "delta_performance": 0.09146399999999999,
+    "ufa_spend": 4.35423,
+    "MIS": 1218628
+  },
+  {
+    "season": 2019,
+    "team": "Maple Leafs",
+    "prior_finish": 0.640244,
+    "delta_performance": -0.03048800000000007,
+    "ufa_spend": 1.46532,
+    "MIS": 219939
+  },
+  {
+    "season": 2019,
+    "team": "Canucks",
+    "prior_finish": 0.445122,
+    "delta_performance": 0.04877999999999999,
+    "ufa_spend": 7.852927,
+    "MIS": 563196.5
+  },
+  {
+    "season": 2019,
+    "team": "Golden Knights",
+    "prior_finish": 0.664634,
+    "delta_performance": -0.0975609999999999,
+    "ufa_spend": 0.00282,
+    "MIS": 564
+  },
+  {
+    "season": 2019,
+    "team": "Jets",
+    "prior_finish": 0.695122,
+    "delta_performance": -0.09146300000000007,
+    "ufa_spend": 0.002115,
+    "MIS": 423
+  },
+  {
+    "season": 2019,
+    "team": "Capitals",
+    "prior_finish": 0.640244,
+    "delta_performance": -0.006098000000000048,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2020,
+    "team": "Ducks",
+    "prior_finish": 0.487805,
+    "delta_performance": -0.015973999999999988,
+    "ufa_spend": 7.85,
+    "MIS": 1775000
+  },
+  {
+    "season": 2020,
+    "team": "Coyotes",
+    "prior_finish": 0.52439,
+    "delta_performance": 0.00418099999999999,
+    "ufa_spend": 3.901516,
+    "MIS": 622767.95
+  },
+  {
+    "season": 2020,
+    "team": "Bruins",
+    "prior_finish": 0.652439,
+    "delta_performance": 0.061846999999999985,
+    "ufa_spend": 6.20141,
+    "MIS": 310387.75
+  },
+  {
+    "season": 2020,
+    "team": "Sabres",
+    "prior_finish": 0.463415,
+    "delta_performance": 0.029339000000000004,
+    "ufa_spend": 2.254432,
+    "MIS": 450644.6
+  },
+  {
+    "season": 2020,
+    "team": "Hurricanes",
+    "prior_finish": 0.603659,
+    "delta_performance": -0.00807099999999994,
+    "ufa_spend": 0.002527,
+    "MIS": 549.35
+  },
+  {
+    "season": 2020,
+    "team": "Blue Jackets",
+    "prior_finish": 0.597561,
+    "delta_performance": -0.018990000000000062,
+    "ufa_spend": 2.210705,
+    "MIS": 477676.25
+  },
+  {
+    "season": 2020,
+    "team": "Flames",
+    "prior_finish": 0.652439,
+    "delta_performance": -0.08815300000000004,
+    "ufa_spend": 5.37782,
+    "MIS": 1256919.75
+  },
+  {
+    "season": 2020,
+    "team": "Blackhawks",
+    "prior_finish": 0.512195,
+    "delta_performance": 0.002091000000000065,
+    "ufa_spend": 3.925106,
+    "MIS": 821271.2
+  },
+  {
+    "season": 2020,
+    "team": "Avalanche",
+    "prior_finish": 0.54878,
+    "delta_performance": 0.10836299999999999,
+    "ufa_spend": 0.752115,
+    "MIS": 112887.75
+  },
+  {
+    "season": 2020,
+    "team": "Stars",
+    "prior_finish": 0.567073,
+    "delta_performance": 0.027129999999999987,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2020,
+    "team": "Red Wings",
+    "prior_finish": 0.45122,
+    "delta_performance": -0.176572,
+    "ufa_spend": 7.000624,
+    "MIS": 2187531.2
+  },
+  {
+    "season": 2020,
+    "team": "Oilers",
+    "prior_finish": 0.481707,
+    "delta_performance": 0.1028,
+    "ufa_spend": 8.700705,
+    "MIS": 1933996.75
+  },
+  {
+    "season": 2020,
+    "team": "Panthers",
+    "prior_finish": 0.52439,
+    "delta_performance": 0.04082699999999995,
+    "ufa_spend": 8.875917,
+    "MIS": 1353898.15
+  },
+  {
+    "season": 2020,
+    "team": "Kings",
+    "prior_finish": 0.432927,
+    "delta_performance": 0.024216000000000015,
+    "ufa_spend": 1.20141,
+    "MIS": 240423
+  },
+  {
+    "season": 2020,
+    "team": "Wild",
+    "prior_finish": 0.506098,
+    "delta_performance": 0.05187299999999995,
+    "ufa_spend": 3.669487,
+    "MIS": 1284073.7
+  },
+  {
+    "season": 2020,
+    "team": "Canadiens",
+    "prior_finish": 0.585366,
+    "delta_performance": -0.08536600000000005,
+    "ufa_spend": 10.750705,
+    "MIS": 612605.75
+  },
+  {
+    "season": 2020,
+    "team": "Devils",
+    "prior_finish": 0.439024,
+    "delta_performance": 0.05373,
+    "ufa_spend": 5.050911,
+    "MIS": 1652798.25
+  },
+  {
+    "season": 2020,
+    "team": "Predators",
+    "prior_finish": 0.609756,
+    "delta_performance": -0.044538999999999995,
+    "ufa_spend": 6.501828,
+    "MIS": 325516.9
+  },
+  {
+    "season": 2020,
+    "team": "Islanders",
+    "prior_finish": 0.628049,
+    "delta_performance": -0.039814000000000016,
+    "ufa_spend": 0.725,
+    "MIS": 145000
+  },
+  {
+    "season": 2020,
+    "team": "Rangers",
+    "prior_finish": 0.47561,
+    "delta_performance": 0.08867599999999998,
+    "ufa_spend": 3.513205,
+    "MIS": 928266
+  },
+  {
+    "season": 2020,
+    "team": "Senators",
+    "prior_finish": 0.390244,
+    "delta_performance": 0.04637600000000003,
+    "ufa_spend": 2.826211,
+    "MIS": 213966.9
+  },
+  {
+    "season": 2020,
+    "team": "Flyers",
+    "prior_finish": 0.5,
+    "delta_performance": 0.14492799999999995,
+    "ufa_spend": 0.001011,
+    "MIS": 252.75
+  },
+  {
+    "season": 2020,
+    "team": "Penguins",
+    "prior_finish": 0.609756,
+    "delta_performance": 0.013432,
+    "ufa_spend": 1.25423,
+    "MIS": 313451.75
+  },
+  {
+    "season": 2020,
+    "team": "Sharks",
+    "prior_finish": 0.615854,
+    "delta_performance": -0.165854,
+    "ufa_spend": 0.00423,
+    "MIS": 423
+  },
+  {
+    "season": 2020,
+    "team": "Blues",
+    "prior_finish": 0.603659,
+    "delta_performance": 0.05831300000000006,
+    "ufa_spend": 6.503033,
+    "MIS": 1625625.8
+  },
+  {
+    "season": 2020,
+    "team": "Lightning",
+    "prior_finish": 0.780488,
+    "delta_performance": -0.12334499999999993,
+    "ufa_spend": 0.000705,
+    "MIS": 246.74999999999997
+  },
+  {
+    "season": 2020,
+    "team": "Maple Leafs",
+    "prior_finish": 0.609756,
+    "delta_performance": -0.031185000000000018,
+    "ufa_spend": 3.729437,
+    "MIS": 404673
+  },
+  {
+    "season": 2020,
+    "team": "Canucks",
+    "prior_finish": 0.493902,
+    "delta_performance": 0.07131499999999996,
+    "ufa_spend": 5.550805,
+    "MIS": 1817661
+  },
+  {
+    "season": 2020,
+    "team": "Golden Knights",
+    "prior_finish": 0.567073,
+    "delta_performance": 0.038560999999999956,
+    "ufa_spend": 8.80141,
+    "MIS": 2200070.5
+  },
+  {
+    "season": 2020,
+    "team": "Jets",
+    "prior_finish": 0.603659,
+    "delta_performance": -0.040278999999999954,
+    "ufa_spend": 0.755041,
+    "MIS": 150379
+  },
+  {
+    "season": 2020,
+    "team": "Capitals",
+    "prior_finish": 0.634146,
+    "delta_performance": 0.018028000000000044,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2021,
+    "team": "Ducks",
+    "prior_finish": 0.471831,
+    "delta_performance": -0.08790199999999998,
+    "ufa_spend": 3,
+    "MIS": 637500
+  },
+  {
+    "season": 2021,
+    "team": "Coyotes",
+    "prior_finish": 0.528571,
+    "delta_performance": -0.046428000000000025,
+    "ufa_spend": 6.7,
+    "MIS": 822500
+  },
+  {
+    "season": 2021,
+    "team": "Bruins",
+    "prior_finish": 0.714286,
+    "delta_performance": -0.0625,
+    "ufa_spend": 16.100812,
+    "MIS": 1442753.6
+  },
+  {
+    "season": 2021,
+    "team": "Sabres",
+    "prior_finish": 0.492754,
+    "delta_performance": -0.162397,
+    "ufa_spend": 7.050905,
+    "MIS": 1710226.25
+  },
+  {
+    "season": 2021,
+    "team": "Hurricanes",
+    "prior_finish": 0.595588,
+    "delta_performance": 0.11869799999999997,
+    "ufa_spend": 14.751117,
+    "MIS": 3770299.85
+  },
+  {
+    "season": 2021,
+    "team": "Blue Jackets",
+    "prior_finish": 0.578571,
+    "delta_performance": -0.14999999999999997,
+    "ufa_spend": 4,
+    "MIS": 800000
+  },
+  {
+    "season": 2021,
+    "team": "Flames",
+    "prior_finish": 0.564286,
+    "delta_performance": -0.07321499999999997,
+    "ufa_spend": 9.104025,
+    "MIS": 2105362.25
+  },
+  {
+    "season": 2021,
+    "team": "Blackhawks",
+    "prior_finish": 0.514286,
+    "delta_performance": -0.02321500000000004,
+    "ufa_spend": 0.976211,
+    "MIS": 146552.75
+  },
+  {
+    "season": 2021,
+    "team": "Avalanche",
+    "prior_finish": 0.657143,
+    "delta_performance": 0.07499999999999996,
+    "ufa_spend": 2.251117,
+    "MIS": 487733.7
+  },
+  {
+    "season": 2021,
+    "team": "Stars",
+    "prior_finish": 0.594203,
+    "delta_performance": -0.05848900000000001,
+    "ufa_spend": 12.250206,
+    "MIS": 2052572.1
+  },
+  {
+    "season": 2021,
+    "team": "Red Wings",
+    "prior_finish": 0.274648,
+    "delta_performance": 0.15392299999999998,
+    "ufa_spend": 7.775,
+    "MIS": 1740000
+  },
+  {
+    "season": 2021,
+    "team": "Oilers",
+    "prior_finish": 0.584507,
+    "delta_performance": 0.05835000000000001,
+    "ufa_spend": 23.875,
+    "MIS": 2168750
+  },
+  {
+    "season": 2021,
+    "team": "Panthers",
+    "prior_finish": 0.565217,
+    "delta_performance": 0.14014000000000004,
+    "ufa_spend": 2.25,
+    "MIS": 675000
+  },
+  {
+    "season": 2021,
+    "team": "Kings",
+    "prior_finish": 0.457143,
+    "delta_performance": -0.01964300000000002,
+    "ufa_spend": 9.75,
+    "MIS": 2125000
+  },
+  {
+    "season": 2021,
+    "team": "Wild",
+    "prior_finish": 0.557971,
+    "delta_performance": 0.111672,
+    "ufa_spend": 6.551411,
+    "MIS": 1540352.75
+  },
+  {
+    "season": 2021,
+    "team": "Canadiens",
+    "prior_finish": 0.5,
+    "delta_performance": 0.026785999999999976,
+    "ufa_spend": 16.85,
+    "MIS": 1947500
+  },
+  {
+    "season": 2021,
+    "team": "Devils",
+    "prior_finish": 0.492754,
+    "delta_performance": -0.09096800000000005,
+    "ufa_spend": 10.501711,
+    "MIS": 750347.25
+  },
+  {
+    "season": 2021,
+    "team": "Predators",
+    "prior_finish": 0.565217,
+    "delta_performance": 0.006211999999999995,
+    "ufa_spend": 2.75,
+    "MIS": 737500
+  },
+  {
+    "season": 2021,
+    "team": "Islanders",
+    "prior_finish": 0.588235,
+    "delta_performance": 0.04569400000000001,
+    "ufa_spend": 1.5,
+    "MIS": 225000
+  },
+  {
+    "season": 2021,
+    "team": "Rangers",
+    "prior_finish": 0.564286,
+    "delta_performance": -0.02857199999999993,
+    "ufa_spend": 3.250905,
+    "MIS": 775226.25
+  },
+  {
+    "season": 2021,
+    "team": "Senators",
+    "prior_finish": 0.43662,
+    "delta_performance": 0.018737000000000004,
+    "ufa_spend": 2.252921,
+    "MIS": 337687.25
+  },
+  {
+    "season": 2021,
+    "team": "Flyers",
+    "prior_finish": 0.644928,
+    "delta_performance": -0.12707099999999993,
+    "ufa_spend": 1.577721,
+    "MIS": 353120.35
+  },
+  {
+    "season": 2021,
+    "team": "Penguins",
+    "prior_finish": 0.623188,
+    "delta_performance": 0.06431200000000004,
+    "ufa_spend": 6.85,
+    "MIS": 1382500
+  },
+  {
+    "season": 2021,
+    "team": "Sharks",
+    "prior_finish": 0.45,
+    "delta_performance": -0.012500000000000011,
+    "ufa_spend": 5.050318,
+    "MIS": 1310015.9
+  },
+  {
+    "season": 2021,
+    "team": "Blues",
+    "prior_finish": 0.661972,
+    "delta_performance": -0.099472,
+    "ufa_spend": 12,
+    "MIS": 900000
+  },
+  {
+    "season": 2021,
+    "team": "Lightning",
+    "prior_finish": 0.657143,
+    "delta_performance": 0.012499999999999956,
+    "ufa_spend": 3.101223,
+    "MIS": 812843.25
+  },
+  {
+    "season": 2021,
+    "team": "Maple Leafs",
+    "prior_finish": 0.578571,
+    "delta_performance": 0.10892900000000005,
+    "ufa_spend": 13.75,
+    "MIS": 3085000
+  },
+  {
+    "season": 2021,
+    "team": "Canucks",
+    "prior_finish": 0.565217,
+    "delta_performance": -0.11878799999999995,
+    "ufa_spend": 9.363611,
+    "MIS": 2003433.35
+  },
+  {
+    "season": 2021,
+    "team": "Golden Knights",
+    "prior_finish": 0.605634,
+    "delta_performance": 0.12650899999999998,
+    "ufa_spend": 5.025,
+    "MIS": 1353750
+  },
+  {
+    "season": 2021,
+    "team": "Jets",
+    "prior_finish": 0.56338,
+    "delta_performance": -0.0008799999999999919,
+    "ufa_spend": 5.25,
+    "MIS": 862500
+  },
+  {
+    "season": 2021,
+    "team": "Capitals",
+    "prior_finish": 0.652174,
+    "delta_performance": 0.03532599999999997,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2022,
+    "team": "Ducks",
+    "prior_finish": 0.383929,
+    "delta_performance": 0.079486,
+    "ufa_spend": 12.689218,
+    "MIS": 1560852.1
+  },
+  {
+    "season": 2022,
+    "team": "Coyotes",
+    "prior_finish": 0.482143,
+    "delta_performance": -0.13458199999999998,
+    "ufa_spend": 4.025905,
+    "MIS": 1043931
+  },
+  {
+    "season": 2022,
+    "team": "Bruins",
+    "prior_finish": 0.651786,
+    "delta_performance": 0.0006530000000000147,
+    "ufa_spend": 3.025106,
+    "MIS": 717526.5
+  },
+  {
+    "season": 2022,
+    "team": "Sabres",
+    "prior_finish": 0.330357,
+    "delta_performance": 0.12695999999999996,
+    "ufa_spend": 5.500805,
+    "MIS": 1460201.25
+  },
+  {
+    "season": 2022,
+    "team": "Hurricanes",
+    "prior_finish": 0.714286,
+    "delta_performance": -0.006969000000000003,
+    "ufa_spend": 7.6,
+    "MIS": 1375000
+  },
+  {
+    "season": 2022,
+    "team": "Blue Jackets",
+    "prior_finish": 0.428571,
+    "delta_performance": 0.06533100000000003,
+    "ufa_spend": 10.500406,
+    "MIS": 1612601.5
+  },
+  {
+    "season": 2022,
+    "team": "Flames",
+    "prior_finish": 0.491071,
+    "delta_performance": 0.18575800000000003,
+    "ufa_spend": 3.563206,
+    "MIS": 750766.2
+  },
+  {
+    "season": 2022,
+    "team": "Blackhawks",
+    "prior_finish": 0.491071,
+    "delta_performance": -0.07643699999999998,
+    "ufa_spend": 5.900918,
+    "MIS": 1265091.8
+  },
+  {
+    "season": 2022,
+    "team": "Avalanche",
+    "prior_finish": 0.732143,
+    "delta_performance": -0.006533000000000011,
+    "ufa_spend": 5.275206,
+    "MIS": 867530.9
+  },
+  {
+    "season": 2022,
+    "team": "Stars",
+    "prior_finish": 0.535714,
+    "delta_performance": 0.061846999999999985,
+    "ufa_spend": 7.85,
+    "MIS": 1437500
+  },
+  {
+    "season": 2022,
+    "team": "Red Wings",
+    "prior_finish": 0.428571,
+    "delta_performance": 0.02264900000000003,
+    "ufa_spend": 26.988305,
+    "MIS": 4202701.25
+  },
+  {
+    "season": 2022,
+    "team": "Oilers",
+    "prior_finish": 0.642857,
+    "delta_performance": -0.008711000000000024,
+    "ufa_spend": 3.513006,
+    "MIS": 817052.1
+  },
+  {
+    "season": 2022,
+    "team": "Panthers",
+    "prior_finish": 0.705357,
+    "delta_performance": 0.03854499999999994,
+    "ufa_spend": 8.65,
+    "MIS": 1700000
+  },
+  {
+    "season": 2022,
+    "team": "Kings",
+    "prior_finish": 0.4375,
+    "delta_performance": 0.16615899999999995,
+    "ufa_spend": 0.825,
+    "MIS": 288750
+  },
+  {
+    "season": 2022,
+    "team": "Wild",
+    "prior_finish": 0.669643,
+    "delta_performance": 0.01938099999999998,
+    "ufa_spend": 3.1,
+    "MIS": 657500
+  },
+  {
+    "season": 2022,
+    "team": "Canadiens",
+    "prior_finish": 0.526786,
+    "delta_performance": -0.19141999999999998,
+    "ufa_spend": 2.25,
+    "MIS": 487500
+  },
+  {
+    "season": 2022,
+    "team": "Devils",
+    "prior_finish": 0.401786,
+    "delta_performance": -0.01763999999999999,
+    "ufa_spend": 3.550606,
+    "MIS": 775090.9
+  },
+  {
+    "season": 2022,
+    "team": "Predators",
+    "prior_finish": 0.571429,
+    "delta_performance": 0.020033999999999996,
+    "ufa_spend": 5.287906,
+    "MIS": 1359435.9
+  },
+  {
+    "season": 2022,
+    "team": "Islanders",
+    "prior_finish": 0.633929,
+    "delta_performance": -0.12173400000000001,
+    "ufa_spend": 1.5125,
+    "MIS": 303125
+  },
+  {
+    "season": 2022,
+    "team": "Rangers",
+    "prior_finish": 0.535714,
+    "delta_performance": 0.13501799999999997,
+    "ufa_spend": 16.5625,
+    "MIS": 1969375
+  },
+  {
+    "season": 2022,
+    "team": "Senators",
+    "prior_finish": 0.455357,
+    "delta_performance": -0.010234999999999994,
+    "ufa_spend": 18.1,
+    "MIS": 1970000
+  },
+  {
+    "season": 2022,
+    "team": "Flyers",
+    "prior_finish": 0.517857,
+    "delta_performance": -0.14590600000000004,
+    "ufa_spend": 4.025106,
+    "MIS": 830026.5
+  },
+  {
+    "season": 2022,
+    "team": "Penguins",
+    "prior_finish": 0.6875,
+    "delta_performance": -0.05945100000000003,
+    "ufa_spend": 5.025905,
+    "MIS": 1033885.75
+  },
+  {
+    "season": 2022,
+    "team": "Kraken",
+    "prior_finish": 0.5561636129032258,
+    "delta_performance": -0.1903096129032258,
+    "ufa_spend": 17.025512,
+    "MIS": 1867648.6
+  },
+  {
+    "season": 2022,
+    "team": "Sharks",
+    "prior_finish": 0.4375,
+    "delta_performance": 0.032011999999999985,
+    "ufa_spend": 8.575206,
+    "MIS": 1780041.2
+  },
+  {
+    "season": 2022,
+    "team": "Blues",
+    "prior_finish": 0.5625,
+    "delta_performance": 0.10213399999999995,
+    "ufa_spend": 6.25,
+    "MIS": 1325000
+  },
+  {
+    "season": 2022,
+    "team": "Lightning",
+    "prior_finish": 0.669643,
+    "delta_performance": 0.0010890000000000066,
+    "ufa_spend": 6.512806,
+    "MIS": 628201.5
+  },
+  {
+    "season": 2022,
+    "team": "Maple Leafs",
+    "prior_finish": 0.6875,
+    "delta_performance": 0.013719999999999954,
+    "ufa_spend": 6.990736,
+    "MIS": 1743141.9
+  },
+  {
+    "season": 2022,
+    "team": "Canucks",
+    "prior_finish": 0.446429,
+    "delta_performance": 0.11454700000000001,
+    "ufa_spend": 7.825212,
+    "MIS": 1515010.6
+  },
+  {
+    "season": 2022,
+    "team": "Golden Knights",
+    "prior_finish": 0.732143,
+    "delta_performance": -0.158972,
+    "ufa_spend": 3.775,
+    "MIS": 754375
+  },
+  {
+    "season": 2022,
+    "team": "Jets",
+    "prior_finish": 0.5625,
+    "delta_performance": -0.019816999999999974,
+    "ufa_spend": 3.763405,
+    "MIS": 603441.75
+  },
+  {
+    "season": 2022,
+    "team": "Capitals",
+    "prior_finish": 0.6875,
+    "delta_performance": -0.07774400000000004,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2023,
+    "team": "Ducks",
+    "prior_finish": 0.463415,
+    "delta_performance": -0.10975600000000002,
+    "ufa_spend": 14.051211,
+    "MIS": 1012883.25
+  },
+  {
+    "season": 2023,
+    "team": "Coyotes",
+    "prior_finish": 0.347561,
+    "delta_performance": 0.079268,
+    "ufa_spend": 25.07661,
+    "MIS": 3520322
+  },
+  {
+    "season": 2023,
+    "team": "Bruins",
+    "prior_finish": 0.652439,
+    "delta_performance": 0.170732,
+    "ufa_spend": 5.651117,
+    "MIS": 1146427.85
+  },
+  {
+    "season": 2023,
+    "team": "Sabres",
+    "prior_finish": 0.457317,
+    "delta_performance": 0.09756100000000001,
+    "ufa_spend": 8.908333,
+    "MIS": 2343333.25
+  },
+  {
+    "season": 2023,
+    "team": "Hurricanes",
+    "prior_finish": 0.707317,
+    "delta_performance": -0.018293000000000004,
+    "ufa_spend": 10.200805,
+    "MIS": 2550120.75
+  },
+  {
+    "season": 2023,
+    "team": "Blue Jackets",
+    "prior_finish": 0.493902,
+    "delta_performance": -0.134146,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2023,
+    "team": "Flames",
+    "prior_finish": 0.676829,
+    "delta_performance": -0.10975599999999996,
+    "ufa_spend": 2.475,
+    "MIS": 618750
+  },
+  {
+    "season": 2023,
+    "team": "Blackhawks",
+    "prior_finish": 0.414634,
+    "delta_performance": -0.05487799999999998,
+    "ufa_spend": 0.000206,
+    "MIS": 41.2
+  },
+  {
+    "season": 2023,
+    "team": "Avalanche",
+    "prior_finish": 0.72561,
+    "delta_performance": -0.06097600000000003,
+    "ufa_spend": 11.8,
+    "MIS": 1818750
+  },
+  {
+    "season": 2023,
+    "team": "Stars",
+    "prior_finish": 0.597561,
+    "delta_performance": 0.06097600000000003,
+    "ufa_spend": 1.625824,
+    "MIS": 363791.2
+  },
+  {
+    "season": 2023,
+    "team": "Red Wings",
+    "prior_finish": 0.45122,
+    "delta_performance": 0.03658499999999998,
+    "ufa_spend": 23.851111,
+    "MIS": 4662847.65
+  },
+  {
+    "season": 2023,
+    "team": "Oilers",
+    "prior_finish": 0.634146,
+    "delta_performance": 0.03048799999999996,
+    "ufa_spend": 6.200406,
+    "MIS": 736310.9
+  },
+  {
+    "season": 2023,
+    "team": "Panthers",
+    "prior_finish": 0.743902,
+    "delta_performance": -0.18292599999999992,
+    "ufa_spend": 9.760624,
+    "MIS": 2391620.1
+  },
+  {
+    "season": 2023,
+    "team": "Kings",
+    "prior_finish": 0.603659,
+    "delta_performance": 0.030487000000000042,
+    "ufa_spend": 4.751117,
+    "MIS": 732799.85
+  },
+  {
+    "season": 2023,
+    "team": "Wild",
+    "prior_finish": 0.689024,
+    "delta_performance": -0.060975,
+    "ufa_spend": 2.325,
+    "MIS": 426250
+  },
+  {
+    "season": 2023,
+    "team": "Canadiens",
+    "prior_finish": 0.335366,
+    "delta_performance": 0.079268,
+    "ufa_spend": 1.55,
+    "MIS": 348750
+  },
+  {
+    "season": 2023,
+    "team": "Devils",
+    "prior_finish": 0.384146,
+    "delta_performance": 0.29878099999999996,
+    "ufa_spend": 3.875911,
+    "MIS": 1007717.15
+  },
+  {
+    "season": 2023,
+    "team": "Predators",
+    "prior_finish": 0.591463,
+    "delta_performance": -0.03048699999999993,
+    "ufa_spend": 19.205,
+    "MIS": 2619000
+  },
+  {
+    "season": 2023,
+    "team": "Islanders",
+    "prior_finish": 0.512195,
+    "delta_performance": 0.05487800000000009,
+    "ufa_spend": 2.3375,
+    "MIS": 389375
+  },
+  {
+    "season": 2023,
+    "team": "Rangers",
+    "prior_finish": 0.670732,
+    "delta_performance": -0.018293000000000004,
+    "ufa_spend": 3.93911,
+    "MIS": 828406.75
+  },
+  {
+    "season": 2023,
+    "team": "Senators",
+    "prior_finish": 0.445122,
+    "delta_performance": 0.079268,
+    "ufa_spend": 2.325912,
+    "MIS": 426468
+  },
+  {
+    "season": 2023,
+    "team": "Flyers",
+    "prior_finish": 0.371951,
+    "delta_performance": 0.085366,
+    "ufa_spend": 6.425,
+    "MIS": 1260000
+  },
+  {
+    "season": 2023,
+    "team": "Penguins",
+    "prior_finish": 0.628049,
+    "delta_performance": -0.07317099999999999,
+    "ufa_spend": 19.563626,
+    "MIS": 3416373.2
+  },
+  {
+    "season": 2023,
+    "team": "Kraken",
+    "prior_finish": 0.365854,
+    "delta_performance": 0.24390199999999995,
+    "ufa_spend": 8.525,
+    "MIS": 1630000
+  },
+  {
+    "season": 2023,
+    "team": "Sharks",
+    "prior_finish": 0.469512,
+    "delta_performance": -0.10365799999999997,
+    "ufa_spend": 5.300805,
+    "MIS": 982620.75
+  },
+  {
+    "season": 2023,
+    "team": "Blues",
+    "prior_finish": 0.664634,
+    "delta_performance": -0.17073199999999994,
+    "ufa_spend": 3.875,
+    "MIS": 930000
+  },
+  {
+    "season": 2023,
+    "team": "Lightning",
+    "prior_finish": 0.670732,
+    "delta_performance": -0.07317099999999999,
+    "ufa_spend": 3.105896,
+    "MIS": 581933.15
+  },
+  {
+    "season": 2023,
+    "team": "Maple Leafs",
+    "prior_finish": 0.70122,
+    "delta_performance": -0.02439099999999994,
+    "ufa_spend": 14.975612,
+    "MIS": 3107530.6
+  },
+  {
+    "season": 2023,
+    "team": "Canucks",
+    "prior_finish": 0.560976,
+    "delta_performance": -0.05487799999999998,
+    "ufa_spend": 8.300306,
+    "MIS": 1977576.5
+  },
+  {
+    "season": 2023,
+    "team": "Golden Knights",
+    "prior_finish": 0.573171,
+    "delta_performance": 0.10365800000000003,
+    "ufa_spend": 0.775,
+    "MIS": 38750
+  },
+  {
+    "season": 2023,
+    "team": "Jets",
+    "prior_finish": 0.542683,
+    "delta_performance": 0.03658499999999998,
+    "ufa_spend": 3.3,
+    "MIS": 1000000
+  },
+  {
+    "season": 2023,
+    "team": "Capitals",
+    "prior_finish": 0.609756,
+    "delta_performance": -0.12195099999999998,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2024,
+    "team": "Ducks",
+    "prior_finish": 0.353659,
+    "delta_performance": 0.006097000000000019,
+    "ufa_spend": 1.5625,
+    "MIS": 273750
+  },
+  {
+    "season": 2024,
+    "team": "Coyotes",
+    "prior_finish": 0.426829,
+    "delta_performance": 0.04268299999999997,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2024,
+    "team": "Bruins",
+    "prior_finish": 0.823171,
+    "delta_performance": -0.15853700000000004,
+    "ufa_spend": 19.375506,
+    "MIS": 1550126.5
+  },
+  {
+    "season": 2024,
+    "team": "Sabres",
+    "prior_finish": 0.554878,
+    "delta_performance": -0.042683000000000026,
+    "ufa_spend": 5.426324,
+    "MIS": 1245128.9
+  },
+  {
+    "season": 2024,
+    "team": "Hurricanes",
+    "prior_finish": 0.689024,
+    "delta_performance": -0.012194999999999956,
+    "ufa_spend": 14.425206,
+    "MIS": 2983780.9
+  },
+  {
+    "season": 2024,
+    "team": "Blue Jackets",
+    "prior_finish": 0.359756,
+    "delta_performance": 0.04268299999999997,
+    "ufa_spend": 7.825905,
+    "MIS": 1720135.75
+  },
+  {
+    "season": 2024,
+    "team": "Flames",
+    "prior_finish": 0.567073,
+    "delta_performance": -0.07317100000000004,
+    "ufa_spend": 7.276011,
+    "MIS": 1546482.15
+  },
+  {
+    "season": 2024,
+    "team": "Blackhawks",
+    "prior_finish": 0.359756,
+    "delta_performance": -0.042683000000000026,
+    "ufa_spend": 30.050618,
+    "MIS": 3922612.1
+  },
+  {
+    "season": 2024,
+    "team": "Avalanche",
+    "prior_finish": 0.664634,
+    "delta_performance": -0.012194999999999956,
+    "ufa_spend": 4.20171,
+    "MIS": 970427.5
+  },
+  {
+    "season": 2024,
+    "team": "Stars",
+    "prior_finish": 0.658537,
+    "delta_performance": 0.03048699999999993,
+    "ufa_spend": 10.100212,
+    "MIS": 2370063.6
+  },
+  {
+    "season": 2024,
+    "team": "Red Wings",
+    "prior_finish": 0.487805,
+    "delta_performance": 0.067073,
+    "ufa_spend": 11.126011,
+    "MIS": 2440212.5
+  },
+  {
+    "season": 2024,
+    "team": "Oilers",
+    "prior_finish": 0.664634,
+    "delta_performance": -0.03048799999999996,
+    "ufa_spend": 2.32653,
+    "MIS": 658847.7
+  },
+  {
+    "season": 2024,
+    "team": "Panthers",
+    "prior_finish": 0.560976,
+    "delta_performance": 0.10975599999999996,
+    "ufa_spend": 6.295805,
+    "MIS": 1297201.25
+  },
+  {
+    "season": 2024,
+    "team": "Kings",
+    "prior_finish": 0.634146,
+    "delta_performance": -0.030487000000000042,
+    "ufa_spend": 11.225,
+    "MIS": 2301250
+  },
+  {
+    "season": 2024,
+    "team": "Wild",
+    "prior_finish": 0.628049,
+    "delta_performance": -0.09756100000000001,
+    "ufa_spend": 10.475,
+    "MIS": 1978750
+  },
+  {
+    "season": 2024,
+    "team": "Canadiens",
+    "prior_finish": 0.414634,
+    "delta_performance": 0.04878100000000002,
+    "ufa_spend": 0.775,
+    "MIS": 155000
+  },
+  {
+    "season": 2024,
+    "team": "Devils",
+    "prior_finish": 0.682927,
+    "delta_performance": -0.18902499999999994,
+    "ufa_spend": 13.400406,
+    "MIS": 2277601.5
+  },
+  {
+    "season": 2024,
+    "team": "Predators",
+    "prior_finish": 0.560976,
+    "delta_performance": 0.042682999999999915,
+    "ufa_spend": 10.101512,
+    "MIS": 2400337.7
+  },
+  {
+    "season": 2024,
+    "team": "Islanders",
+    "prior_finish": 0.567073,
+    "delta_performance": 0.006097999999999937,
+    "ufa_spend": 9.325,
+    "MIS": 853750
+  },
+  {
+    "season": 2024,
+    "team": "Rangers",
+    "prior_finish": 0.652439,
+    "delta_performance": 0.042683000000000026,
+    "ufa_spend": 1.562606,
+    "MIS": 351896.2
+  },
+  {
+    "season": 2024,
+    "team": "Senators",
+    "prior_finish": 0.52439,
+    "delta_performance": -0.048780000000000046,
+    "ufa_spend": 6.552422,
+    "MIS": 1348871.1
+  },
+  {
+    "season": 2024,
+    "team": "Flyers",
+    "prior_finish": 0.457317,
+    "delta_performance": 0.07317099999999999,
+    "ufa_spend": 1.55,
+    "MIS": 426250
+  },
+  {
+    "season": 2024,
+    "team": "Penguins",
+    "prior_finish": 0.554878,
+    "delta_performance": -0.018293000000000004,
+    "ufa_spend": 9.725,
+    "MIS": 2097500
+  },
+  {
+    "season": 2024,
+    "team": "Kraken",
+    "prior_finish": 0.609756,
+    "delta_performance": -0.11585399999999996,
+    "ufa_spend": 11.792857,
+    "MIS": 2754464.25
+  },
+  {
+    "season": 2024,
+    "team": "Sharks",
+    "prior_finish": 0.365854,
+    "delta_performance": -0.07926900000000003,
+    "ufa_spend": 1.628328,
+    "MIS": 364274.05
+  },
+  {
+    "season": 2024,
+    "team": "Blues",
+    "prior_finish": 0.493902,
+    "delta_performance": 0.06707400000000002,
+    "ufa_spend": 2.5,
+    "MIS": 625000
+  },
+  {
+    "season": 2024,
+    "team": "Lightning",
+    "prior_finish": 0.597561,
+    "delta_performance": 0,
+    "ufa_spend": 4.025905,
+    "MIS": 588885.75
+  },
+  {
+    "season": 2024,
+    "team": "Maple Leafs",
+    "prior_finish": 0.676829,
+    "delta_performance": -0.05487799999999998,
+    "ufa_spend": 11.295,
+    "MIS": 2885000
+  },
+  {
+    "season": 2024,
+    "team": "Canucks",
+    "prior_finish": 0.506098,
+    "delta_performance": 0.1585359999999999,
+    "ufa_spend": 13.375206,
+    "MIS": 2598801.5
+  },
+  {
+    "season": 2024,
+    "team": "Golden Knights",
+    "prior_finish": 0.676829,
+    "delta_performance": -0.079268,
+    "ufa_spend": 8.975,
+    "MIS": 1600000
+  },
+  {
+    "season": 2024,
+    "team": "Jets",
+    "prior_finish": 0.579268,
+    "delta_performance": 0.09146399999999999,
+    "ufa_spend": 2.325911,
+    "MIS": 504068.85
+  },
+  {
+    "season": 2024,
+    "team": "Capitals",
+    "prior_finish": 0.487805,
+    "delta_performance": 0.067073,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2025,
+    "team": "Ducks",
+    "prior_finish": 0.359756,
+    "delta_performance": 0.12789799999999996,
+    "ufa_spend": 0.000706,
+    "MIS": 141.20000000000002
+  },
+  {
+    "season": 2025,
+    "team": "Bruins",
+    "prior_finish": 0.664634,
+    "delta_performance": -0.20121899999999993,
+    "ufa_spend": 10.025,
+    "MIS": 1871250
+  },
+  {
+    "season": 2025,
+    "team": "Sabres",
+    "prior_finish": 0.512195,
+    "delta_performance": -0.036885999999999974,
+    "ufa_spend": 7.225905,
+    "MIS": 1548976.25
+  },
+  {
+    "season": 2025,
+    "team": "Hurricanes",
+    "prior_finish": 0.676829,
+    "delta_performance": -0.05807899999999999,
+    "ufa_spend": 10.375,
+    "MIS": 1666250
+  },
+  {
+    "season": 2025,
+    "team": "Blue Jackets",
+    "prior_finish": 0.402439,
+    "delta_performance": 0.134598,
+    "ufa_spend": 2.850911,
+    "MIS": 570227.75
+  },
+  {
+    "season": 2025,
+    "team": "Flames",
+    "prior_finish": 0.493902,
+    "delta_performance": 0.08634499999999995,
+    "ufa_spend": 0,
+    "MIS": 0
+  },
+  {
+    "season": 2025,
+    "team": "Blackhawks",
+    "prior_finish": 0.317073,
+    "delta_performance": 0.05487799999999998,
+    "ufa_spend": 0.850106,
+    "MIS": 170026.5
+  },
+  {
+    "season": 2025,
+    "team": "Avalanche",
+    "prior_finish": 0.652439,
+    "delta_performance": -0.03048799999999996,
+    "ufa_spend": 3.900106,
+    "MIS": 740026.5
+  },
+  {
+    "season": 2025,
+    "team": "Stars",
+    "prior_finish": 0.689024,
+    "delta_performance": -0.03470299999999993,
+    "ufa_spend": 0.775206,
+    "MIS": 116291.2
+  },
+  {
+    "season": 2025,
+    "team": "Red Wings",
+    "prior_finish": 0.554878,
+    "delta_performance": -0.03612799999999994,
+    "ufa_spend": 4.550212,
+    "MIS": 992542.4
+  },
+  {
+    "season": 2025,
+    "team": "Oilers",
+    "prior_finish": 0.634146,
+    "delta_performance": -0.023035000000000028,
+    "ufa_spend": 8.2,
+    "MIS": 1382500
+  },
+  {
+    "season": 2025,
+    "team": "Panthers",
+    "prior_finish": 0.670732,
+    "delta_performance": -0.07317099999999999,
+    "ufa_spend": 3.875,
+    "MIS": 891250
+  },
+  {
+    "season": 2025,
+    "team": "Kings",
+    "prior_finish": 0.603659,
+    "delta_performance": 0.044489,
+    "ufa_spend": 11.575612,
+    "MIS": 2791382.4
+  },
+  {
+    "season": 2025,
+    "team": "Wild",
+    "prior_finish": 0.530488,
+    "delta_performance": 0.060975,
+    "ufa_spend": 3.101011,
+    "MIS": 697742.45
+  },
+  {
+    "season": 2025,
+    "team": "Canadiens",
+    "prior_finish": 0.463415,
+    "delta_performance": 0.08596799999999993,
+    "ufa_spend": 3.476011,
+    "MIS": 906452.2
+  },
+  {
+    "season": 2025,
+    "team": "Devils",
+    "prior_finish": 0.493902,
+    "delta_performance": 0.067826,
+    "ufa_spend": 3.100412,
+    "MIS": 232561.8
+  },
+  {
+    "season": 2025,
+    "team": "Predators",
+    "prior_finish": 0.603659,
+    "delta_performance": -0.19625199999999993,
+    "ufa_spend": 2.75,
+    "MIS": 687500
+  },
+  {
+    "season": 2025,
+    "team": "Islanders",
+    "prior_finish": 0.573171,
+    "delta_performance": -0.066998,
+    "ufa_spend": 3.425512,
+    "MIS": 707598
+  },
+  {
+    "season": 2025,
+    "team": "Rangers",
+    "prior_finish": 0.695122,
+    "delta_performance": -0.18277600000000005,
+    "ufa_spend": 4.600706,
+    "MIS": 922676.5
+  },
+  {
+    "season": 2025,
+    "team": "Senators",
+    "prior_finish": 0.47561,
+    "delta_performance": 0.11081000000000008,
+    "ufa_spend": 7.7375,
+    "MIS": 1191875
+  },
+  {
+    "season": 2025,
+    "team": "Flyers",
+    "prior_finish": 0.530488,
+    "delta_performance": -0.06135199999999996,
+    "ufa_spend": 15.800905,
+    "MIS": 2086476.25
+  },
+  {
+    "season": 2025,
+    "team": "Penguins",
+    "prior_finish": 0.536585,
+    "delta_performance": -0.055103999999999986,
+    "ufa_spend": 6.326111,
+    "MIS": 1104027.75
+  },
+  {
+    "season": 2025,
+    "team": "Kraken",
+    "prior_finish": 0.493902,
+    "delta_performance": -0.030486999999999986,
+    "ufa_spend": 4.500106,
+    "MIS": 1125037.1
+  },
+  {
+    "season": 2025,
+    "team": "Sharks",
+    "prior_finish": 0.286585,
+    "delta_performance": 0.03440300000000002,
+    "ufa_spend": 10.801224,
+    "MIS": 2640173.3
+  },
+  {
+    "season": 2025,
+    "team": "Blues",
+    "prior_finish": 0.560976,
+    "delta_performance": 0.024390000000000023,
+    "ufa_spend": 8.2,
+    "MIS": 1523750
+  },
+  {
+    "season": 2025,
+    "team": "Lightning",
+    "prior_finish": 0.597561,
+    "delta_performance": 0.032069000000000014,
+    "ufa_spend": 4.65,
+    "MIS": 813750
+  },
+  {
+    "season": 2025,
+    "team": "Maple Leafs",
+    "prior_finish": 0.621951,
+    "delta_performance": 0.03237000000000001,
+    "ufa_spend": 2.4,
+    "MIS": 480000
+  },
+  {
+    "season": 2025,
+    "team": "Utah Hockey Club",
+    "prior_finish": 0.469512,
+    "delta_performance": 0.07317100000000004,
+    "ufa_spend": 14.05,
+    "MIS": 2123750
+  },
+  {
+    "season": 2025,
+    "team": "Canucks",
+    "prior_finish": 0.664634,
+    "delta_performance": -0.1090779999999999,
+    "ufa_spend": 4.975,
+    "MIS": 1150000
+  },
+  {
+    "season": 2025,
+    "team": "Golden Knights",
+    "prior_finish": 0.597561,
+    "delta_performance": 0.069106,
+    "ufa_spend": 2.738305,
+    "MIS": 603326.25
+  },
+  {
+    "season": 2025,
+    "team": "Jets",
+    "prior_finish": 0.670732,
+    "delta_performance": 0.032972,
+    "ufa_spend": 13.625212,
+    "MIS": 1301281.8
+  },
+  {
+    "season": 2025,
+    "team": "Capitals",
+    "prior_finish": 0.554878,
+    "delta_performance": 0.13030700000000006,
+    "ufa_spend": 0,
+    "MIS": 0
+  }
+]

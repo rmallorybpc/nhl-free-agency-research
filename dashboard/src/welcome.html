@@ -22,6 +22,66 @@
     .tmg-page-links a[aria-current="page"] {
       background: rgba(132,169,140,0.15); color: var(--tmg-sage-hover);
     }
+    .mean-reversion-wrap { max-width: 900px; margin: 0 auto; }
+    .mean-reversion-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .mean-reversion-check,
+    .mean-reversion-fit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      border: none;
+      padding: 0;
+      min-height: 36px;
+    }
+    .mean-reversion-fit legend {
+      margin-right: 6px;
+      font-size: 13px;
+      color: var(--tmg-muted);
+    }
+    .mean-reversion-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      color: var(--tmg-charcoal);
+    }
+    .mean-reversion-spec-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(132,169,140,0.35);
+      background: rgba(132,169,140,0.14);
+      color: var(--tmg-charcoal);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .mean-reversion-plot {
+      width: 100%;
+      min-height: 430px;
+    }
+    .mean-reversion-caption {
+      font-size: 13px;
+      color: var(--tmg-muted);
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 768px) {
+      .mean-reversion-controls {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -107,6 +167,11 @@
           &nbsp;·&nbsp;
           <a href="./audit.html">Audit reproducibility checks</a>
         </p>
+      </section>
+
+      <section style="margin-bottom: var(--tmg-gap);" aria-label="Mean reversion visualization section">
+        <!-- Mean-reversion chart reads ./data/team_seasons.json and renders via ./js/mean_reversion_chart.js -->
+        <div id="meanReversionChartContainer"></div>
       </section>
 
       <div style="margin-bottom: var(--tmg-gap);">
@@ -195,6 +260,8 @@
        target="_blank" rel="noopener noreferrer">View the source on GitHub →</a>
   </footer>
 
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="./js/mean_reversion_chart.js" defer></script>
   <script>
     const btn  = document.getElementById('tmgDdBtn');
     const menu = document.getElementById('tmgDdMenu');
