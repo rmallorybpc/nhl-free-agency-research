@@ -170,14 +170,14 @@
       </section>
 
       <div class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
-        <h2 class="tmg-h2">Does where a player comes from change the result?</h2>
+        <h2 class="tmg-h2">Does it matter if a team signs a player from a rival or from across the league?</h2>
         <p class="tmg-body">
-          The question comes from the same behavioral economics framing as the
-          mean reversion finding. Hengchen Dai's research suggested that the more
-          a player's environment changes, the larger the reset effect should be.
-          Applied to NHL free agency: does signing a player from across the
-          conference produce a different outcome than signing a player from your
-          own division?
+          A natural question for any front office: should you target players
+          from other parts of the league rather than your own backyard? The idea
+          is that a fresh environment - new opponents, new travel, new systems -
+          might help a player perform better than re-treading the same matchups.
+          We tested whether signings from different parts of the league produce
+          different outcomes for the team that signed them.
         </p>
 
         <p id="finding3Plain" class="tmg-body"
@@ -195,10 +195,10 @@
           <thead>
             <tr>
               <th scope="col">Player came from</th>
-              <th scope="col">Avg points % change</th>
-              <th scope="col">Standard deviation</th>
+              <th scope="col">Avg next-season change</th>
+              <th scope="col">Typical season-to-season variation</th>
               <th scope="col">Signings analyzed</th>
-              <th scope="col">Seasons ranked highest</th>
+              <th scope="col">Best result in</th>
             </tr>
           </thead>
           <tbody id="geographyOverallBody">
@@ -206,8 +206,24 @@
           </tbody>
         </table>
 
+        <p class="tmg-body" style="margin-top:16px">
+          The practical implication: when a team chases a player from a
+          different conference, they should not expect a bigger improvement
+          than if they had signed someone closer to home. The novelty of
+          a new environment - different opponents, different cities, different
+          systems - does not translate into a measurable team-level edge.
+          Individual players may benefit from the fresh start, but at the
+          team level the effect does not show up.
+        </p>
+
         <p class="tmg-body-sm tmg-text-muted" style="margin-top:16px">
-          Signings where the previous team is unknown are excluded from this comparison.
+          Each signing is matched to the team's overall performance change that
+          season - the same method the NFL site uses. Variation shows how
+          much individual team-seasons in each group differ from the group
+          average. The fact that the variation in each group is much larger
+          than the spread between groups is why geography is not a reliable
+          predictor on its own. Signings where the previous team is unknown
+          are excluded.
         </p>
       </div>
 
@@ -560,88 +576,99 @@
     }
 
     function renderFinding3Plain(overallSummary, seasonsRanked, regressionCoefs) {
-      const within = overallSummary.find(r => r.movement_geography === 'within_division');
-      const crossD = overallSummary.find(r => r.movement_geography === 'cross_division_same_conference');
-      const crossC = overallSummary.find(r => r.movement_geography === 'cross_conference');
+      // Parse the three CSVs
+      const within = overallSummary.find(r =>
+        r.movement_geography === 'within_division');
+      const crossD = overallSummary.find(r =>
+        r.movement_geography === 'cross_division_same_conference');
+      const crossC = overallSummary.find(r =>
+        r.movement_geography === 'cross_conference');
 
       if (!within || !crossD || !crossC) {
         setFindingsFallback();
         return;
       }
 
-      const withinMean = toNumber(within.mean_change);
-      const crossDMean = toNumber(crossD.mean_change);
-      const crossCMean = toNumber(crossC.mean_change);
-      const withinSD = toNumber(within.sd_change);
-      const crossDSD = toNumber(crossD.sd_change);
-      const crossCSD = toNumber(crossC.sd_change);
-
-      if (!Number.isFinite(withinMean) || !Number.isFinite(crossDMean) || !Number.isFinite(crossCMean)
-          || !Number.isFinite(withinSD) || !Number.isFinite(crossDSD) || !Number.isFinite(crossCSD)) {
-        setFindingsFallback();
-        return;
-      }
+      // Get values as numbers
+      const withinMean = parseFloat(within.mean_change);
+      const crossDMean = parseFloat(crossD.mean_change);
+      const crossCMean = parseFloat(crossC.mean_change);
 
       const means = [withinMean, crossDMean, crossCMean];
       const spread = Math.max(...means) - Math.min(...means);
-      const maxSD = Math.max(withinSD, crossDSD, crossCSD);
 
-      const crossCRow = seasonsRanked.find(r => r.category === 'cross_conference');
-      const crossCSeasons = crossCRow ? Number(crossCRow.seasons_ranked_first) : 0;
-      const totalSeasons = crossCRow ? Number(crossCRow.total_seasons) : 8;
+      // Largest within-group variation - used to make the
+      // "individual teams vary more than groups" point in plain language
+      const maxSD = Math.max(
+        parseFloat(within.sd_change),
+        parseFloat(crossD.sd_change),
+        parseFloat(crossC.sd_change)
+      );
 
-      // Supplementary regression p-value is read for completeness/reporting parity.
-      const regPval = toNumber((regressionCoefs || []).find(r => r.term === 'pct_cross_conference')?.p_value);
-      const regText = Number.isFinite(regPval)
-        ? ` Supplementary regression p-value for cross-conference share: ${regPval.toFixed(3)}.`
-        : '';
+      // Cross-conference seasons ranked first
+      const crossCSeasons = seasonsRanked.find(r =>
+        r.category === 'cross_conference').seasons_ranked_first;
+      const totalSeasons = seasonsRanked.find(r =>
+        r.category === 'cross_conference').total_seasons;
+
+      // Convert to percentage points for readability
+      const spreadPP = (spread * 100).toFixed(1);
+      const variationPP = (maxSD * 100).toFixed(1);
 
       let sentence;
 
       if (spread < 0.010) {
+        // Null finding - no meaningful geography effect
         sentence = `
-          <strong>No — not in this data.</strong>
-          Whether a team signs a player from within their own division, from
-          across the division line in the same conference, or from the other
-          conference entirely, the average performance outcome is nearly
-          identical. The three groups differ by less than
-          ${(spread * 100).toFixed(1)} percentage points, against a within-group
-          standard deviation of ${(maxSD * 100).toFixed(1)} percentage points.
-          Cross-conference signings ranked highest in ${crossCSeasons} of
-          ${totalSeasons} seasons. Where a player came from does not reliably
-          predict how much a team improves.${regText}
+          <strong>No - not really.</strong>
+          Whether a team signs a player from a division rival, from a team
+          in the same conference, or from the other side of the league,
+          the average outcome is almost identical. The three groups land
+          within ${spreadPP} percentage points of each other - a difference
+          so small it disappears next to the season-to-season variation
+          within each group, which is roughly ${variationPP} percentage points.
+          A signing from across the country is just as likely to help or
+          hurt a team as a signing from down the road. Players from across
+          the conference led the league in only ${crossCSeasons} of
+          ${totalSeasons} seasons.
         `;
       } else if (spread < 0.025) {
+        // Suggestive but small
         sentence = `
-          <strong>Suggestive — but small.</strong>
-          There is a measurable difference in average outcomes across geography
-          categories, but the spread is modest at
-          ${(spread * 100).toFixed(1)} percentage points. The within-group
-          variation of ${(maxSD * 100).toFixed(1)} percentage points means
-          individual signings vary far more than the group averages. Cross-conference
-          signings ranked highest in ${crossCSeasons} of ${totalSeasons} seasons.${regText}
+          <strong>A little - but barely.</strong>
+          There is a small difference in average outcomes depending on
+          where a player came from, but it is modest at ${spreadPP}
+          percentage points. Individual signings vary far more than the
+          group averages, so picking signings based on geography alone is
+          not a reliable strategy. Players from across the conference led
+          the league in ${crossCSeasons} of ${totalSeasons} seasons.
         `;
       } else {
+        // Meaningful effect
         const highest = means.indexOf(Math.max(...means));
-        const categoryNames = ['within-division', 'cross-division', 'cross-conference'];
+        const categoryNames = [
+          'players signed from within the division',
+          'players signed from elsewhere in the conference',
+          'players signed from the other conference'
+        ];
         sentence = `
-          <strong>Yes — meaningfully.</strong>
-          Signings from ${categoryNames[highest]} produce the highest average
-          performance gains, leading the lowest category by
-          ${(spread * 100).toFixed(1)} percentage points. Cross-conference
-          signings ranked highest in ${crossCSeasons} of ${totalSeasons} seasons.${regText}
+          <strong>Yes - meaningfully.</strong>
+          ${categoryNames[highest].charAt(0).toUpperCase() +
+            categoryNames[highest].slice(1)} produce the highest average
+          outcomes, leading the lowest group by ${spreadPP} percentage points.
+          Players from across the conference led the league in
+          ${crossCSeasons} of ${totalSeasons} seasons.
         `;
       }
 
-      const container = document.getElementById('finding3Plain');
-      if (container) container.innerHTML = sentence;
+      document.getElementById('finding3Plain').innerHTML = sentence;
     }
 
     function renderGeographyTable(overallSummary, seasonsRanked) {
       const displayName = {
-        within_division: 'Same division',
-        cross_division_same_conference: 'Different division, same conference',
-        cross_conference: 'Other conference'
+        'within_division': 'From a division rival',
+        'cross_division_same_conference': 'From elsewhere in the conference',
+        'cross_conference': 'From the other conference'
       };
 
       const seasonsMap = {};
@@ -660,8 +687,9 @@
         const count = Number(r.signing_count) || 0;
         const seasonsTop = seasonsMap[r.movement_geography] || 0;
 
-        const changeFormatted = `${change >= 0 ? '+' : ''}${(change * 100).toFixed(2)} pp`;
-        const sdFormatted = `${(sd * 100).toFixed(2)} pp`;
+        const changeSymbol = change > 0.0001 ? '▲' : change < -0.0001 ? '▼' : '→';
+        const changeFormatted = `${changeSymbol} ${(change * 100).toFixed(2)} pp`;
+        const sdFormatted = `± ${(sd * 100).toFixed(1)} pp`;
         const changeColor = change > 0.005 ? 'var(--tmg-success)'
           : change < -0.005 ? 'var(--tmg-error)'
           : 'var(--tmg-text-muted)';
@@ -672,7 +700,7 @@
             <td style="color:${changeColor}; font-weight:500">${changeFormatted}</td>
             <td>${sdFormatted}</td>
             <td>${count}</td>
-            <td>${seasonsTop} of ${totalSeasons}</td>
+            <td>${seasonsTop} of ${totalSeasons} seasons</td>
           </tr>
         `;
       }).join('');

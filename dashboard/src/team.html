@@ -712,7 +712,7 @@
       `).join('');
 
       const geoFootnote = geoRow
-        ? `<p class="tmg-body-sm tmg-text-muted" style="margin:10px 0 0;">Geography reference: ${toNum(geoRow.total_signing_count)} total signings, ${(toNum(geoRow.pct_cross_conference) * 100).toFixed(1)}% cross conference.</p>`
+        ? `<p class="tmg-body-sm tmg-text-muted" style="margin:10px 0 0;">Player origin reference: ${toNum(geoRow.total_signing_count)} total signings, ${(toNum(geoRow.pct_cross_conference) * 100).toFixed(1)}% from the other conference.</p>`
         : '';
 
       els.misCard.innerHTML = `
@@ -742,11 +742,11 @@
     function geographyBadge(value) {
       switch ((value || '').trim()) {
         case 'within_division':
-          return '<span class="geo-badge geo-within">Within division</span>';
+          return '<span class="geo-badge geo-within">From a division rival</span>';
         case 'cross_division_same_conference':
-          return '<span class="geo-badge geo-cross-div">Cross division</span>';
+          return '<span class="geo-badge geo-cross-div">From elsewhere in the conference</span>';
         case 'cross_conference':
-          return '<span class="geo-badge geo-cross-conf">Cross conference</span>';
+          return '<span class="geo-badge geo-cross-conf">From the other conference</span>';
         case 'same_team':
           return '<span class="geo-badge geo-same-team">Re-signed</span>';
         default:
@@ -794,7 +794,7 @@
                 <th>Player</th>
                 <th>Pos</th>
                 <th>Previous team</th>
-                <th>Geography</th>
+                <th>Player came from</th>
                 <th>AAV</th>
                 <th>Years</th>
                 <th>Cap flag</th>

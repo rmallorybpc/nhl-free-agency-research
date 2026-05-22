@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>All Signings — NHL Free Agency Research</title>
-  <meta name="description" content="Browse and filter all 1,648 NHL UFA signings from 2017 through 2025. Sort by AAV, year, position, team, or movement geography.">
+  <meta name="description" content="Browse and filter all 1,648 NHL UFA signings from 2017 through 2025. Sort by AAV, year, position, team, or where players came from.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <!-- CDN to restore when published:
@@ -163,7 +163,7 @@
         <p class="tmg-page-desc">
           Search and filter all 1,648 NHL UFA signings from 2017 through 2025.
           Re-signings excluded. Sort by AAV, year, position, team, or
-          movement geography.
+          where players came from.
         </p>
       </div>
 
@@ -197,12 +197,12 @@
           </div>
 
           <div>
-            <label class="tmg-field-label" for="filterGeography">Movement geography</label>
+            <label class="tmg-field-label" for="filterGeography">Player came from</label>
             <select class="tmg-select" id="filterGeography">
               <option value="all">All geographies</option>
-              <option value="within_division">Within division</option>
-              <option value="cross_division_same_conference">Cross division</option>
-              <option value="cross_conference">Cross conference</option>
+              <option value="within_division">From a division rival</option>
+              <option value="cross_division_same_conference">From elsewhere in the conference</option>
+              <option value="cross_conference">From the other conference</option>
             </select>
           </div>
 
@@ -431,9 +431,9 @@
     }
 
     function geographyLabel(value) {
-      if (value === 'within_division') return 'Within division';
-      if (value === 'cross_division_same_conference') return 'Cross division';
-      if (value === 'cross_conference') return 'Cross conference';
+      if (value === 'within_division') return 'From a division rival';
+      if (value === 'cross_division_same_conference') return 'From elsewhere in the conference';
+      if (value === 'cross_conference') return 'From the other conference';
       return 'Unknown';
     }
 
@@ -582,7 +582,7 @@
                 <th>Pos</th>
                 <th>Signing team</th>
                 <th>Previous team</th>
-                <th>Geography</th>
+                <th>Player came from</th>
                 <th>AAV</th>
                 <th>Years</th>
                 <th>Total value</th>

@@ -290,20 +290,20 @@
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
-        <h2 class="tmg-h2">Movement geography for selected season</h2>
+        <h2 class="tmg-h2">Where signed players came from in the selected season</h2>
         <div id="geographyTiles" class="geo-grid">
           <article class="tmg-card" style="padding: 16px;">
-            <p class="tmg-card-label">WITHIN DIVISION</p>
+            <p class="tmg-card-label">FROM A DIVISION RIVAL</p>
             <p class="tmg-card-value">Loading...</p>
             <p class="tmg-card-sub">Loading...</p>
           </article>
           <article class="tmg-card" style="padding: 16px;">
-            <p class="tmg-card-label">CROSS DIVISION</p>
+            <p class="tmg-card-label">FROM ELSEWHERE IN THE CONFERENCE</p>
             <p class="tmg-card-value">Loading...</p>
             <p class="tmg-card-sub">Loading...</p>
           </article>
           <article class="tmg-card" style="padding: 16px;">
-            <p class="tmg-card-label">CROSS CONFERENCE</p>
+            <p class="tmg-card-label">FROM THE OTHER CONFERENCE</p>
             <p class="tmg-card-value">Loading...</p>
             <p class="tmg-card-sub">Loading...</p>
           </article>
@@ -780,19 +780,19 @@
 
       els.geographyTiles.innerHTML = [
         '<article class="tmg-card" style="padding: 16px;">',
-        '  <p class="tmg-card-label">WITHIN DIVISION</p>',
+        '  <p class="tmg-card-label">FROM A DIVISION RIVAL</p>',
         '  <p class="tmg-card-value">' + within + '</p>',
-        '  <p class="tmg-card-sub">' + withinPct.toFixed(1) + '% of all signings</p>',
+        '  <p class="tmg-card-sub">' + withinPct.toFixed(1) + '% of all signings that season</p>',
         '</article>',
         '<article class="tmg-card" style="padding: 16px;">',
-        '  <p class="tmg-card-label">CROSS DIVISION</p>',
+        '  <p class="tmg-card-label">FROM ELSEWHERE IN THE CONFERENCE</p>',
         '  <p class="tmg-card-value">' + crossDivision + '</p>',
-        '  <p class="tmg-card-sub">' + crossDivPct.toFixed(1) + '% of all signings</p>',
+        '  <p class="tmg-card-sub">' + crossDivPct.toFixed(1) + '% of all signings that season</p>',
         '</article>',
         '<article class="tmg-card" style="padding: 16px;">',
-        '  <p class="tmg-card-label">CROSS CONFERENCE</p>',
+        '  <p class="tmg-card-label">FROM THE OTHER CONFERENCE</p>',
         '  <p class="tmg-card-value">' + crossConference + '</p>',
-        '  <p class="tmg-card-sub">' + crossConfPct.toFixed(1) + '% of all signings</p>',
+        '  <p class="tmg-card-sub">' + crossConfPct.toFixed(1) + '% of all signings that season</p>',
         '</article>'
       ].join('');
     }
