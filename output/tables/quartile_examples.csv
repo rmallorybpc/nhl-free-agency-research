@@ -1,0 +1,13 @@
+quartile,quartile_label,example_rank,teamCommonName,teamTriCode,season_year,prior_season_points_pct,points_percentage,points_pct_change
+4,Q4 Top 25%,1,Bruins,BOS,2025,0.665,0.463,-0.201
+4,Q4 Top 25%,2,Devils,NJD,2024,0.683,0.494,-0.189
+4,Q4 Top 25%,3,Panthers,FLA,2023,0.744,0.561,-0.183
+3,Q3 Upper mid,1,Lightning,TBL,2024,0.598,0.598,0
+3,Q3 Upper mid,2,Islanders,NYI,2024,0.567,0.573,0.006
+3,Q3 Upper mid,3,Predators,NSH,2022,0.571,0.591,0.02
+2,Q2 Lower mid,1,Penguins,PIT,2024,0.555,0.537,-0.018
+2,Q2 Lower mid,2,Jets,WPG,2022,0.562,0.543,-0.02
+2,Q2 Lower mid,3,Blues,STL,2025,0.561,0.585,0.024
+1,Q1 Bottom 25%,1,Devils,NJD,2023,0.384,0.683,0.299
+1,Q1 Bottom 25%,2,Kraken,SEA,2023,0.366,0.61,0.244
+1,Q1 Bottom 25%,3,Kings,LAK,2022,0.438,0.604,0.166

@@ -118,54 +118,28 @@
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">Mean reversion across performance quartiles</h2>
-        <p class="tmg-body">
-          Teams divided into four groups by prior season points percentage.
-          Average season-over-season change shown for each group. N=252
-          team-seasons, 2018–2025.
+        <p id="quartileAnecdote" class="tmg-body" style="margin-bottom:20px">
+          Loading example...
         </p>
         <div style="overflow-x: auto; margin-top: 12px;">
-          <table class="tmg-table" aria-label="Mean reversion quartile table">
+          <table class="tmg-table" id="quartileTable">
             <thead>
               <tr>
-                <th>Prior season quartile</th>
-                <th>Points % range</th>
-                <th>Avg change</th>
-                <th>Direction</th>
+                <th scope="col">Prior season finish</th>
+                <th scope="col">Points % range</th>
+                <th scope="col">Avg change next season</th>
+                <th scope="col">Recent examples</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="quartileTableBody">
               <tr>
-                <td>Q4 — Top 25%</td>
-                <td>Above ~0.622</td>
-                <td>Negative</td>
-                <td style="color: var(--tmg-error); font-weight: 500;">▼ Declined</td>
-              </tr>
-              <tr>
-                <td>Q3 — Upper mid</td>
-                <td>0.549 – 0.622</td>
-                <td>Near zero</td>
-                <td style="color: rgba(45, 52, 54, 0.55); font-weight: 500;">→ Flat</td>
-              </tr>
-              <tr>
-                <td>Q2 — Lower mid</td>
-                <td>0.476 – 0.549</td>
-                <td>Near zero</td>
-                <td style="color: rgba(45, 52, 54, 0.55); font-weight: 500;">→ Flat</td>
-              </tr>
-              <tr>
-                <td>Q1 — Bottom 25%</td>
-                <td>Below ~0.476</td>
-                <td>Positive</td>
-                <td style="color: var(--tmg-success); font-weight: 500;">▲ Improved</td>
+                <td colspan="4">Loading quartile data...</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="tmg-body-sm tmg-text-muted" style="margin-top: 12px;">
-          Top-quartile teams declined on average the following season.
-          Bottom-quartile teams improved. The middle two quartiles showed
-          negligible average change. This pattern held in 7 of 8 seasons
-          in the analysis window.
+        <p id="quartileClosing" class="tmg-body" style="margin-top:16px">
+          Loading interpretation...
         </p>
       </section>
 
@@ -446,10 +420,16 @@
       const f1 = document.getElementById('finding1Plain');
       const f2 = document.getElementById('finding2Plain');
       const f3 = document.getElementById('finding3Plain');
+      const quartileAnecdote = document.getElementById('quartileAnecdote');
+      const quartileClosing = document.getElementById('quartileClosing');
+      const quartileBody = document.getElementById('quartileTableBody');
       const geographyBody = document.getElementById('geographyOverallBody');
       if (f1) f1.innerHTML = fallbackHtml;
       if (f2) f2.innerHTML = fallbackHtml;
       if (f3) f3.innerHTML = fallbackHtml;
+      if (quartileAnecdote) quartileAnecdote.innerHTML = fallbackHtml;
+      if (quartileClosing) quartileClosing.innerHTML = fallbackHtml;
+      if (quartileBody) quartileBody.innerHTML = '<tr><td colspan="4"><em>Quartile table temporarily unavailable.</em></td></tr>';
       if (geographyBody) geographyBody.innerHTML = '<tr><td colspan="5"><em>Geography table temporarily unavailable.</em></td></tr>';
     }
 
@@ -573,6 +553,108 @@
 
       const container = document.getElementById('finding2Plain');
       if (container) container.innerHTML = sentence;
+    }
+
+    function renderQuartileAnecdote(examples) {
+      // Find the most extreme Q4 fall - largest negative points_pct_change
+      const q4Examples = examples.filter(e => e.quartile === '4');
+      if (!q4Examples.length) {
+        setFindingsFallback();
+        return;
+      }
+
+      const worstFall = q4Examples.reduce((worst, current) => {
+        return parseFloat(current.points_pct_change) < parseFloat(worst.points_pct_change)
+          ? current : worst;
+      });
+
+      const priorSeason = parseInt(worstFall.season_year, 10) - 1;
+      const fallPP = Math.abs(parseFloat(worstFall.points_pct_change) * 100).toFixed(1);
+      const priorPct = parseFloat(worstFall.prior_season_points_pct).toFixed(3);
+      const currentPct = parseFloat(worstFall.points_percentage).toFixed(3);
+
+      const sentence = `
+        Take the <strong>${worstFall.teamCommonName}</strong>. They finished
+        the ${priorSeason}-${parseInt(worstFall.season_year, 10).toString().slice(2)}
+        season with a points percentage of ${priorPct}, near the top of the league.
+        The next season they fell to ${currentPct} - a drop of ${fallPP} percentage
+        points. That fall happened without any major change in roster strategy.
+        It is the pattern mean reversion predicts.
+      `;
+
+      document.getElementById('quartileAnecdote').innerHTML = sentence;
+    }
+
+    function renderQuartileTable(summary, examples) {
+      // Map quartile to display name
+      const finishLabel = {
+        '4': 'Top 25%',
+        '3': 'Upper mid',
+        '2': 'Lower mid',
+        '1': 'Bottom 25%'
+      };
+
+      // Sort Q4 to top, Q1 to bottom
+      const sorted = [...summary].sort((a, b) =>
+        parseInt(b.quartile, 10) - parseInt(a.quartile, 10));
+
+      const rows = sorted.map(q => {
+        const change = parseFloat(q.mean_change);
+        const changePP = (change * 100).toFixed(1);
+        const changeSign = change >= 0 ? '+' : '';
+        const changeColor = change > 0.005 ? 'var(--tmg-success)'
+          : change < -0.005 ? 'var(--tmg-error)'
+          : 'var(--tmg-text-muted)';
+        const arrow = change > 0.005 ? '▲' : change < -0.005 ? '▼' : '→';
+
+        const pctMin = parseFloat(q.points_pct_min).toFixed(3);
+        const pctMax = parseFloat(q.points_pct_max).toFixed(3);
+        const range = `${pctMin} - ${pctMax}`;
+
+        // Get three examples for this quartile
+        const quartileExamples = examples.filter(e => e.quartile === q.quartile);
+        const exampleStrings = quartileExamples.slice(0, 3).map(e => {
+          const seasonShort = parseInt(e.season_year, 10).toString();
+          return `${e.teamCommonName} ${seasonShort}`;
+        });
+        const exampleList = exampleStrings.join(', ');
+
+        return `
+          <tr>
+            <td><strong>${finishLabel[q.quartile]}</strong></td>
+            <td>${range}</td>
+            <td style="color:${changeColor}; font-weight:500">
+              ${arrow} ${changeSign}${changePP} pp
+            </td>
+            <td style="color:var(--tmg-text-muted)">${exampleList}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('quartileTableBody').innerHTML = rows;
+    }
+
+    function renderQuartileClosing(summary) {
+      const q4 = summary.find(q => q.quartile === '4');
+      const q1 = summary.find(q => q.quartile === '1');
+
+      if (!q4 || !q1) {
+        setFindingsFallback();
+        return;
+      }
+
+      const q4Drop = Math.abs(parseFloat(q4.mean_change) * 100).toFixed(1);
+      const q1Gain = (parseFloat(q1.mean_change) * 100).toFixed(1);
+
+      const closing = `
+        The top quartile teams declined on average by ${q4Drop} percentage
+        points the following season. The bottom quartile teams improved by
+        ${q1Gain} percentage points. This is not about which teams made
+        smart offseason moves - it is the gravitational pull of mean reversion
+        working on every team regardless of what they did.
+      `;
+
+      document.getElementById('quartileClosing').innerHTML = closing;
     }
 
     function renderFinding3Plain(overallSummary, seasonsRanked, regressionCoefs) {
@@ -750,6 +832,8 @@
       fetchCsvSafe(coefficientUrlCandidates('model_b_full_coefficients.csv'), 'model_b_full_coefficients.csv'),
       fetchCsvSafe(coefficientUrlCandidates('model_a_restricted_coefficients.csv'), 'model_a_restricted_coefficients.csv'),
       fetchCsvSafe(coefficientUrlCandidates('model_b_restricted_coefficients.csv'), 'model_b_restricted_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('quartile_summary.csv'), 'quartile_summary.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('quartile_examples.csv'), 'quartile_examples.csv'),
       fetchCsvSafe(coefficientUrlCandidates('geography_overall_summary.csv'), 'geography_overall_summary.csv'),
       fetchCsvSafe(coefficientUrlCandidates('geography_seasons_ranked_first.csv'), 'geography_seasons_ranked_first.csv'),
       fetchCsvSafe(coefficientUrlCandidates('geography_regression.csv'), 'geography_regression.csv')
@@ -759,6 +843,8 @@
       modelBFullCsv,
       modelARestrictedCsv,
       modelBRestrictedCsv,
+      quartileSummaryCsv,
+      quartileExamplesCsv,
       geoOverallCsv,
       geoSeasonsCsv,
       geoRegCsv
@@ -784,6 +870,17 @@
         modelBRestrictedRows,
         modelComparisonRows
       );
+
+      if (quartileSummaryCsv && quartileExamplesCsv) {
+        const summaryParsed = parseCsv(quartileSummaryCsv);
+        const examplesParsed = parseCsv(quartileExamplesCsv);
+        renderQuartileAnecdote(examplesParsed);
+        renderQuartileTable(summaryParsed, examplesParsed);
+        renderQuartileClosing(summaryParsed);
+      } else {
+        setFindingsFallback();
+        return;
+      }
 
       if (geoOverallCsv && geoSeasonsCsv && geoRegCsv) {
         const overallParsed = parseCsv(geoOverallCsv);
