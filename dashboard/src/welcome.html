@@ -38,6 +38,7 @@
       <a href="./team.html">Team Detail</a>
       <a href="./explorer.html">All Signings</a>
       <a href="./audit.html">Audit</a>
+      <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/METHODS.md" target="_blank" rel="noopener noreferrer">Methods</a>
     </div>
     <div class="tmg-dropdown-wrap">
       <button class="tmg-dropdown-btn" id="tmgDdBtn"
@@ -81,6 +82,30 @@
         <h2 class="tmg-h2">Executive summary</h2>
         <p class="tmg-body">
           This study analyzes nine NHL seasons and 1,648 unrestricted free-agent signings to test whether offseason UFA spending predicts team performance. The headline result: after controlling for prior performance, teams show <strong>mean reversion</strong> — the fitted relationship between prior finish and next-season change is negative (slope ≈ −0.42) and statistically meaningful, so extreme prior results tend to move toward the mean rather than amplify. In practice, this means large UFA spending spikes rarely produce reliably better team outcomes once you account for where a team started; front offices should treat big UFA moves as higher-variance bets, not guaranteed performance upgrades. See the <a href="./findings.html">Methodology</a> and <a href="./audit.html">Audit</a> pages for data sources, inclusion rules, and robustness checks.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Methodology at a glance</h2>
+        <ul class="tmg-body" style="margin: 0; padding-left: 20px;">
+          <li style="margin-bottom: 10px;"><strong>What we analyzed.</strong> Nine NHL seasons of unrestricted free-agent signings (2017–2025), totaling 1,648 UFA movement events and 252 team-season outcomes.</li>
+          <li style="margin-bottom: 10px;"><strong>Data sources.</strong> Contract and signing data from Spotrac and transaction scrapes; game results and team outcomes from the NHL API via nhlscraper. See the project source on GitHub for raw files and scripts.</li>
+          <li style="margin-bottom: 10px;"><strong>Scope and exclusions.</strong> This study covers <strong>unrestricted</strong> free-agent signings only. Restricted free agents, trade-deadline acquisitions, AHL call-ups, and entry-level signings are out of scope for Version 1. The 2026 season will be added after the offseason window closes.</li>
+          <li style="margin-bottom: 10px;"><strong>Key variables.</strong>
+            <ul style="margin-top: 8px; padding-left: 20px;">
+              <li><strong>Outcome:</strong> season-over-season team performance change (team points % / playoff outcome delta).</li>
+              <li><strong>Primary predictors:</strong> prior season finish and offseason UFA investment (total dollars and a position-weighted Movement Impact Score).</li>
+              <li><strong>Reported headline:</strong> the fitted prior-finish coefficient (mean-reversion slope) is approximately −0.42 and is statistically significant across specifications.</li>
+            </ul>
+          </li>
+          <li style="margin-bottom: 10px;"><strong>Modeling approach (brief).</strong> We estimate the relationship between prior season performance and next-season change while adding controls for offseason UFA spending (dollars and MIS), and run robustness checks excluding COVID-affected seasons. Results are reported with standard errors and p-values; full model specs are in the appendix.</li>
+          <li style="margin-bottom: 10px;"><strong>Robustness and audit.</strong> Results hold in the full 2018–2025 sample and when the COVID seasons are excluded; see the Audit page for data-quality checks and sensitivity tests.</li>
+          <li><strong>Limitations (short).</strong> Correlation is not causation; UFA spending may be endogenous to front-office expectations and injuries. The analysis does not capture in-season trades or prospect development. See the full methods appendix for additional caveats.</li>
+        </ul>
+        <p class="tmg-body" style="margin-top: 12px; margin-bottom: 0;">
+          <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/METHODS.md" target="_blank" rel="noopener noreferrer">Full methods appendix (GitHub source)</a>
+          &nbsp;·&nbsp;
+          <a href="./audit.html">Audit reproducibility checks</a>
         </p>
       </section>
 
