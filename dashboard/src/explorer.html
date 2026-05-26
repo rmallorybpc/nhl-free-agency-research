@@ -617,9 +617,9 @@
         </div>
       `;
 
-      els.tableContent.querySelectorAll('tr.clickable-row').forEach(rowEl => {
+      els.tableContent.querySelectorAll('tr.clickable-row').forEach((rowEl, index) => {
         rowEl.addEventListener('click', () => {
-          const target = rowEl.getAttribute('data-target');
+          const target = pageRows[index] ? pageRows[index].profile_url : null;
           const safeTarget = toSafeNavigationTarget(target);
           if (safeTarget) {
             window.location.assign(safeTarget);
