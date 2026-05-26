@@ -542,17 +542,15 @@
       const trimmed = rawTarget.trim();
       if (!trimmed) return null;
 
-      // Allow root-relative internal paths like "/player/123"
-      if (trimmed.startsWith('/')) {
-        return trimmed;
-      }
-
-      // Allow only same-origin http/https absolute URLs
+      // Canonicalize via URL parser and allow only same-origin http/https targets.
+      // Return a relative target to avoid assigning a raw tainted absolute URL.
       try {
         const parsed = new URL(trimmed, window.location.origin);
         const isHttp = parsed.protocol === 'http:' || parsed.protocol === 'https:';
         const isSameOrigin = parsed.origin === window.location.origin;
-        return isHttp && isSameOrigin ? parsed.href : null;
+        return isHttp && isSameOrigin
+          ? `${parsed.pathname}${parsed.search}${parsed.hash}`
+          : null;
       } catch (e) {
         return null;
       }
@@ -624,7 +622,7 @@
           const target = rowEl.getAttribute('data-target');
           const safeTarget = toSafeNavigationTarget(target);
           if (safeTarget) {
-            window.location.href = safeTarget;
+            window.location.assign(safeTarget);
           }
         });
       });
