@@ -537,6 +537,25 @@
       });
     }
 
+    function toSafeNavigationTarget(rawTarget) {
+      if (typeof rawTarget !== 'string') return null;
+      const trimmed = rawTarget.trim();
+      if (!trimmed) return null;
+
+      // Canonicalize via URL parser and allow only same-origin http/https targets.
+      // Return a relative target to avoid assigning a raw tainted absolute URL.
+      try {
+        const parsed = new URL(trimmed, window.location.origin);
+        const isHttp = parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        const isSameOrigin = parsed.origin === window.location.origin;
+        return isHttp && isSameOrigin
+          ? `${parsed.pathname}${parsed.search}${parsed.hash}`
+          : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
     function renderTable(pageRows) {
       if (!pageRows.length) {
         els.tableContent.innerHTML = `
@@ -601,8 +620,9 @@
       els.tableContent.querySelectorAll('tr.clickable-row').forEach(rowEl => {
         rowEl.addEventListener('click', () => {
           const target = rowEl.getAttribute('data-target');
-          if (target) {
-            window.location.href = target;
+          const safeTarget = toSafeNavigationTarget(target);
+          if (safeTarget) {
+            window.location.assign(safeTarget);
           }
         });
       });
