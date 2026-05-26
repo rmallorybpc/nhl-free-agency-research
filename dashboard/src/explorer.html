@@ -537,6 +537,27 @@
       });
     }
 
+    function toSafeNavigationTarget(rawTarget) {
+      if (typeof rawTarget !== 'string') return null;
+      const trimmed = rawTarget.trim();
+      if (!trimmed) return null;
+
+      // Allow root-relative internal paths like "/player/123"
+      if (trimmed.startsWith('/')) {
+        return trimmed;
+      }
+
+      // Allow only same-origin http/https absolute URLs
+      try {
+        const parsed = new URL(trimmed, window.location.origin);
+        const isHttp = parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        const isSameOrigin = parsed.origin === window.location.origin;
+        return isHttp && isSameOrigin ? parsed.href : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
     function renderTable(pageRows) {
       if (!pageRows.length) {
         els.tableContent.innerHTML = `
@@ -601,8 +622,9 @@
       els.tableContent.querySelectorAll('tr.clickable-row').forEach(rowEl => {
         rowEl.addEventListener('click', () => {
           const target = rowEl.getAttribute('data-target');
-          if (target) {
-            window.location.href = target;
+          const safeTarget = toSafeNavigationTarget(target);
+          if (safeTarget) {
+            window.location.href = safeTarget;
           }
         });
       });
