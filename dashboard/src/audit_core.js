@@ -411,7 +411,14 @@
   function resolveInternalTarget(fromPagePath, href, siteBaseUrl) {
     const clean = (href || '').trim();
     if (!clean) return null;
-    if (clean.startsWith('#') || clean.startsWith('mailto:') || clean.startsWith('tel:') || clean.startsWith('javascript:')) return null;
+    if (
+      clean.startsWith('#') ||
+      clean.startsWith('mailto:') ||
+      clean.startsWith('tel:') ||
+      clean.startsWith('javascript:') ||
+      clean.startsWith('data:') ||
+      clean.startsWith('vbscript:')
+    ) return null;
 
     let resolvedPath = null;
 
