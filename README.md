@@ -2,65 +2,80 @@
 
 An applied sports analytics project built around one front-office question:
 
-**Does spending in NHL unrestricted free agency actually predict team improvement the next season?**
+**Does spending in NHL unrestricted free agency (UFA) predict team improvement the next season?**
 
-This repository combines data engineering, statistical analysis, and a public-facing dashboard to test that question across multiple NHL seasons.
+Live dashboard: https://rmallorybpc.github.io/nhl-free-agency-research/
 
-Live site: https://rmallorybpc.github.io/nhl-free-agency-research/
+## Start here (choose your path)
 
-## Why this project exists
-
-Most offseason coverage focuses on who spent the most and who "won July." This project tests whether those narratives still hold up when you step back and look at league-wide results year over year.
-
-The work is inspired by behavioral economics research on "fresh start" effects (including Hengchen Dai's work), adapted to team-level NHL performance.
+- If you want the non-technical summary: jump to **For general readers**.
+- If you want methods, code, and reproducibility: jump to **For technical and data users**.
 
 ## Executive summary (plain English)
 
-- Teams that do very well one year often slide back the next.
-- Teams that struggle one year often rebound.
-- That mean-reversion pattern is the strongest signal in the data.
-- Free-agent spending, whether measured as raw dollars or weighted by position importance, is not a reliable stand-alone predictor of improvement in this model setup.
+- Teams that perform very well one year often decline the next year.
+- Teams that struggle one year often improve the next year.
+- This bounce-back pattern (mean reversion) is the strongest and most consistent signal in the data.
+- UFA spending, by itself, is not a reliable stand-alone predictor of next-season improvement in this model setup.
 
-In short: **where a team starts is usually more predictive than how much it spends in unrestricted free agency.**
+Bottom line: **starting team quality is usually more predictive than total UFA spending.**
 
-## What this means
+## Why this project exists
 
-For fans, analysts, and decision-makers: offseason spending absolutely matters at the player level, but this project suggests it is often over-credited at the team level. The bigger story is still baseline team quality and natural performance correction.
+Offseason narratives often focus on who spent the most and who "won July." This project tests whether those narratives hold up when evaluated across multiple seasons and all teams.
 
-## What you can explore on the site
+The framing is informed by behavioral economics research on "fresh start" effects (including Hengchen Dai's work), adapted here to team-level NHL performance.
 
-The dashboard is designed so you do not need a technical background to use it.
+## For general readers
 
-- **Welcome**: the short version of the study and why it matters.
-- **Key Findings**: the core research questions answered in plain language.
-- **Overview**: league-wide team rankings by Movement Impact Score (MIS), season by season.
-- **Team Detail**: one team and season at a time, with signing-level context.
-- **All Signings**: a filterable table of individual movement events.
-- **Audit**: quality checks for links, language clarity, and page health.
+### What this study means in practice
 
-Dashboard pages live in `dashboard/src`.
+Spending still matters at the player level. But at the team level, this project suggests spending is often over-credited compared with baseline team strength and natural year-to-year correction.
 
-## Scope and boundaries
+### How to use the dashboard (no setup required)
 
-This version is intentionally focused so the results stay interpretable.
+1. Open the live dashboard.
+2. Read **Welcome** for the short story.
+3. Read **Key Findings** for direct answers.
+4. Use **Overview** to compare teams by season.
+5. Use **Team Detail** and **All Signings** to inspect specific teams and contracts.
 
-- Primary focus is unrestricted free-agent movement and team-level outcomes.
-- Team performance is evaluated year over year.
-- Models include controls for prior-season performance and selected season context variables.
-- COVID-affected seasons are tested in a restricted-sample sensitivity check.
+### Dashboard pages at a glance
 
-Out of scope for this version are full roster-building effects from drafting, player development pipelines, and other non-UFA acquisition channels.
+- **Welcome**: short, non-technical project overview.
+- **Key Findings**: headline results in plain language.
+- **Overview**: season-by-season team ranking view.
+- **Team Detail**: team and season deep-dive.
+- **All Signings**: filterable movement table.
+- **Audit**: readability and site quality checks.
 
-## Data and pipeline at a glance
+Dashboard source lives in `dashboard/src`.
 
-The work runs as a reproducible pipeline:
+## For technical and data users
+
+### Scope and boundaries
+
+- Focus: UFA movement and team-level outcomes.
+- Outcome: year-over-year team performance change.
+- Controls: prior-season performance plus selected season context variables.
+- Sensitivity check: restricted sample excluding COVID-affected seasons.
+
+Out of scope in Version 1:
+
+- Draft pipeline effects.
+- Prospect development effects.
+- Non-UFA roster channels (for example, most trade and call-up dynamics).
+
+### Data and workflow overview
+
+Pipeline stages:
 
 1. Extract source data.
 2. Clean and standardize records.
-3. Engineer features (including MIS and cap/geography variables).
-4. Build the team-season panel.
-5. Run descriptive and regression analysis.
-6. Publish tables and visuals that power the dashboard.
+3. Engineer features (MIS, cap variables, geography variables).
+4. Build the master team-season panel.
+5. Run descriptive and regression models.
+6. Export tables/figures used by the dashboard.
 
 Top-level workflow folders:
 
@@ -69,58 +84,61 @@ Top-level workflow folders:
 - `R/03_feature_engineering`
 - `R/04_analysis`
 - `R/05_visualization`
+- `R/06_reproducibility`
 
-## Repository structure
+### Reproduce core results
 
-- `dashboard/src`: static dashboard pages and shared audit core.
-- `data/raw`: extracted source files.
-- `data/processed`: cleaned, analysis-ready datasets.
-- `output/tables`: model outputs, summaries, QA exports, and audit reports.
-- `output/figures`: generated visuals.
-- `scripts/run_audit.js`: Node-based automated site audit runner.
-- `docs`: project scope, methodology notes, and audit checklist.
+From repository root:
 
-## For non-technical readers
+```bash
+Rscript R/06_reproducibility/01_reproduce_main_results.R
+```
 
-If you were sent this from LinkedIn and want the quick version:
+Primary generated outputs include:
 
-1. Start at the live site.
-2. Read **Welcome** and **Key Findings** first.
-3. Use **Overview** and **Team Detail** to check the teams you care about.
+- `data/processed/nhl_master_analysis_panel.csv`
+- `output/tables/model_a_full_coefficients.csv`
+- `output/tables/model_b_full_coefficients.csv`
+- `output/tables/model_a_restricted_coefficients.csv`
+- `output/tables/model_b_restricted_coefficients.csv`
+- `output/tables/model_comparison_summary.csv`
 
-No local setup is required to use the dashboard.
-
-## For technical reviewers and collaborators
-
-### Core tools
-
-- R (analysis pipeline)
-- tidyverse ecosystem
-- nhlscraper
-- rvest
-- Node.js (dashboard audit tooling)
-
-### Run the dashboard audit
-
-Use the repository script:
+### Run dashboard audit tooling
 
 ```bash
 npm run audit
 ```
 
-This writes the report to `output/tables/audit_report.json`.
+Audit output is written to `output/tables/audit_report.json`.
+
+### Repository structure
+
+- `dashboard/src`: static pages and shared audit core.
+- `data/raw`: source extracts.
+- `data/processed`: cleaned, analysis-ready tables.
+- `output/tables`: model outputs, QA exports, and audits.
+- `output/figures`: generated plots.
+- `scripts/run_audit.js`: Node-based audit runner.
+- `docs`: scope, methodology, and audit docs.
 
 ### Data handling note
 
-Source and processed datasets may be regenerated as the pipeline evolves. Review `data/README.md` plus the extraction and cleaning scripts for the current regeneration flow.
+Raw and processed data are expected to be regenerated as the pipeline evolves. See `data/README.md` and relevant extraction/cleaning scripts for the current flow.
+
+## Key definitions
+
+- **UFA**: unrestricted free agent.
+- **MIS (Movement Impact Score)**: a position-weighted summary of offseason UFA spending.
+- **Mean reversion**: teams far above or below average often move back toward average the following season.
 
 ## Documentation
 
 - Scope definition: `docs/scope/scope_definition.md`
+- Methods appendix: `METHODS.md`
 - Methodology notes: `docs/methodology/methodology_notes.md`
 - Non-data user audit checklist: `docs/audit/non-data-user-audit-checklist.md`
 - Security policy: `SECURITY.md`
 
 ## Project status
 
-Active and evolving. The analysis and dashboard continue to be refined as new offseason data, QA checks, and usability improvements are added.
+Active and evolving. Analysis, dashboard content, and QA checks are updated as new offseason data becomes available.
