@@ -7,20 +7,15 @@ suppressPackageStartupMessages({
 	library(here)
 })
 
-season_end_dates <- tibble(
-	season_year = 2017:2025,
-	end_date = as.Date(c(
-		"2017-04-09",
-		"2018-04-08",
-		"2019-04-06",
-		"2020-03-11",
-		"2021-05-19",
-		"2022-05-01",
-		"2023-04-14",
-		"2024-04-18",
-		"2025-04-15"
-	))
-)
+season_end_dates <- nhlscraper::seasons() |>
+	as_tibble() |>
+	transmute(
+		season_year = as.integer(substr(as.character(seasonId), 5, 8)),
+		# Use regular-season endpoint for standings snapshots; fall back to season end if needed.
+		end_date = as.Date(substr(coalesce(regularSeasonEndDate, endDate), 1, 10))
+	) |>
+	filter(season_year >= 2017, season_year <= 2025) |>
+	arrange(season_year)
 
 expected_team_counts <- c(
 	`2017` = 30,
