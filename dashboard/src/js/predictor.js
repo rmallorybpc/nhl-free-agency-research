@@ -25,6 +25,14 @@
       candidatePaths.push(`./../../output/tables/${suffix}`);
       candidatePaths.push(`../output/tables/${suffix}`);
       candidatePaths.push(`./output/tables/${suffix}`);
+      candidatePaths.push(`${pathPrefix}/dashboard/src/data/${suffix}`);
+      candidatePaths.push(`/dashboard/src/data/${suffix}`);
+      candidatePaths.push(`../../dashboard/src/data/${suffix}`);
+      candidatePaths.push(`./../../dashboard/src/data/${suffix}`);
+      candidatePaths.push(`./data/${suffix}`);
+      candidatePaths.push(`data/${suffix}`);
+      candidatePaths.push(`../data/${suffix}`);
+      candidatePaths.push(`../../data/${suffix}`);
     }
 
     const uniquePaths = [...new Set(candidatePaths.filter(Boolean))];
