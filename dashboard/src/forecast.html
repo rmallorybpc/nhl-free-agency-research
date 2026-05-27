@@ -59,6 +59,21 @@
       font-weight: 500;
     }
 
+    .ci-consistent-yes {
+      color: var(--tmg-success);
+      font-weight: 500;
+    }
+
+    .ci-consistent-no {
+      color: var(--tmg-error);
+      font-weight: 500;
+    }
+
+    .ci-consistent-na {
+      color: var(--tmg-charcoal);
+      font-weight: 500;
+    }
+
     .th-tip {
       display: inline-block;
       text-decoration: underline dotted;
@@ -155,13 +170,16 @@
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">League forecast table</h2>
+        <p class="tmg-body-sm tmg-text-muted" style="margin:0 0 12px 0;">
+          Model Accuracy shows how close each prediction was as a ratio. Statistical consistency is evaluated separately by whether the actual result falls within the model's 95% prediction interval.
+        </p>
         <div class="table-wrap">
           <table class="tmg-table" id="forecastTable">
             <thead>
               <tr id="forecastHeaderRow"></tr>
             </thead>
             <tbody id="forecastBody">
-              <tr><td colspan="10">Loading forecast...</td></tr>
+              <tr><td colspan="11">Loading forecast...</td></tr>
             </tbody>
           </table>
         </div>
@@ -169,6 +187,9 @@
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="calibrationCard">
         <h2 class="tmg-h2">How accurate is the model?</h2>
+        <p class="tmg-body-sm tmg-text-muted" style="margin:0 0 8px 0;">
+          95% CI flag: Yes means the outcome is statistically consistent with model uncertainty; No means the miss is larger than expected model noise.
+        </p>
         <p class="tmg-body-sm tmg-text-muted">Calculating historical calibration...</p>
       </section>
     </div>
@@ -352,6 +373,8 @@
             teamCommonName: row.teamCommonName,
             currentPct,
             predictedPct: prediction.predicted,
+            lowerPct: prediction.lower,
+            upperPct: prediction.upper,
             predictedChange: prediction.change,
             directionText: direction.text,
             directionClass: direction.cls,
@@ -409,7 +432,14 @@
       headerCols.push(
         thWithTooltip(
           'Model Accuracy',
-          'Actual next pts % divided by Predicted next pts %. 100% means exact, below 100% means overprediction, above 100% means underprediction.'
+          'Model Accuracy = Actual next pts % / Predicted next pts %. 100% = exact match. >100% = model underpredicted. <100% = model overpredicted. This ratio is directional fit, not a significance test.'
+        )
+      );
+
+      headerCols.push(
+        thWithTooltip(
+          'CI Consistent',
+          'Yes if actual next pts % is inside the model\'s 95% prediction interval; No if it falls outside. Not yet indicates unavailable next-season actuals.'
         )
       );
 
@@ -433,6 +463,20 @@
             : 'N/A';
         }
 
+        let ciConsistentCell = 'Not yet';
+        if (Number.isFinite(row.actualNextPct)) {
+          const hasInterval = Number.isFinite(row.lowerPct) && Number.isFinite(row.upperPct);
+          ciConsistentCell = hasInterval && row.actualNextPct >= row.lowerPct && row.actualNextPct <= row.upperPct
+            ? 'Yes'
+            : 'No';
+        }
+
+        const ciConsistentClass = ciConsistentCell === 'Yes'
+          ? 'ci-consistent-yes'
+          : ciConsistentCell === 'No'
+            ? 'ci-consistent-no'
+            : 'ci-consistent-na';
+
         return `
           <tr>
             <td>${row.rank}</td>
@@ -445,11 +489,12 @@
             <td>${row.expectedPointsLow} to ${row.expectedPointsHigh}</td>
             <td>${actualCell}</td>
             <td>${modelAccuracyCell}</td>
+            <td class="${ciConsistentClass}">${ciConsistentCell}</td>
           </tr>
         `;
       }).join('');
 
-      els.forecastBody.innerHTML = bodyRows || '<tr><td colspan="10">No rows available for selected season.</td></tr>';
+      els.forecastBody.innerHTML = bodyRows || '<tr><td colspan="11">No rows available for selected season.</td></tr>';
 
       els.seasonHint.textContent = payload.hasAnyNextSeason
         ? `Historical check enabled: compares forecast from ${currentSeason} against ${payload.nextSeason} outcomes where available.`
@@ -487,6 +532,9 @@
       if (!records.length) {
         els.calibrationCard.innerHTML = `
           <h2 class="tmg-h2">How accurate is the model?</h2>
+          <p class="tmg-body-sm tmg-text-muted" style="margin:0 0 8px 0;">
+            95% CI flag: Yes means the outcome is statistically consistent with model uncertainty; No means the miss is larger than expected model noise.
+          </p>
           <p class="tmg-body">No historical prediction-actual pairs available.</p>
         `;
         return;
@@ -500,6 +548,9 @@
 
       els.calibrationCard.innerHTML = `
         <h2 class="tmg-h2">How accurate is the model?</h2>
+        <p class="tmg-body-sm tmg-text-muted" style="margin:0 0 12px 0;">
+          95% CI flag: Yes means the outcome is statistically consistent with model uncertainty; No means the miss is larger than expected model noise.
+        </p>
         <div class="calibration-grid">
           <article class="tmg-card" style="padding:16px;">
             <p class="tmg-card-label">MEAN ABSOLUTE ERROR</p>
@@ -579,9 +630,12 @@
           renderForecastTable(season);
         });
       } catch (err) {
-        els.forecastBody.innerHTML = `<tr><td colspan="10">Unable to load forecast data: ${err.message}</td></tr>`;
+        els.forecastBody.innerHTML = `<tr><td colspan="11">Unable to load forecast data: ${err.message}</td></tr>`;
         els.calibrationCard.innerHTML = `
           <h2 class="tmg-h2">How accurate is the model?</h2>
+          <p class="tmg-body-sm tmg-text-muted" style="margin:0 0 8px 0;">
+            95% CI flag: Yes means the outcome is statistically consistent with model uncertainty; No means the miss is larger than expected model noise.
+          </p>
           <p class="tmg-body">Unable to compute calibration metrics: ${err.message}</p>
         `;
       }
