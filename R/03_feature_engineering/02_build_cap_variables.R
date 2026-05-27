@@ -65,7 +65,15 @@ cap_output <- mis_scores %>%
 		cap_spending_pct = total_aav_spent / cap_ceiling,
 		near_cap_floor = total_aav_spent < (0.05 * cap_ceiling),
 		# Version 1 threshold prior assumption; review against empirical distribution.
-		heavy_spender = cap_spending_pct > 0.15
+		heavy_spender = cap_spending_pct > 0.15,
+		total_aav_committed = if_else(offseason_data_pending, 0, total_aav_committed),
+		total_contract_value = if_else(offseason_data_pending, 0, total_contract_value),
+		signing_count_cap = if_else(offseason_data_pending, 0L, signing_count_cap),
+		cap_ceiling = if_else(offseason_data_pending, 0, cap_ceiling),
+		cap_ceiling_change = if_else(offseason_data_pending, 0, cap_ceiling_change),
+		cap_spending_pct = if_else(offseason_data_pending, 0, cap_spending_pct),
+		near_cap_floor = if_else(offseason_data_pending, FALSE, near_cap_floor),
+		heavy_spender = if_else(offseason_data_pending, FALSE, heavy_spender)
 	) %>%
 	arrange(season_year, signing_team)
 
@@ -98,7 +106,7 @@ cap_change_2025_label <- ifelse(
 )
 
 cat("===== CAP VARIABLES QA CHECKS =====\n")
-cat("Total rows in output:", total_rows, "(expected 282)\n")
+cat("Total rows in output:", total_rows, "(expected 314)\n")
 cat(
 	"cap_spending_pct min/max/mean:",
 	round(cap_spending_stats$min_cap_spending_pct, 4),

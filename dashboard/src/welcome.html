@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NHL Free Agency Research — The Mallory Group</title>
-  <meta name="description" content="Nine seasons of NHL UFA data examined through behavioral economics. Does offseason spending predict team improvement? The data says mean reversion dominates.">
+  <meta name="description" content="NHL UFA offseasons and team outcomes examined through behavioral economics. Does offseason spending predict team improvement? The data says mean reversion dominates.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <!-- CDN to restore when published:
@@ -164,6 +164,7 @@
       <a href="./index.html">Overview</a>
       <a href="./team.html">Team Detail</a>
       <a href="./explorer.html">All Signings</a>
+      <a href="./forecast.html">Forecast</a>
       <a href="./audit.html">Audit</a>
       <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/METHODS.md" target="_blank" rel="noopener noreferrer">Methods</a>
     </div>
@@ -215,9 +216,9 @@
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">Methodology at a glance</h2>
         <ul class="tmg-body" style="margin: 0; padding-left: 20px;">
-          <li style="margin-bottom: 10px;"><strong>What we analyzed.</strong> Nine NHL seasons of unrestricted free-agent signings (2017–2025), totaling 1,648 UFA movement events and 252 team-season outcomes.</li>
+          <li style="margin-bottom: 10px;"><strong>What we analyzed.</strong> Nine NHL offseasons of unrestricted free-agent signings (2017–2025), totaling 1,648 UFA movement events and 284 team-season outcomes (2018–2026).</li>
           <li style="margin-bottom: 10px;"><strong>Data sources.</strong> Contract and signing data from Spotrac and transaction scrapes; game results and team outcomes from the NHL API via nhlscraper. See the project source on GitHub for raw files and scripts.</li>
-          <li style="margin-bottom: 10px;"><strong>Scope and exclusions.</strong> This study covers <strong>unrestricted</strong> free-agent signings only. Restricted free agents, trade-deadline acquisitions, AHL call-ups, and entry-level signings are out of scope for Version 1. The 2026 season will be added after the offseason window closes.</li>
+          <li style="margin-bottom: 10px;"><strong>Scope and exclusions.</strong> This study covers <strong>unrestricted</strong> free-agent signings only. Restricted free agents, trade-deadline acquisitions, AHL call-ups, and entry-level signings are out of scope for Version 1. The 2026 team outcome season is included; 2026 offseason UFA signing data is pending until the July 2026 window opens.</li>
           <li style="margin-bottom: 10px;"><strong>Key variables.</strong>
             <ul style="margin-top: 8px; padding-left: 20px;">
               <li><strong>Outcome:</strong> season-over-season team performance change (team points % / playoff outcome delta).</li>
@@ -226,7 +227,7 @@
             </ul>
           </li>
           <li style="margin-bottom: 10px;"><strong>Modeling approach (brief).</strong> We estimate the relationship between prior season performance and next-season change while adding controls for offseason UFA spending (dollars and MIS), and run robustness checks excluding COVID-affected seasons. Results are reported with standard errors and p-values; full model specs are in the appendix.</li>
-          <li style="margin-bottom: 10px;"><strong>Robustness and audit.</strong> Results hold in the full 2018–2025 sample and when the COVID seasons are excluded; see the Audit page for data-quality checks and sensitivity tests.</li>
+          <li style="margin-bottom: 10px;"><strong>Robustness and audit.</strong> Results hold in the full 2018–2026 sample and when the COVID seasons are excluded; see the Audit page for data-quality checks and sensitivity tests.</li>
           <li><strong>Limitations (short).</strong> Correlation is not causation; UFA spending may be endogenous to front-office expectations and injuries. The analysis does not capture in-season trades or prospect development. See the full methods appendix for additional caveats.</li>
         </ul>
         <p class="tmg-body" style="margin-top: 12px; margin-bottom: 0;">
@@ -247,9 +248,9 @@
 
       <div class="tmg-bento-grid" style="margin-bottom: var(--tmg-gap);">
         <article class="tmg-card">
-          <p class="tmg-card-label">SEASONS COVERED</p>
-          <p class="tmg-card-value">2017 – 2025</p>
-          <p class="tmg-card-sub">NHL regular season and playoffs</p>
+          <p class="tmg-card-label">TEAM PERFORMANCE SEASONS</p>
+          <p class="tmg-card-value">2017 – 2026</p>
+          <p class="tmg-card-sub">NHL regular seasons in panel construction</p>
         </article>
         <article class="tmg-card">
           <p class="tmg-card-label">UFA MOVEMENT EVENTS</p>
@@ -258,8 +259,8 @@
         </article>
         <article class="tmg-card">
           <p class="tmg-card-label">TEAM-SEASONS ANALYZED</p>
-          <p class="tmg-card-value">252</p>
-          <p class="tmg-card-sub">2018 – 2025 outcome window</p>
+          <p class="tmg-card-value">284</p>
+          <p class="tmg-card-sub">2018 – 2026 outcome window</p>
         </article>
         <article class="tmg-card">
           <p class="tmg-card-label">MEAN REVERSION SLOPE</p>
@@ -274,10 +275,10 @@
           The strongest predictor of whether an NHL team improves or declines next season is how well they performed this season. Teams that finished near the top tend to fall back. Teams that finished near the bottom tend to improve. This mean reversion effect has a slope of −0.42 and is significant at p &lt; 0.001 across all model specifications.
         </p>
         <p class="tmg-body">
-          Offseason UFA spending — measured in total dollars or through a position-weighted Movement Impact Score — does not significantly predict season-over-season performance change after controlling for prior season performance. This holds in both the full 2018–2025 sample and when the COVID-affected 2020 and 2021 seasons are excluded.
+          Offseason UFA spending — measured in total dollars or through a position-weighted Movement Impact Score — does not significantly predict season-over-season performance change after controlling for prior season performance. This holds in both the full 2018–2026 sample and when the COVID-affected 2020 and 2021 seasons are excluded.
         </p>
         <p class="tmg-body">
-          This study covers unrestricted free agent signings only. Restricted free agents, trade deadline acquisitions, AHL call-ups, and entry-level signings are out of scope for Version 1 and are documented in the methodology. The 2026 season will be added after the offseason window closes in July 2026.
+          This study covers unrestricted free agent signings only. Restricted free agents, trade deadline acquisitions, AHL call-ups, and entry-level signings are out of scope for Version 1 and are documented in the methodology. The 2026 team outcome season is already included; 2026 offseason UFA signing data will be added after the offseason window opens in July 2026.
         </p>
       </section>
 
@@ -292,7 +293,7 @@
           Dai found that when a struggling player is traded — triggering a statistical reset — their performance improves significantly. This project applies that framing to the team level: does offseason roster movement produce a measurable reset effect in NHL team performance?
         </p>
         <p class="tmg-body">
-          The answer from nine seasons of data: mean reversion dominates. Where a team starts predicts where they end up far more reliably than what they spent in the offseason.
+          The answer from the full 2018-2026 outcome window: mean reversion dominates. Where a team starts predicts where they end up far more reliably than what they spent in the offseason.
         </p>
       </section>
 
@@ -319,9 +320,10 @@
   </main>
 
   <footer class="tmg-footer">
-    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
-    movement events, Spotrac contract data, and NHL API game results via
-    nhlscraper. &nbsp;·&nbsp;
+    Built on ten seasons of NHL team performance data (2017–2026), nine
+    offseasons of UFA transaction data (2017–2025), 1,648 UFA movement events,
+    Spotrac contract data, and NHL API game results via nhlscraper.
+    &nbsp;·&nbsp;
     <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
        target="_blank" rel="noopener noreferrer">View the source on GitHub →</a>
   </footer>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Key Findings — NHL Free Agency Research</title>
-  <meta name="description" content="Two research questions, nine seasons of NHL data, and what the numbers actually show about offseason spending and team performance.">
+  <meta name="description" content="Two research questions, updated through the 2026 outcome season, and what the numbers show about offseason spending and team performance.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <!-- CDN to restore when published:
@@ -37,6 +37,7 @@
       <a href="./index.html">Overview</a>
       <a href="./team.html">Team Detail</a>
       <a href="./explorer.html">All Signings</a>
+      <a href="./forecast.html">Forecast</a>
       <a href="./audit.html">Audit</a>
       <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/METHODS.md" target="_blank" rel="noopener noreferrer">Methods</a>
     </div>
@@ -71,9 +72,9 @@
     <div class="tmg-container">
       <div class="tmg-page-header">
         <p class="tmg-eyebrow">Key Findings</p>
-        <h1 class="tmg-page-title">Two questions. Nine seasons. Here is what the data shows.</h1>
+        <h1 class="tmg-page-title">Two questions. Updated through 2026. Here is what the data shows.</h1>
         <p class="tmg-page-desc">
-          1,648 UFA movement events across 252 NHL team-seasons, 2018–2025.
+          1,648 UFA movement events across 284 NHL team-seasons, 2018–2026.
           Three research questions examined through regression analysis and
           descriptive comparison, with COVID-season sensitivity checks.
         </p>
@@ -206,7 +207,7 @@
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">Does offseason UFA spending predict team improvement?</h2>
         <p class="tmg-body">
-          The question every front office faces every July: is spending big in free agency worth it? This analysis compares offseason UFA investment — measured two ways — against actual season-over-season performance change for all 32 NHL teams across nine seasons.
+          The question every front office faces every July: is spending big in free agency worth it? This analysis compares offseason UFA investment — measured two ways — against actual season-over-season performance change for all 32 NHL teams across the full 2018-2026 outcome window.
         </p>
         <p id="finding2Plain" class="tmg-body" style="border-left:3px solid var(--tmg-sage); padding-left:16px; margin:20px 0">
           Loading finding...
@@ -291,7 +292,7 @@
         <h2 class="tmg-h2">Data and methodology</h2>
         <ul class="tmg-body-sm" style="margin: 10px 0 14px 18px; padding: 0;">
           <li>Data sources: Spotrac (contract and transaction data), NHL API via nhlscraper (team performance data)</li>
-          <li>Analysis window: 2018–2025 outcome seasons (2016 baseline out of scope)</li>
+          <li>Analysis window: 2018–2026 outcome seasons (2016 baseline out of scope)</li>
           <li>Dependent variable: season-over-season change in points percentage</li>
           <li>Primary independent variables: total AAV spent, weighted MIS</li>
           <li>Controls: prior season points percentage, season type, cap ceiling change</li>
@@ -308,9 +309,10 @@
   </main>
 
   <footer class="tmg-footer">
-    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
-    movement events, Spotrac contract data, and NHL API game results via
-    nhlscraper. &nbsp;·&nbsp;
+    Built on ten seasons of NHL team performance data (2017–2026), nine
+    offseasons of UFA transaction data (2017–2025), 1,648 UFA movement events,
+    Spotrac contract data, and NHL API game results via nhlscraper.
+    &nbsp;·&nbsp;
     <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
        target="_blank" rel="noopener noreferrer">View the source on GitHub →</a>
   </footer>
@@ -499,13 +501,13 @@
       const rows = [
         formatRow(
           'Raw dollars',
-          'All 2018-2025',
+          'All 2018-2026',
           'Total UFA spending',
           getAdjR2(rawFull), rawFullP, true
         ),
         formatRow(
           'Position-weighted',
-          'All 2018-2025',
+          'All 2018-2026',
           'Weighted by position importance',
           getAdjR2(weightedFull), weightedFullP, true
         ),

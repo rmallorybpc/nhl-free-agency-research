@@ -13,6 +13,8 @@ spotrac_ua <- httr::user_agent(
 	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
 
+# Keep 2017:2025 until 2026 offseason data is published on Spotrac.
+# Add 2026 after July 2026 when UFA signing pages open for that cycle.
 years <- 2017:2025
 positions <- c("g", "d", "c", "lw", "rw")
 

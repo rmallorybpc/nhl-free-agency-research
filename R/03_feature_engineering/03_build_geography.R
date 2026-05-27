@@ -210,7 +210,14 @@ team_geography_output <- team_season_panel %>%
 		count_cross_conference = coalesce(count_cross_conference, 0L),
 		total_signing_count = coalesce(total_signing_count, 0L),
 		pct_cross_conference = coalesce(pct_cross_conference, 0),
-		any_cross_conference = coalesce(any_cross_conference, FALSE)
+		any_cross_conference = coalesce(any_cross_conference, FALSE),
+		offseason_data_pending = season_year == 2026L,
+		count_within_division = if_else(offseason_data_pending, 0L, count_within_division),
+		count_cross_division = if_else(offseason_data_pending, 0L, count_cross_division),
+		count_cross_conference = if_else(offseason_data_pending, 0L, count_cross_conference),
+		total_signing_count = if_else(offseason_data_pending, 0L, total_signing_count),
+		pct_cross_conference = if_else(offseason_data_pending, 0, pct_cross_conference),
+		any_cross_conference = if_else(offseason_data_pending, FALSE, any_cross_conference)
 	) %>%
 	arrange(season_year, signing_team)
 
@@ -246,7 +253,7 @@ team_season_movement_totals <- team_geography_output %>%
 	)
 
 cat("===== GEOGRAPHY QA CHECKS =====\n")
-cat("Total rows in output:", output_rows, "(expected 282)\n")
+cat("Total rows in output:", output_rows, "(expected 314)\n")
 cat("Movement geography distribution across all signing rows:\n")
 print(movement_distribution_signings)
 cat(

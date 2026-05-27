@@ -27,7 +27,8 @@ mis_scores <- read_csv(
 		signing_count_tier2,
 		signing_count_tier3,
 		signing_count_tier4,
-		has_goalie_signing
+		has_goalie_signing,
+		offseason_data_pending
 	)
 
 cap_variables <- read_csv(
@@ -106,7 +107,7 @@ master_panel <- performance %>%
 		# Expansion teams with no prior franchise season use prior-year league mean.
 		prior_season_points_pct = coalesce(prior_season_points_pct, league_prior_season_points_pct)
 	) %>%
-	filter(season_year >= 2018L, season_year <= 2025L) %>%
+	filter(season_year >= 2018L, season_year <= 2026L) %>%
 	group_by(season_year) %>%
 	mutate(
 		season_mis_min = min(total_mis, na.rm = TRUE),
@@ -145,7 +146,7 @@ write_csv(
 )
 
 cat("===== MASTER PANEL QA CHECKS =====\n")
-cat("Row count:", nrow(master_panel), "\n")
+cat("Row count:", nrow(master_panel), "(expected 284)\n")
 cat("Column count:", ncol(master_panel), "\n")
 
 if (all(key_na_counts$na_count == 0)) {

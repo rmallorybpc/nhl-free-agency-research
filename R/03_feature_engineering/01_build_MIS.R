@@ -90,7 +90,16 @@ mis_output <- team_season_panel %>%
 		signing_count_tier2 = coalesce(signing_count_tier2, 0L),
 		signing_count_tier3 = coalesce(signing_count_tier3, 0L),
 		signing_count_tier4 = coalesce(signing_count_tier4, 0L),
-		has_goalie_signing = coalesce(has_goalie_signing, FALSE)
+		has_goalie_signing = coalesce(has_goalie_signing, FALSE),
+		offseason_data_pending = season_year == 2026L,
+		total_mis = if_else(offseason_data_pending, 0, total_mis),
+		total_aav_spent = if_else(offseason_data_pending, 0, total_aav_spent),
+		signing_count = if_else(offseason_data_pending, 0L, signing_count),
+		signing_count_tier1 = if_else(offseason_data_pending, 0L, signing_count_tier1),
+		signing_count_tier2 = if_else(offseason_data_pending, 0L, signing_count_tier2),
+		signing_count_tier3 = if_else(offseason_data_pending, 0L, signing_count_tier3),
+		signing_count_tier4 = if_else(offseason_data_pending, 0L, signing_count_tier4),
+		has_goalie_signing = if_else(offseason_data_pending, FALSE, has_goalie_signing)
 	) %>%
 	arrange(season_year, signing_team)
 
@@ -131,7 +140,7 @@ signing_count_distribution <- mis_output %>%
 	arrange(signing_count_bucket)
 
 cat("===== MIS QA CHECKS =====\n")
-cat("Total team-season rows in output:", total_rows, "(expected 282)\n")
+cat("Total team-season rows in output:", total_rows, "(expected 314)\n")
 cat("Team-seasons with zero total_mis:", zero_mis_count, "\n")
 cat("Team-seasons with at least one goalie signing:", goalie_team_season_count, "\n")
 cat(

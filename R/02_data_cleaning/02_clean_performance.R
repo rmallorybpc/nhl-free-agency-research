@@ -7,7 +7,7 @@ suppressPackageStartupMessages({
 	library(here)
 })
 
-expected_total_rows <- 282L
+expected_total_rows <- 314L
 expected_season_counts <- c(
 	`2017` = 30L,
 	`2018` = 31L,
@@ -17,7 +17,8 @@ expected_season_counts <- c(
 	`2022` = 32L,
 	`2023` = 32L,
 	`2024` = 32L,
-	`2025` = 32L
+	`2025` = 32L,
+	`2026` = 32L
 )
 expected_divisions <- c("M", "A", "C", "P", "NTH", "EST", "WST", "CEN")
 
@@ -238,6 +239,7 @@ if (length(validation_warnings) == 0) {
 }
 
 # Version 1 analysis-window note:
-# Effective season-over-season outcome window is 2018 to 2025 because 2016
-# baseline performance is out of scope. As a result, 2017 Spotrac signings are
-# excluded from regression models that require a prior-season baseline.
+# Effective season-over-season outcome window is 2018 to 2026 because 2016
+# baseline performance is out of scope. This yields 9 outcome seasons total.
+# As a result, 2017 Spotrac signings are excluded from regression models that
+# require a prior-season baseline.

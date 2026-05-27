@@ -13,6 +13,7 @@
     'index.html',
     'team.html',
     'explorer.html',
+    'forecast.html',
     'audit.html'
   ];
 
@@ -21,10 +22,11 @@
     'findings.html',
     'index.html',
     'team.html',
-    'explorer.html'
+    'explorer.html',
+    'forecast.html'
   ];
 
-  const NAV_EXPECTED = ['welcome.html', 'findings.html', 'index.html', 'team.html', 'explorer.html', 'audit.html'];
+  const NAV_EXPECTED = ['welcome.html', 'findings.html', 'index.html', 'team.html', 'explorer.html', 'forecast.html', 'audit.html'];
   const ACRONYM_RULES = [
     { acronym: 'UFA', definition: 'unrestricted free agent', suggestion: 'define as unrestricted free agent on first use' },
     { acronym: 'RFA', definition: 'restricted free agent', suggestion: 'define as restricted free agent on first use' },
@@ -73,7 +75,7 @@
   const CSV_EXPECTATIONS = [
     {
       file: 'data/processed/nhl_master_analysis_panel.csv',
-      expected_rows: 252,
+      expected_rows: 284,
       key_columns: ['season_year', 'teamTriCode', 'points_percentage', 'prior_season_points_pct', 'total_mis']
     },
     {
@@ -83,7 +85,7 @@
     },
     {
       file: 'data/processed/nhl_team_season_performance_clean.csv',
-      expected_rows: 282,
+      expected_rows: 314,
       key_columns: ['season_year', 'teamTriCode', 'points_percentage', 'gamesPlayed']
     },
     {
@@ -903,11 +905,15 @@
         if (years.length) {
           const minYear = Math.min.apply(null, years);
           const maxYear = Math.max.apply(null, years);
-          if (minYear < 2017 || maxYear > 2025) {
+          const yearWindow = yearCol === 'spotrac_year'
+            ? { min: 2017, max: 2025, label: '2017-2025 Spotrac offseason window' }
+            : { min: 2017, max: 2026, label: '2017-2026 team-season window' };
+
+          if (minYear < yearWindow.min || maxYear > yearWindow.max) {
             issues.push({
               page: cfg.file,
               severity: 'warning',
-              message: 'Year range outside documented 2017-2025 window',
+              message: 'Year range outside documented ' + yearWindow.label,
               context: 'Found years ' + minYear + '-' + maxYear + '.'
             });
           }

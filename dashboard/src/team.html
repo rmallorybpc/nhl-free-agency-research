@@ -126,6 +126,35 @@
       pointer-events: none;
     }
 
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .forecast-direction-up {
+      color: var(--tmg-success);
+    }
+
+    .forecast-direction-flat {
+      color: var(--tmg-charcoal);
+    }
+
+    .forecast-direction-down {
+      color: var(--tmg-error);
+    }
+
+    .forecast-note {
+      margin: 12px 0 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(196, 127, 0, 0.3);
+      background: rgba(196, 127, 0, 0.09);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--tmg-charcoal);
+    }
+
     @media (max-width: 680px) {
       .team-controls > div {
         width: 100%;
@@ -138,6 +167,10 @@
       .team-controls #loadTeamBtn {
         width: 100%;
         justify-content: center;
+      }
+
+      .forecast-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -155,6 +188,7 @@
       <a href="./index.html">Overview</a>
       <a href="./team.html" aria-current="page">Team Detail</a>
       <a href="./explorer.html">All Signings</a>
+      <a href="./forecast.html">Forecast</a>
       <a href="./audit.html">Audit</a>
       <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/METHODS.md" target="_blank" rel="noopener noreferrer">Methods</a>
     </div>
@@ -219,6 +253,8 @@
 
       <section class="tmg-bento-grid" id="summaryTiles" style="margin-bottom: var(--tmg-gap);" aria-live="polite"></section>
 
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="forecastCard" aria-live="polite"></section>
+
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="misCard" aria-live="polite"></section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="signingsCard" aria-live="polite"></section>
@@ -234,9 +270,10 @@
   </main>
 
   <footer class="tmg-footer">
-    Built on nine seasons of NHL transaction data (2017–2025), 1,648 UFA
-    movement events, Spotrac contract data, and NHL API game results via
-    nhlscraper. &nbsp;·&nbsp;
+    Built on ten seasons of NHL team performance data (2017–2026), nine
+    offseasons of UFA transaction data (2017–2025), 1,648 UFA movement events,
+    Spotrac contract data, and NHL API game results via nhlscraper.
+    &nbsp;·&nbsp;
     <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
        target="_blank" rel="noopener noreferrer">View the source on GitHub →</a>
   </footer>
@@ -258,6 +295,8 @@
     });
   </script>
 
+  <script src="./js/predictor.js"></script>
+
   <script>
     const BASE = '/nhl-free-agency-research';
 
@@ -276,6 +315,7 @@
       loadTeamBtn: document.getElementById('loadTeamBtn'),
       selectorHint: document.getElementById('selectorHint'),
       summaryTiles: document.getElementById('summaryTiles'),
+      forecastCard: document.getElementById('forecastCard'),
       misCard: document.getElementById('misCard'),
       signingsCard: document.getElementById('signingsCard'),
       performanceCard: document.getElementById('performanceCard'),
@@ -504,6 +544,7 @@
       els.selectorHint.textContent = 'Choose a team and season, then select Load Team.';
       els.covidBannerWrap.innerHTML = '';
       els.summaryTiles.innerHTML = '';
+      els.forecastCard.innerHTML = '';
       els.misCard.innerHTML = '';
       els.signingsCard.innerHTML = '';
       els.performanceCard.innerHTML = '';
@@ -540,6 +581,7 @@
         els.selectorHint.textContent = '';
         els.covidBannerWrap.innerHTML = '';
         els.summaryTiles.innerHTML = '';
+        els.forecastCard.innerHTML = '<h2 class="tmg-h2">Forecast for next season</h2><p class="tmg-body">No team-season row found.</p>';
         els.misCard.innerHTML = '<h2 class="tmg-h2">Movement Impact Score breakdown by position tier</h2><p class="tmg-body">No team-season row found.</p>';
         els.signingsCard.innerHTML = '<h2 class="tmg-h2">UFA signings</h2><p class="tmg-body">No signings available.</p>';
         els.performanceCard.innerHTML = '<h2 class="tmg-h2">Season performance in league context</h2><p class="tmg-body">No context available.</p>';
@@ -555,6 +597,7 @@
       renderHeader(teamRow);
       showCovidBanner(teamRow.season_type, season);
       renderTiles(teamRow);
+      renderForecastCard(teamRow);
       renderMISTierBreakdown(teamRow, misRow, signings, geoRow);
       renderSigningsTable(signings, season);
 
@@ -631,6 +674,94 @@
           <p class="tmg-card-value">${signings}</p>
           <p class="tmg-card-sub">Goalie signed: ${hasGoalie ? '✓' : '—'}</p>
         </article>
+      `;
+    }
+
+    function formatPointRange(low, high) {
+      if (!Number.isFinite(low) || !Number.isFinite(high)) return '--';
+      return `${low} to ${high}`;
+    }
+
+    function classifyDirection(change) {
+      if (change > 0.01) {
+        return { label: '▲ Improve', cls: 'forecast-direction-up' };
+      }
+      if (change < -0.01) {
+        return { label: '▼ Decline', cls: 'forecast-direction-down' };
+      }
+      return { label: '→ Stay similar', cls: 'forecast-direction-flat' };
+    }
+
+    function renderForecastCard(teamRow) {
+      if (!window.NHLPredictor || !window.NHLPredictor.coefficients) {
+        els.forecastCard.innerHTML = `
+          <h2 class="tmg-h2">Forecast for next season</h2>
+          <p class="tmg-body">Unable to load the model coefficients needed for the forecast.</p>
+        `;
+        return;
+      }
+
+      const teamName = teamRow.teamCommonName || teamRow.teamTriCode;
+      const season = Number.parseInt(teamRow.season_year, 10);
+      const currentPointsPct = toNum(teamRow.points_percentage);
+      const currentPoints = toNum(teamRow.points);
+
+      let result;
+      try {
+        result = window.NHLPredictor.predict(currentPointsPct);
+      } catch (err) {
+        els.forecastCard.innerHTML = `
+          <h2 class="tmg-h2">Forecast for next season</h2>
+          <p class="tmg-body">Forecast unavailable for this row: ${err.message}</p>
+        `;
+        return;
+      }
+
+      const direction = classifyDirection(result.change);
+
+      const aboveAverage = currentPointsPct >= 0.53;
+      const belowAverage = currentPointsPct <= 0.47;
+      let headline = `The model expects ${teamName} to land near where they finished - roughly ${result.expectedPoints} points next season.`;
+
+      if (aboveAverage) {
+        headline = `Mean reversion expects ${teamName} to step back slightly next season - model predicts roughly ${result.expectedPoints} points, down from this season's ${currentPoints}.`;
+      } else if (belowAverage) {
+        headline = `Mean reversion expects ${teamName} to improve next season - model predicts roughly ${result.expectedPoints} points, up from this season's ${currentPoints}.`;
+      }
+
+      const pendingNote = season === 2026 || String(teamRow.offseason_data_pending).toUpperCase() === 'TRUE'
+        ? `<p class="forecast-note">This team's 2026 offseason data is not yet in the dataset since UFA free agency opens July 1, 2026. The forecast uses only the mean reversion signal from this season's finish. Once 2026 offseason signings are added, the model can incorporate any spending effect - though the research suggests UFA spending does not reliably change the prediction.</p>`
+        : '';
+
+      els.forecastCard.innerHTML = `
+        <h2 class="tmg-h2">Forecast for next season</h2>
+        <p class="tmg-body" style="margin:0 0 10px;">${headline}</p>
+        <div class="forecast-grid">
+          <article class="tmg-card" style="padding:16px;">
+            <p class="tmg-card-label">PREDICTED POINTS %</p>
+            <p class="tmg-card-value">${formatPctDecimal(result.predicted)}</p>
+            <p class="tmg-card-sub">based on this season's ${formatPctDecimal(currentPointsPct)}</p>
+          </article>
+          <article class="tmg-card" style="padding:16px;">
+            <p class="tmg-card-label">PREDICTED POINTS</p>
+            <p class="tmg-card-value">${result.expectedPoints}</p>
+            <p class="tmg-card-sub">in an 82-game season</p>
+          </article>
+          <article class="tmg-card" style="padding:16px;">
+            <p class="tmg-card-label">95% CONFIDENCE RANGE</p>
+            <p class="tmg-card-value">${formatPointRange(result.expectedPointsLow, result.expectedPointsHigh)}</p>
+            <p class="tmg-card-sub">wide because the model leaves room for variation</p>
+          </article>
+          <article class="tmg-card" style="padding:16px;">
+            <p class="tmg-card-label">PREDICTED DIRECTION</p>
+            <p class="tmg-card-value ${direction.cls}">${direction.label}</p>
+            <p class="tmg-card-sub">change vs this season</p>
+          </article>
+        </div>
+        <p class="tmg-body-sm tmg-text-muted" style="margin:0;">
+          This forecast is based on mean reversion alone - the strongest signal in the research. The model explains roughly 19% of the variation in team performance change, which means about 80% of what actually happens next season comes from factors not in the model: trades, internal development, injuries, coaching changes, and noise. Treat the prediction as a baseline expectation, not a confident bet.
+        </p>
+        ${pendingNote}
       `;
     }
 
@@ -855,7 +986,7 @@
           <span class="context-expected" style="color:${expectedColor};">${expected}</span>
         </p>
         <p class="tmg-body-sm tmg-text-muted" style="margin:10px 0 0;">
-          Expected direction is based on the mean reversion pattern observed across 252 team-seasons.
+          Expected direction is based on the mean reversion pattern observed across 284 team-seasons.
           It is not a prediction - it reflects the average historical tendency for teams at this performance level.
         </p>
       `;
@@ -949,6 +1080,8 @@
     // init() — on DOMContentLoaded
     function init() {
       loadAllData().then(() => {
+        return window.NHLPredictor.loadCoefficients({ base: BASE });
+      }).then(() => {
         populateTeamSelector();
 
         const firstTeam = els.teamSelect.options[1]?.value || '';

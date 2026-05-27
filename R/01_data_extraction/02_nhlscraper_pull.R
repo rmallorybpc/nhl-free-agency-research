@@ -1,5 +1,5 @@
 # 02_nhlscraper_pull.R
-# Pull team-level season performance data via nhlscraper::standings for 2017-2025.
+# Pull team-level season performance data via nhlscraper::standings for 2017-2026.
 
 suppressPackageStartupMessages({
 	library(nhlscraper)
@@ -14,7 +14,7 @@ season_end_dates <- nhlscraper::seasons() |>
 		# Use regular-season endpoint for standings snapshots; fall back to season end if needed.
 		end_date = as.Date(substr(coalesce(regularSeasonEndDate, endDate), 1, 10))
 	) |>
-	filter(season_year >= 2017, season_year <= 2025) |>
+	filter(season_year >= 2017, season_year <= 2026) |>
 	arrange(season_year)
 
 expected_team_counts <- c(
@@ -26,7 +26,8 @@ expected_team_counts <- c(
 	`2022` = 32,
 	`2023` = 32,
 	`2024` = 32,
-	`2025` = 32
+	`2025` = 32,
+	`2026` = 32
 )
 
 expected_total_rows <- sum(unname(expected_team_counts))

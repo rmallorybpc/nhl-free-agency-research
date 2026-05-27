@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forecast — NHL Free Agency Research</title>
+  <meta name="description" content="Mean reversion-based forecast for NHL team next-season points percentage, with confidence ranges and historical calibration.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./tmg.css">
+  <style>
+    .tmg-page-links { display: flex; gap: 4px; }
+    .tmg-page-links a {
+      padding: 6px 12px;
+      border-radius: var(--tmg-nav-radius);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tmg-charcoal);
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .tmg-page-links a:hover { background: rgba(132,169,140,0.12); }
+    .tmg-page-links a[aria-current="page"] {
+      background: rgba(132,169,140,0.15);
+      color: var(--tmg-sage-hover);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .forecast-direction-up {
+      color: var(--tmg-success);
+      font-weight: 500;
+    }
+
+    .forecast-direction-flat {
+      color: var(--tmg-charcoal);
+      font-weight: 500;
+    }
+
+    .forecast-direction-down {
+      color: var(--tmg-error);
+      font-weight: 500;
+    }
+
+    .change-up {
+      color: var(--tmg-success);
+      font-weight: 500;
+    }
+
+    .change-flat {
+      color: var(--tmg-charcoal);
+      font-weight: 500;
+    }
+
+    .change-down {
+      color: var(--tmg-error);
+      font-weight: 500;
+    }
+
+    .calibration-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    @media (max-width: 900px) {
+      .calibration-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="tmg-nav" role="banner">
+    <a class="tmg-logo" href="./welcome.html" aria-label="The Mallory Group">
+      <span>TM</span>
+      <div class="tmg-logo-divider" aria-hidden="true"></div>
+      <span>G</span>
+    </a>
+    <div class="tmg-page-links" aria-label="Dashboard pages">
+      <a href="./welcome.html">Welcome</a>
+      <a href="./findings.html">Key Findings</a>
+      <a href="./index.html">Overview</a>
+      <a href="./team.html">Team Detail</a>
+      <a href="./explorer.html">All Signings</a>
+      <a href="./forecast.html" aria-current="page">Forecast</a>
+      <a href="./audit.html">Audit</a>
+      <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/METHODS.md" target="_blank" rel="noopener noreferrer">Methods</a>
+    </div>
+    <div class="tmg-dropdown-wrap">
+      <button class="tmg-dropdown-btn" id="tmgDdBtn"
+              aria-haspopup="true" aria-expanded="false" aria-controls="tmgDdMenu">
+        TMG Tool Suite
+        <svg class="tmg-chevron" viewBox="0 0 12 12" fill="none"
+             width="12" height="12" aria-hidden="true">
+          <path d="M2 4l4 4 4-4" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="tmg-dropdown-menu" id="tmgDdMenu" role="menu">
+        <a href="https://rmallorybpc.github.io/pdf-multi-agent-analysis/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">PDF Multi-Agent Analysis</a>
+        <a href="https://rmallorybpc.github.io/housing-market-intel/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">Housing Market Intel</a>
+        <a href="https://rmallorybpc.github.io/real-estate-report/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">Real Estate Report</a>
+        <a href="https://rmallorybpc.github.io/nflanalysis/dashboard/src/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">NFL Analysis</a>
+        <a href="https://rmallorybpc.github.io/nhl-free-agency-research/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">NHL Analysis</a>
+        <a href="https://rmallorybpc.github.io/recipes/"
+           target="_blank" rel="noopener noreferrer" role="menuitem">Recipe Book</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="tmg-page">
+    <div class="tmg-container">
+      <div class="tmg-page-header">
+        <p class="tmg-eyebrow">Next Season Forecast</p>
+        <h1 class="tmg-page-title">Who is the model expecting to improve or decline?</h1>
+        <p class="tmg-page-desc">
+          Mean reversion-based forecast for each team's next season,
+          ranked by predicted points percentage. Wide confidence intervals
+          reflect how much of next season's outcome the model cannot explain.
+        </p>
+      </div>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">How to read this forecast</h2>
+        <p class="tmg-body" style="margin:0;">
+          This forecast is based on mean reversion alone - the strongest signal in the research. The model explains roughly 19% of the variation in team performance change, which means about 80% of what actually happens next season comes from factors not in the model: trades, internal development, injuries, coaching changes, and noise. Treat the prediction as a baseline expectation, not a confident bet.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <div style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
+          <div>
+            <label class="tmg-field-label" for="seasonSelect">Current season to forecast from</label>
+            <select class="tmg-select" id="seasonSelect" style="width:180px"></select>
+          </div>
+          <p class="tmg-body-sm tmg-text-muted" id="seasonHint" style="margin:0;"></p>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">League forecast table</h2>
+        <div class="table-wrap">
+          <table class="tmg-table" id="forecastTable">
+            <thead>
+              <tr id="forecastHeaderRow"></tr>
+            </thead>
+            <tbody id="forecastBody">
+              <tr><td colspan="9">Loading forecast...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" id="calibrationCard">
+        <h2 class="tmg-h2">How accurate is the model?</h2>
+        <p class="tmg-body-sm tmg-text-muted">Calculating historical calibration...</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="tmg-footer">
+    Forecasts update from live model coefficients in the research outputs. &nbsp;·&nbsp;
+    <a href="https://github.com/rmallorybpc/nhl-free-agency-research"
+      target="_blank" rel="noopener noreferrer">View the source on GitHub →</a>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('tmgDdBtn');
+    const menu = document.getElementById('tmgDdMenu');
+    btn.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script src="./js/predictor.js"></script>
+  <script>
+    const BASE = '/nhl-free-agency-research';
+
+    const els = {
+      seasonSelect: document.getElementById('seasonSelect'),
+      seasonHint: document.getElementById('seasonHint'),
+      forecastHeaderRow: document.getElementById('forecastHeaderRow'),
+      forecastBody: document.getElementById('forecastBody'),
+      calibrationCard: document.getElementById('calibrationCard')
+    };
+
+    let masterRows = [];
+
+    function getPathPrefix() {
+      const marker = '/dashboard/src/';
+      const idx = window.location.pathname.indexOf(marker);
+      if (idx === -1) return '';
+      return window.location.pathname.slice(0, idx);
+    }
+
+    function fetchCSVWithFallback(basePath) {
+      const suffixMarker = '/data/processed/';
+      const suffixIdx = basePath.indexOf(suffixMarker);
+      const suffix = suffixIdx >= 0 ? basePath.slice(suffixIdx + suffixMarker.length) : '';
+      const pathPrefix = getPathPrefix();
+
+      const candidatePaths = [basePath];
+      if (suffix) {
+        candidatePaths.push(`${pathPrefix}/data/processed/${suffix}`);
+        candidatePaths.push(`/data/processed/${suffix}`);
+      }
+
+      const uniquePaths = [...new Set(candidatePaths.filter(Boolean))];
+
+      return uniquePaths.reduce((chain, path) => {
+        return chain.catch(errs => {
+          return fetch(path).then(resp => {
+            if (resp.ok) return resp.text();
+            return Promise.reject([...errs, { path, status: resp.status }]);
+          }).catch(fetchErr => {
+            if (Array.isArray(fetchErr)) throw fetchErr;
+            return Promise.reject([...errs, { path, status: 'network_error' }]);
+          });
+        });
+      }, Promise.reject([])).catch(errs => {
+        const detail = errs.map(e => `${e.path} (${e.status})`).join(' and ');
+        throw new Error(`Failed to load ${detail}`);
+      });
+    }
+
+    function parseCSVLine(line) {
+      const cols = [];
+      let cur = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i += 1) {
+        const ch = line[i];
+        const next = line[i + 1];
+
+        if (ch === '"') {
+          if (inQuotes && next === '"') {
+            cur += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          cols.push(cur);
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+
+      cols.push(cur);
+      return cols;
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (lines.length < 2) return [];
+
+      const headers = parseCSVLine(lines[0]);
+      return lines.slice(1).filter(line => line.trim()).map(line => {
+        const cols = parseCSVLine(line);
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header] = (cols[idx] || '').trim();
+        });
+        return row;
+      });
+    }
+
+    function toNum(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatPctDecimal(value) {
+      if (!Number.isFinite(value)) return '--';
+      const fixed = value.toFixed(3);
+      return fixed.startsWith('0') ? fixed.slice(1) : fixed;
+    }
+
+    function formatSignedPP(value, digits = 1) {
+      if (!Number.isFinite(value)) return '--';
+      const sign = value > 0 ? '+' : '';
+      return `${sign}${value.toFixed(digits)} pp`;
+    }
+
+    function classifyDirection(change) {
+      if (change > 0.01) return { text: '▲', cls: 'forecast-direction-up' };
+      if (change < -0.01) return { text: '▼', cls: 'forecast-direction-down' };
+      return { text: '→', cls: 'forecast-direction-flat' };
+    }
+
+    function byTeamSeason(rows) {
+      const map = new Map();
+      rows.forEach(row => {
+        const season = Number.parseInt(row.season_year, 10);
+        if (!Number.isFinite(season)) return;
+        const key = `${row.teamTriCode}__${season}`;
+        map.set(key, row);
+      });
+      return map;
+    }
+
+    function buildForecastRows(currentSeason) {
+      const currentRows = masterRows
+        .filter(row => Number.parseInt(row.season_year, 10) === currentSeason)
+        .map(row => {
+          const currentPct = toNum(row.points_percentage);
+          const prediction = window.NHLPredictor.predict(currentPct);
+          const direction = classifyDirection(prediction.change);
+          return {
+            teamTriCode: row.teamTriCode,
+            teamCommonName: row.teamCommonName,
+            currentPct,
+            predictedPct: prediction.predicted,
+            predictedChange: prediction.change,
+            directionText: direction.text,
+            directionClass: direction.cls,
+            expectedPoints: prediction.expectedPoints,
+            expectedPointsLow: prediction.expectedPointsLow,
+            expectedPointsHigh: prediction.expectedPointsHigh
+          };
+        })
+        .sort((a, b) => b.predictedPct - a.predictedPct)
+        .map((row, idx) => ({ ...row, rank: idx + 1 }));
+
+      const rowMap = byTeamSeason(masterRows);
+      const nextSeason = currentSeason + 1;
+      const hasAnyNextSeason = currentRows.some(row => rowMap.has(`${row.teamTriCode}__${nextSeason}`));
+
+      const withActual = currentRows.map(row => {
+        const next = rowMap.get(`${row.teamTriCode}__${nextSeason}`);
+        return {
+          ...row,
+          actualNextPct: next ? toNum(next.points_percentage) : null
+        };
+      });
+
+      return { rows: withActual, hasAnyNextSeason, nextSeason };
+    }
+
+    function renderForecastTable(currentSeason) {
+      const payload = buildForecastRows(currentSeason);
+      const rows = payload.rows;
+
+      const headerCols = [
+        '<th scope="col">Rank</th>',
+        '<th scope="col">Team</th>',
+        '<th scope="col">Current pts %</th>',
+        '<th scope="col">Predicted next pts %</th>',
+        '<th scope="col">Predicted change</th>',
+        '<th scope="col">Direction</th>',
+        '<th scope="col">Predicted points (82 GP)</th>',
+        '<th scope="col">95% range</th>'
+      ];
+
+      if (payload.hasAnyNextSeason) {
+        headerCols.push(`<th scope="col">Actual ${payload.nextSeason} pts %</th>`);
+      } else {
+        headerCols.push('<th scope="col">Actual next pts %</th>');
+      }
+
+      els.forecastHeaderRow.innerHTML = headerCols.join('');
+
+      const bodyRows = rows.map(row => {
+        const changeClass = row.predictedChange > 0.01
+          ? 'change-up'
+          : row.predictedChange < -0.01
+            ? 'change-down'
+            : 'change-flat';
+
+        const actualCell = Number.isFinite(row.actualNextPct)
+          ? formatPctDecimal(row.actualNextPct)
+          : 'Not yet';
+
+        return `
+          <tr>
+            <td>${row.rank}</td>
+            <td>${row.teamCommonName} (${row.teamTriCode})</td>
+            <td>${formatPctDecimal(row.currentPct)}</td>
+            <td>${formatPctDecimal(row.predictedPct)}</td>
+            <td class="${changeClass}">${formatSignedPP(row.predictedChange * 100, 1)}</td>
+            <td class="${row.directionClass}">${row.directionText}</td>
+            <td>${row.expectedPoints}</td>
+            <td>${row.expectedPointsLow} to ${row.expectedPointsHigh}</td>
+            <td>${actualCell}</td>
+          </tr>
+        `;
+      }).join('');
+
+      els.forecastBody.innerHTML = bodyRows || '<tr><td colspan="9">No rows available for selected season.</td></tr>';
+
+      els.seasonHint.textContent = payload.hasAnyNextSeason
+        ? `Historical check enabled: compares forecast from ${currentSeason} against ${payload.nextSeason} outcomes where available.`
+        : `No next-season outcomes are available yet for ${currentSeason}.`;
+    }
+
+    function buildCalibration() {
+      const rowMap = byTeamSeason(masterRows);
+      const records = [];
+
+      masterRows.forEach(row => {
+        const season = Number.parseInt(row.season_year, 10);
+        if (!Number.isFinite(season)) return;
+
+        const next = rowMap.get(`${row.teamTriCode}__${season + 1}`);
+        if (!next) return;
+
+        const currentPct = toNum(row.points_percentage);
+        const actualPct = toNum(next.points_percentage);
+        const prediction = window.NHLPredictor.predict(currentPct);
+        const residual = actualPct - prediction.predicted;
+        const absErrorPP = Math.abs(residual * 100);
+        const inCI = actualPct >= prediction.lower && actualPct <= prediction.upper;
+
+        records.push({
+          teamTriCode: row.teamTriCode,
+          teamCommonName: row.teamCommonName,
+          fromSeason: season,
+          toSeason: season + 1,
+          absErrorPP,
+          inCI
+        });
+      });
+
+      if (!records.length) {
+        els.calibrationCard.innerHTML = `
+          <h2 class="tmg-h2">How accurate is the model?</h2>
+          <p class="tmg-body">No historical prediction-actual pairs available.</p>
+        `;
+        return;
+      }
+
+      const maePP = records.reduce((sum, r) => sum + r.absErrorPP, 0) / records.length;
+      const coveragePct = (records.filter(r => r.inCI).length / records.length) * 100;
+
+      const largestMiss = records.slice().sort((a, b) => b.absErrorPP - a.absErrorPP)[0];
+      const closestHit = records.slice().sort((a, b) => a.absErrorPP - b.absErrorPP)[0];
+
+      els.calibrationCard.innerHTML = `
+        <h2 class="tmg-h2">How accurate is the model?</h2>
+        <div class="calibration-grid">
+          <article class="tmg-card" style="padding:16px;">
+            <p class="tmg-card-label">MEAN ABSOLUTE ERROR</p>
+            <p class="tmg-card-value">${maePP.toFixed(1)} pp</p>
+            <p class="tmg-card-sub">average absolute miss vs next season</p>
+          </article>
+          <article class="tmg-card" style="padding:16px;">
+            <p class="tmg-card-label">WITHIN 95% CI</p>
+            <p class="tmg-card-value">${coveragePct.toFixed(1)}%</p>
+            <p class="tmg-card-sub">share of outcomes inside prediction interval</p>
+          </article>
+          <article class="tmg-card" style="padding:16px;">
+            <p class="tmg-card-label">PAIRS EVALUATED</p>
+            <p class="tmg-card-value">${records.length}</p>
+            <p class="tmg-card-sub">team-season prediction vs actual pairs</p>
+          </article>
+        </div>
+        <div class="table-wrap">
+          <table class="tmg-table">
+            <thead>
+              <tr>
+                <th>Calibration highlight</th>
+                <th>Team</th>
+                <th>Forecast window</th>
+                <th>Absolute error</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Largest miss</td>
+                <td>${largestMiss.teamCommonName} (${largestMiss.teamTriCode})</td>
+                <td>${largestMiss.fromSeason} to ${largestMiss.toSeason}</td>
+                <td>${largestMiss.absErrorPP.toFixed(1)} pp</td>
+              </tr>
+              <tr>
+                <td>Closest hit</td>
+                <td>${closestHit.teamCommonName} (${closestHit.teamTriCode})</td>
+                <td>${closestHit.fromSeason} to ${closestHit.toSeason}</td>
+                <td>${closestHit.absErrorPP.toFixed(1)} pp</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    async function init() {
+      try {
+        const masterText = await fetchCSVWithFallback(`${BASE}/data/processed/nhl_master_analysis_panel.csv`);
+        masterRows = parseCSV(masterText);
+
+        await window.NHLPredictor.loadCoefficients({ base: BASE });
+
+        const seasons = [...new Set(
+          masterRows
+            .map(row => Number.parseInt(row.season_year, 10))
+            .filter(Number.isFinite)
+        )].sort((a, b) => b - a);
+
+        els.seasonSelect.innerHTML = seasons
+          .map(season => `<option value="${season}">${season}</option>`)
+          .join('');
+
+        const defaultSeason = seasons[0];
+        els.seasonSelect.value = String(defaultSeason);
+
+        renderForecastTable(defaultSeason);
+        buildCalibration();
+
+        els.seasonSelect.addEventListener('change', () => {
+          const season = Number.parseInt(els.seasonSelect.value, 10);
+          if (!Number.isFinite(season)) return;
+          renderForecastTable(season);
+        });
+      } catch (err) {
+        els.forecastBody.innerHTML = `<tr><td colspan="9">Unable to load forecast data: ${err.message}</td></tr>`;
+        els.calibrationCard.innerHTML = `
+          <h2 class="tmg-h2">How accurate is the model?</h2>
+          <p class="tmg-body">Unable to compute calibration metrics: ${err.message}</p>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
