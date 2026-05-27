@@ -161,7 +161,7 @@
               <tr id="forecastHeaderRow"></tr>
             </thead>
             <tbody id="forecastBody">
-              <tr><td colspan="9">Loading forecast...</td></tr>
+              <tr><td colspan="10">Loading forecast...</td></tr>
             </tbody>
           </table>
         </div>
@@ -306,6 +306,11 @@
       return fixed.startsWith('0') ? fixed.slice(1) : fixed;
     }
 
+    function formatRatioPercent(value) {
+      if (!Number.isFinite(value)) return '--';
+      return `${(value * 100).toFixed(1)}%`;
+    }
+
     function formatSignedPP(value, digits = 1) {
       if (!Number.isFinite(value)) return '--';
       const sign = value > 0 ? '+' : '';
@@ -401,6 +406,13 @@
         );
       }
 
+      headerCols.push(
+        thWithTooltip(
+          'Model Accuracy',
+          'Actual next pts % divided by Predicted next pts %. 100% means exact, below 100% means overprediction, above 100% means underprediction.'
+        )
+      );
+
       els.forecastHeaderRow.innerHTML = headerCols.join('');
 
       const bodyRows = rows.map(row => {
@@ -414,6 +426,13 @@
           ? formatPctDecimal(row.actualNextPct)
           : 'Not yet';
 
+        let modelAccuracyCell = 'Not yet';
+        if (Number.isFinite(row.actualNextPct)) {
+          modelAccuracyCell = Number.isFinite(row.predictedPct) && row.predictedPct > 0
+            ? formatRatioPercent(row.actualNextPct / row.predictedPct)
+            : 'N/A';
+        }
+
         return `
           <tr>
             <td>${row.rank}</td>
@@ -425,11 +444,12 @@
             <td>${row.expectedPoints}</td>
             <td>${row.expectedPointsLow} to ${row.expectedPointsHigh}</td>
             <td>${actualCell}</td>
+            <td>${modelAccuracyCell}</td>
           </tr>
         `;
       }).join('');
 
-      els.forecastBody.innerHTML = bodyRows || '<tr><td colspan="9">No rows available for selected season.</td></tr>';
+      els.forecastBody.innerHTML = bodyRows || '<tr><td colspan="10">No rows available for selected season.</td></tr>';
 
       els.seasonHint.textContent = payload.hasAnyNextSeason
         ? `Historical check enabled: compares forecast from ${currentSeason} against ${payload.nextSeason} outcomes where available.`
@@ -559,7 +579,7 @@
           renderForecastTable(season);
         });
       } catch (err) {
-        els.forecastBody.innerHTML = `<tr><td colspan="9">Unable to load forecast data: ${err.message}</td></tr>`;
+        els.forecastBody.innerHTML = `<tr><td colspan="10">Unable to load forecast data: ${err.message}</td></tr>`;
         els.calibrationCard.innerHTML = `
           <h2 class="tmg-h2">How accurate is the model?</h2>
           <p class="tmg-body">Unable to compute calibration metrics: ${err.message}</p>
