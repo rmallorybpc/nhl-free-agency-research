@@ -59,6 +59,13 @@
       font-weight: 500;
     }
 
+    .th-tip {
+      display: inline-block;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+      cursor: help;
+    }
+
     .calibration-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -311,6 +318,12 @@
       return { text: '→', cls: 'forecast-direction-flat' };
     }
 
+    function thWithTooltip(label, tooltip) {
+      const safeLabel = String(label || '');
+      const safeTip = String(tooltip || '').replace(/"/g, '&quot;');
+      return `<th scope="col"><span class="th-tip" title="${safeTip}">${safeLabel}</span></th>`;
+    }
+
     function byTeamSeason(rows) {
       const map = new Map();
       rows.forEach(row => {
@@ -367,18 +380,25 @@
       const headerCols = [
         '<th scope="col">Rank</th>',
         '<th scope="col">Team</th>',
-        '<th scope="col">Current pts %</th>',
-        '<th scope="col">Predicted next pts %</th>',
-        '<th scope="col">Predicted change</th>',
-        '<th scope="col">Direction</th>',
-        '<th scope="col">Predicted points (82 GP)</th>',
-        '<th scope="col">95% range</th>'
+        thWithTooltip('Current pts %', 'This team\'s points percentage in the selected current season.'),
+        thWithTooltip('Predicted next pts %', 'Model-estimated points percentage for the next season based on mean reversion.'),
+        thWithTooltip('Predicted change', 'Predicted next-season points % minus current-season points %, shown in percentage points.'),
+        thWithTooltip('Direction', 'Arrow summary of predicted movement: improve, stay similar, or decline.'),
+        thWithTooltip('Predicted points (82 GP)', 'Predicted next-season points percentage converted to expected points over an 82-game schedule.'),
+        thWithTooltip('95% range', 'Approximate 95% prediction interval in expected points over 82 games.')
       ];
 
       if (payload.hasAnyNextSeason) {
-        headerCols.push(`<th scope="col">Actual ${payload.nextSeason} pts %</th>`);
+        headerCols.push(
+          thWithTooltip(
+            `Actual ${payload.nextSeason} pts %`,
+            `Observed points percentage in ${payload.nextSeason}, used to compare forecast vs reality.`
+          )
+        );
       } else {
-        headerCols.push('<th scope="col">Actual next pts %</th>');
+        headerCols.push(
+          thWithTooltip('Actual next pts %', 'Observed next-season points percentage (shown as Not yet when unavailable).')
+        );
       }
 
       els.forecastHeaderRow.innerHTML = headerCols.join('');
