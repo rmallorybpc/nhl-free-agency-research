@@ -221,6 +221,10 @@
       if (suffix) {
         candidatePaths.push(`${pathPrefix}/data/processed/${suffix}`);
         candidatePaths.push(`/data/processed/${suffix}`);
+        candidatePaths.push(`../../data/processed/${suffix}`);
+        candidatePaths.push(`./../../data/processed/${suffix}`);
+        candidatePaths.push(`../data/processed/${suffix}`);
+        candidatePaths.push(`./data/processed/${suffix}`);
       }
 
       const uniquePaths = [...new Set(candidatePaths.filter(Boolean))];
@@ -273,7 +277,7 @@
       const lines = text.trim().split(/\r?\n/);
       if (lines.length < 2) return [];
 
-      const headers = parseCSVLine(lines[0]);
+      const headers = parseCSVLine(lines[0]).map(h => h.replace(/^\uFEFF/, '').trim());
       return lines.slice(1).filter(line => line.trim()).map(line => {
         const cols = parseCSVLine(line);
         const row = {};
@@ -514,6 +518,10 @@
             .map(row => Number.parseInt(row.season_year, 10))
             .filter(Number.isFinite)
         )].sort((a, b) => b - a);
+
+        if (!seasons.length) {
+          throw new Error('No season_year values were found in nhl_master_analysis_panel.csv.');
+        }
 
         els.seasonSelect.innerHTML = seasons
           .map(season => `<option value="${season}">${season}</option>`)

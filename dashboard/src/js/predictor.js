@@ -21,6 +21,10 @@
     if (suffix) {
       candidatePaths.push(`${pathPrefix}/output/tables/${suffix}`);
       candidatePaths.push(`/output/tables/${suffix}`);
+      candidatePaths.push(`../../output/tables/${suffix}`);
+      candidatePaths.push(`./../../output/tables/${suffix}`);
+      candidatePaths.push(`../output/tables/${suffix}`);
+      candidatePaths.push(`./output/tables/${suffix}`);
     }
 
     const uniquePaths = [...new Set(candidatePaths.filter(Boolean))];
@@ -73,7 +77,7 @@
     const lines = String(text || '').trim().split(/\r?\n/);
     if (lines.length < 2) return [];
 
-    const headers = parseCSVLine(lines[0]);
+    const headers = parseCSVLine(lines[0]).map(h => h.replace(/^\uFEFF/, '').trim());
 
     return lines.slice(1).filter(line => line.trim()).map(line => {
       const cols = parseCSVLine(line);
