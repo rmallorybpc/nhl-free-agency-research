@@ -535,14 +535,14 @@
       }
 
       // Get the p-values for each test
-      const netAavP = parseFloat(modelCNetRow.p_value);
-      const contractP = parseFloat(modelDContractRow.p_value);
-      const retentionP = parseFloat(modelERetentionRow.p_value);
+      const netAavP = getPValue(modelCNetRow);
+      const contractP = getPValue(modelDContractRow);
+      const retentionP = getPValue(modelERetentionRow);
 
       // Get Model F results for the robustness note
-      const netAavFP = parseFloat(modelFNetRow.p_value);
-      const contractFP = parseFloat(modelFContractRow.p_value);
-      const retentionFP = parseFloat(modelFRetentionRow.p_value);
+      const netAavFP = getPValue(modelFNetRow);
+      const contractFP = getPValue(modelFContractRow);
+      const retentionFP = getPValue(modelFRetentionRow);
 
       if (!Number.isFinite(netAavP) || !Number.isFinite(contractP)
           || !Number.isFinite(retentionP) || !Number.isFinite(netAavFP)
