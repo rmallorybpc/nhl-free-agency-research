@@ -27,6 +27,42 @@
       line-height: 1.5;
       margin: 0;
     }
+    .impact-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      line-height: 1.3;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .impact-very-high {
+      background: var(--tmg-charcoal);
+      border-color: var(--tmg-charcoal);
+      color: var(--tmg-white);
+    }
+    .impact-high {
+      background: rgba(132,169,140,0.22);
+      border-color: rgba(132,169,140,0.45);
+      color: var(--tmg-charcoal);
+    }
+    .impact-medium {
+      background: rgba(132,169,140,0.13);
+      border-color: rgba(132,169,140,0.35);
+      color: var(--tmg-charcoal);
+    }
+    .impact-low {
+      background: rgba(45, 52, 54, 0.08);
+      border-color: rgba(45, 52, 54, 0.2);
+      color: rgba(45, 52, 54, 0.75);
+    }
+    .impact-unknown {
+      background: rgba(45, 52, 54, 0.08);
+      border-color: rgba(45, 52, 54, 0.2);
+      color: var(--tmg-charcoal);
+    }
   </style>
 </head>
 <body>
@@ -117,6 +153,94 @@ model_f_full <- lm(
           <li style="margin-bottom: 10px;"><strong>Alternate MIS weighting.</strong> Tier weights can be changed in R/03_feature_engineering/01_build_MIS.R, then all outputs are regenerated.</li>
           <li><strong>QA checks.</strong> Script validates row counts, dependent-variable range, and non-finite values before reporting coefficients.</li>
         </ul>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2" id="what-the-model-cant-see">What the model can't see</h2>
+        <p class="tmg-body">
+          The regression models explain roughly 19% of the variation in season-over-season team performance change. That leaves about 81% of team change driven by factors not in the data. This section is honest about what those factors are, why they matter, and what it would take to incorporate them.
+        </p>
+        <p class="tmg-body" style="margin-bottom: 0;">
+          Each category below is rated on potential impact - meaning the qualitative likelihood that adding the relevant data would meaningfully improve the model's predictive accuracy. The ratings are informed estimates based on hockey analytics research and domain knowledge. They are not numeric predictions, because the only way to know how much a new feature would explain is to actually build it.
+        </p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h3 class="tmg-h3">Injuries</h3>
+        <p class="tmg-body" style="margin-top: 0; margin-bottom: 10px;">
+          Loss of key players to injury is one of the most disruptive factors in team performance. When a top center or starting goalie misses 30+ games, team outcomes can swing dramatically regardless of offseason activity.
+        </p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Example:</strong> The 2025-26 Florida Panthers missed the playoffs after winning back-to-back Stanley Cups. Core players including Aleksander Barkov and Matthew Tkachuk missed significant time, and the Panthers had also played 314 games over the prior three seasons, the highest three-year total in NHL history.</p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Impact rating:</strong> <span class="impact-badge impact-very-high">Very High</span></p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Data needed:</strong> Per-player injury reports, games missed by player, and weighting by player importance (for example, ice time or salary as a proxy).</p>
+        <p class="tmg-body-sm" style="margin: 0;"><strong>Current status:</strong> Out of scope for V1.x. The closest existing analog is total team man-games lost to injury, which some analytics sites publish but is not in the current pipeline.</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h3 class="tmg-h3">Internal player development</h3>
+        <p class="tmg-body" style="margin-top: 0; margin-bottom: 10px;">
+          Young players often make meaningful year-over-year jumps, especially in seasons 2-4 of their careers. Team outcomes depend heavily on whether core prospects develop on schedule, and that progression is not captured in offseason UFA activity.
+        </p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Example:</strong> The 2025-26 Buffalo Sabres jumped from a 0.482 points percentage in 2024-25 to 0.665 in 2025-26, ending a 14-season playoff drought. The improvement was beyond what mean reversion alone predicts for a near-average team and reflected internal development plus improved goaltending.</p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Impact rating:</strong> <span class="impact-badge impact-very-high">Very High</span></p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Data needed:</strong> Per-player trajectory data, age curves, and identification of high-potential prospects by roster. The nhlscraper pipeline contains core player data, but turning it into development trajectories is a separate research build.</p>
+        <p class="tmg-body-sm" style="margin: 0;"><strong>Current status:</strong> Out of scope for V1.x. The original Dai behavioral economics framing at the player level is the natural V2 direction.</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h3 class="tmg-h3">Key player departures</h3>
+        <p class="tmg-body" style="margin-top: 0; margin-bottom: 10px;">
+          The model tracks who teams signed in UFA but only partially captures who they did not keep. Replacing one elite player with several modest contracts is a different bet than gross spending implies.
+        </p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Example:</strong> The 2025-26 Toronto Maple Leafs missed the playoffs for the first time in nine seasons after Mitch Marner departed via sign-and-trade to Vegas. They replaced his 102 points with three lesser forwards. Net AAV reflected lower dollar replacement, but not the quality asymmetry.</p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Impact rating:</strong> <span class="impact-badge impact-high">High</span></p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Data needed:</strong> Quality-weighted individual metrics for departing and replacement players, ideally including xGoals or RAPM-style measures.</p>
+        <p class="tmg-body-sm" style="margin: 0;"><strong>Current status:</strong> Partially in scope as of V1.1 through net AAV. Full quality-weighted departures are V2 scope.</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h3 class="tmg-h3">Trade activity</h3>
+        <p class="tmg-body" style="margin-top: 0; margin-bottom: 10px;">
+          This research covers UFA signings only. Trades, both offseason and deadline, represent a substantial share of player movement and can materially reshape a roster even when UFA activity is minimal.
+        </p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Example:</strong> Many contenders add meaningful talent at the deadline. The current model cannot distinguish a team that stood pat in UFA from one that made major March acquisitions, because neither appears in this dataset.</p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Impact rating:</strong> <span class="impact-badge impact-high">High</span></p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Data needed:</strong> Full trade transaction history including retained salary, draft-pick compensation, and quality metrics for assets on both sides.</p>
+        <p class="tmg-body-sm" style="margin: 0;"><strong>Current status:</strong> Out of scope for V1 by design. Trade deadline analysis is a V2 direction documented in the public roadmap.</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h3 class="tmg-h3">Coaching, systems, and culture</h3>
+        <p class="tmg-body" style="margin-top: 0; margin-bottom: 10px;">
+          Coaching changes, tactical systems, and team culture can move performance more than a single signing. These effects are real but difficult to quantify cleanly in a way that remains defensible as data-driven research.
+        </p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Example:</strong> The 2025-26 Maple Leafs hired Craig Berube and signaled a more defensive identity, yet still allowed 286 goals (second most in the league). The strategic intent and execution gap mattered, but neither appears directly in this model.</p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Impact rating:</strong> <span class="impact-badge impact-medium">Medium</span></p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Data needed:</strong> Coaching change indicators, system-style labels, and potentially proxy metrics such as year-over-year special-teams performance.</p>
+        <p class="tmg-body-sm" style="margin: 0;"><strong>Current status:</strong> Out of scope. This area would require qualitative judgment calls that are harder to keep strictly data-driven.</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h3 class="tmg-h3">Variance and luck</h3>
+        <p class="tmg-body" style="margin-top: 0; margin-bottom: 10px;">
+          Some variance is irreducible. Teams can play nearly the same hockey across seasons and still produce different records because of overtime outcomes, one-goal game bounces, and opponent context.
+        </p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Example:</strong> Many teams finish within +/-10 points of expectation based on underlying play. Teams that run above expectation in close games in year N often run below expectation in year N+1 without a meaningful change in play quality.</p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Impact rating:</strong> <span class="impact-badge impact-medium">Medium (but irreducible)</span></p>
+        <p class="tmg-body-sm" style="margin: 0 0 10px;"><strong>Data needed:</strong> Expected-goals models, PDO metrics, and other luck-adjusted indicators that separate process from outcomes.</p>
+        <p class="tmg-body-sm" style="margin: 0;"><strong>Current status:</strong> Out of scope for V1. A related V2 direction is using xGoals-based outcomes, which would partially regress out this variance.</p>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <p class="tmg-body" style="margin-top: 0;">
+          The 81% unexplained variance is not a model failure. It is an honest representation of how much of next-season performance is driven by factors outside the UFA market. The research deliberately scoped itself to offseason UFA activity to test one specific hypothesis: does spending in free agency predict team improvement? The answer, based on nine seasons of data, is that it does not.
+        </p>
+        <p class="tmg-body" style="margin-bottom: 0;">
+          Closing more of the gap would require new data and new research questions, several of which are documented on the
+          <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/roadmap.md"
+             target="_blank" rel="noreferrer" class="tmg-text-accent">project roadmap on GitHub</a>.
+          Each category above maps to a potential future study, but estimating how much each would improve the model requires the actual analysis. We do not put a number on what we have not yet built.
+        </p>
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
