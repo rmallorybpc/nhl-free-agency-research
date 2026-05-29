@@ -258,19 +258,51 @@
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">Does any of this predict team improvement?</h2>
         <p class="tmg-body">
-          Version 1.1 adds three UFA-side dimensions beyond gross spending: net spending
-          (what teams added minus what they lost), contract term behavior, and same-team
-          retention strategy. These additions test whether the original spending null result
-          changes once we account for departures, term commitment, and continuity decisions.
+          After the launch, three additional things were tested to see if
+          they predict whether a team gets better next season:
         </p>
-        <ol class="tmg-body" style="margin: 8px 0 16px 20px;">
-          <li><strong>Net spending</strong> - addresses replacement cases where teams lose high-value players and replace with several lower-value additions.</li>
-          <li><strong>Contract term</strong> - tests whether long-term commitments predict differently than short-term flexibility.</li>
-          <li><strong>Retention rate</strong> - tests whether teams that re-sign their own UFAs perform differently than teams that let UFAs walk.</li>
+
+        <ol class="tmg-body" style="margin-top: 12px;">
+          <li><strong>Net spending</strong> - what a team added in free
+          agency minus what they lost. The Toronto Maple Leafs raised this
+          question after they lost Mitch Marner's 102 points and never
+          matched that loss in their replacements.</li>
+
+          <li style="margin-top: 8px;"><strong>Contract length</strong> -
+          whether teams that lock in long-term deals fare differently than
+          teams that prefer flexibility.</li>
+
+          <li style="margin-top: 8px;"><strong>Retention</strong> - whether
+          teams that re-sign their own players fare differently than teams
+          that let them walk.</li>
         </ol>
-        <div id="v11Verdict" class="tmg-body">
-          Loading V1.1 verdicts...
+
+        <h3 class="tmg-h3" id="v11VerdictHeader" style="margin-top: 24px;">
+          Loading verdict...
+        </h3>
+
+        <table class="tmg-table" id="v11ResultsTable" style="margin-top: 16px;">
+          <thead>
+            <tr>
+              <th scope="col">What was tested</th>
+              <th scope="col">Did it predict team improvement?</th>
+            </tr>
+          </thead>
+          <tbody id="v11ResultsBody">
+            <tr><td colspan="2">Loading results...</td></tr>
+          </tbody>
+        </table>
+
+        <div id="v11Interpretation"
+             class="tmg-body"
+             style="margin-top: 20px; border-left:3px solid var(--tmg-sage);
+                    padding-left:16px;">
+          Loading interpretation...
         </div>
+
+        <p class="tmg-body" id="v11ModelFNote" style="margin-top: 16px;">
+          Loading model robustness note...
+        </p>
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
@@ -449,7 +481,10 @@
       const quartileBody = document.getElementById('quartileTableBody');
       const modelComparisonBody = document.getElementById('modelComparisonBody');
       const modelVerdict = document.getElementById('modelVerdict');
-      const v11Verdict = document.getElementById('v11Verdict');
+      const v11VerdictHeader = document.getElementById('v11VerdictHeader');
+      const v11ResultsBody = document.getElementById('v11ResultsBody');
+      const v11Interpretation = document.getElementById('v11Interpretation');
+      const v11ModelFNote = document.getElementById('v11ModelFNote');
       const geographyBody = document.getElementById('geographyOverallBody');
       if (f1) f1.innerHTML = fallbackHtml;
       if (f2) f2.innerHTML = fallbackHtml;
@@ -459,7 +494,10 @@
       if (quartileBody) quartileBody.innerHTML = '<tr><td colspan="4"><em>Quartile table temporarily unavailable.</em></td></tr>';
       if (modelComparisonBody) modelComparisonBody.innerHTML = '<tr><td colspan="5"><em>Model comparison table temporarily unavailable.</em></td></tr>';
       if (modelVerdict) modelVerdict.innerHTML = fallbackHtml;
-      if (v11Verdict) v11Verdict.innerHTML = fallbackHtml;
+      if (v11VerdictHeader) v11VerdictHeader.textContent = 'V1.1 findings unavailable right now.';
+      if (v11ResultsBody) v11ResultsBody.innerHTML = '<tr><td colspan="2"><em>V1.1 results table temporarily unavailable.</em></td></tr>';
+      if (v11Interpretation) v11Interpretation.innerHTML = fallbackHtml;
+      if (v11ModelFNote) v11ModelFNote.innerHTML = fallbackHtml;
       if (geographyBody) geographyBody.innerHTML = '<tr><td colspan="5"><em>Geography table temporarily unavailable.</em></td></tr>';
     }
 
@@ -482,69 +520,159 @@
       return 'var(--tmg-text-muted)';
     }
 
-    function renderV11Verdict(modelCFullRows, modelDFullRows, modelEFullRows, modelFFullRows) {
-      const netAav = getRowByTerm(modelCFullRows, 'net_aav');
-      const meanContract = getRowByTerm(modelDFullRows, 'mean_contract_years');
-      const pctRetained = getRowByTerm(modelEFullRows, 'pct_retained');
+    function renderV11Card(modelC, modelD, modelE, modelF) {
+      const modelCNetRow = modelC.find(r => r.term === 'net_aav');
+      const modelDContractRow = modelD.find(r => r.term === 'mean_contract_years');
+      const modelERetentionRow = modelE.find(r => r.term === 'pct_retained');
+      const modelFNetRow = modelF.find(r => r.term === 'net_aav');
+      const modelFContractRow = modelF.find(r => r.term === 'mean_contract_years');
+      const modelFRetentionRow = modelF.find(r => r.term === 'pct_retained');
 
-      if (!netAav || !meanContract || !pctRetained) {
+      if (!modelCNetRow || !modelDContractRow || !modelERetentionRow
+          || !modelFNetRow || !modelFContractRow || !modelFRetentionRow) {
         setFindingsFallback();
         return;
       }
 
-      const netBand = significanceBand(getPValue(netAav));
-      const termBand = significanceBand(getPValue(meanContract));
-      const retentionBand = significanceBand(getPValue(pctRetained));
+      // Get the p-values for each test
+      const netAavP = parseFloat(modelCNetRow.p_value);
+      const contractP = parseFloat(modelDContractRow.p_value);
+      const retentionP = parseFloat(modelERetentionRow.p_value);
 
-      const modelFTrackedTerms = modelFFullRows
-        .filter(r => ['net_aav', 'mean_contract_years', 'pct_retained'].includes(r.term))
-        .map(r => ({ term: r.term, band: significanceBand(getPValue(r)) }));
+      // Get Model F results for the robustness note
+      const netAavFP = parseFloat(modelFNetRow.p_value);
+      const contractFP = parseFloat(modelFContractRow.p_value);
+      const retentionFP = parseFloat(modelFRetentionRow.p_value);
 
-      const meaningfulInF = modelFTrackedTerms.filter(x => x.band.tone === 'success');
-      const suggestiveInF = modelFTrackedTerms.filter(x => x.band.tone === 'warning');
-
-      const termLabel = {
-        net_aav: 'Net spending',
-        mean_contract_years: 'Contract term',
-        pct_retained: 'Retention rate'
-      };
-
-      let kitchenSinkSummary = 'In Model F, none of the three variables are meaningful when tested together.';
-      if (meaningfulInF.length > 0) {
-        const names = meaningfulInF.map(x => termLabel[x.term]).join(', ');
-        kitchenSinkSummary = `In Model F, ${names} remains statistically meaningful when tested together.`;
-      } else if (suggestiveInF.length > 0) {
-        const names = suggestiveInF.map(x => termLabel[x.term]).join(', ');
-        kitchenSinkSummary = `In Model F, ${names} is suggestive but not statistically meaningful when tested together.`;
+      if (!Number.isFinite(netAavP) || !Number.isFinite(contractP)
+          || !Number.isFinite(retentionP) || !Number.isFinite(netAavFP)
+          || !Number.isFinite(contractFP) || !Number.isFinite(retentionFP)) {
+        setFindingsFallback();
+        return;
       }
 
-      const cards = [
-        { title: 'Net spending (Model C: net_aav)', band: netBand },
-        { title: 'Contract term (Model D: mean_contract_years)', band: termBand },
-        { title: 'Retention rate (Model E: pct_retained)', band: retentionBand }
-      ].map(item => `
-        <article class="tmg-card" style="padding: 14px; border-left: 4px solid ${toneColor(item.band.tone)}; margin-bottom: 10px;">
-          <p class="tmg-card-label" style="margin-bottom: 6px;">${item.title}</p>
-          <p class="tmg-card-value" style="color: ${toneColor(item.band.tone)}; font-size: 1rem;">${item.band.label}</p>
-          <p class="tmg-card-sub">${item.band.detail}</p>
-        </article>
+      // Translate p-values into plain-language verdicts
+      function verdictText(pvalue) {
+        if (pvalue < 0.05) {
+          return {
+            text: 'Yes - the data shows a clear relationship',
+            color: 'var(--tmg-success)',
+            category: 'meaningful'
+          };
+        } else if (pvalue < 0.10) {
+          return {
+            text: 'Suggestive but not strong enough to draw a conclusion',
+            color: 'var(--tmg-warning)',
+            category: 'suggestive'
+          };
+        } else {
+          return {
+            text: 'No - no meaningful pattern',
+            color: 'var(--tmg-text-muted)',
+            category: 'null'
+          };
+        }
+      }
+
+      const netAavVerdict = verdictText(netAavP);
+      const contractVerdict = verdictText(contractP);
+      const retentionVerdict = verdictText(retentionP);
+
+      // Count how many showed a meaningful result
+      const meaningfulCount = [netAavVerdict, contractVerdict, retentionVerdict]
+        .filter(v => v.category === 'meaningful').length;
+
+      // Build the header based on what was found
+      let headerText;
+      if (meaningfulCount === 0) {
+        headerText = 'None of the three changed the original finding.';
+      } else if (meaningfulCount === 1) {
+        headerText = 'One of the three actually mattered.';
+      } else if (meaningfulCount === 2) {
+        headerText = 'Two of the three turned out to matter.';
+      } else {
+        headerText = 'All three turned out to matter.';
+      }
+      document.getElementById('v11VerdictHeader').textContent = headerText;
+
+      // Build the results table
+      const tableRows = [
+        {
+          name: 'Net spending',
+          verdict: netAavVerdict
+        },
+        {
+          name: 'Contract length',
+          verdict: contractVerdict
+        },
+        {
+          name: 'Retention rate',
+          verdict: retentionVerdict
+        }
+      ];
+
+      const tableHtml = tableRows.map(row => `
+        <tr>
+          <td><strong>${row.name}</strong></td>
+          <td style="color: ${row.verdict.color}; font-weight: 500;">
+            ${row.verdict.text}
+          </td>
+        </tr>
       `).join('');
 
-      const allTones = [netBand.tone, termBand.tone, retentionBand.tone];
-      const headline = allTones.includes('success')
-        ? 'At least one V1.1 variable is statistically meaningful.'
-        : allTones.includes('warning')
-          ? 'V1.1 variables are suggestive but not definitively meaningful.'
-          : 'V1.1 variables do not show meaningful predictive signal.';
+      document.getElementById('v11ResultsBody').innerHTML = tableHtml;
 
-      const container = document.getElementById('v11Verdict');
-      if (container) {
-        container.innerHTML = `
-          <p><strong>${headline}</strong> The results below are generated directly from the latest regression outputs.</p>
-          ${cards}
-          <p style="margin-top: 12px;">${kitchenSinkSummary}</p>
+      // Build the interpretation paragraph based on what was found
+      let interpretation;
+
+      if (netAavVerdict.category === 'meaningful') {
+        interpretation = `
+          <p><strong>The net spending result is a meaningful update to
+          the original research.</strong> The launch post said spending
+          does not predict team improvement, and that is still true for
+          gross spending. But when you account for both what teams gain
+          AND lose in the same offseason, the relationship becomes real.</p>
+
+          <p style="margin-top: 12px;">In hockey terms: it is not how
+          much money you commit in July that matters. It is whether you
+          are adding more talent than you are losing. A team that signs
+          $20M in new players while losing $30M to other teams is in a
+          different position than a team that signs $20M while keeping
+          its core intact - even though their headline spending looks
+          identical.</p>
+        `;
+      } else {
+        // Net AAV did not turn out significant - different framing
+        interpretation = `
+          <p>None of the three new tests changed the original finding
+          that UFA-side activity does not reliably predict team
+          improvement. Even when accounting for player departures,
+          contract term, or retention strategy, the bulk of next-season
+          change still comes from factors outside the UFA market -
+          injuries, internal development, trades, and variance.</p>
         `;
       }
+
+      document.getElementById('v11Interpretation').innerHTML = interpretation;
+
+      // Build the Model F robustness note
+      let modelFNote;
+      if (netAavVerdict.category === 'meaningful' && netAavFP < 0.05) {
+        modelFNote = 'This net spending relationship held up when all '
+                   + 'three new measures were tested together.';
+      } else if (netAavVerdict.category === 'meaningful' && netAavFP >= 0.05) {
+        modelFNote = 'When all three new measures were tested together, '
+                   + 'the net spending relationship became less clear, '
+                   + 'suggesting it overlaps with the other measures.';
+      } else if (meaningfulCount > 0) {
+        modelFNote = 'When all three new measures were tested together, '
+                   + 'the strongest relationship was the one shown above.';
+      } else {
+        modelFNote = 'Testing all three measures together did not change '
+                   + 'the conclusion.';
+      }
+
+      document.getElementById('v11ModelFNote').textContent = modelFNote;
     }
 
     function renderModelComparisonTable(modelSummary, mAFull, mBFull, mARest, mBRest) {
@@ -1124,7 +1252,7 @@
       );
 
       if (modelCFullRows.length && modelDFullRows.length && modelEFullRows.length && modelFFullRows.length) {
-        renderV11Verdict(modelCFullRows, modelDFullRows, modelEFullRows, modelFFullRows);
+        renderV11Card(modelCFullRows, modelDFullRows, modelEFullRows, modelFFullRows);
       } else {
         setFindingsFallback();
         return;
