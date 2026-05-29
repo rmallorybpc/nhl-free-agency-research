@@ -63,6 +63,9 @@
         <p class="tmg-body">
           Core analysis script: <strong>R/04_analysis/02_regression_models.R</strong>. Outcome is points percentage change: points_pct_change = points_percentage - prior_season_points_pct.
         </p>
+        <p class="tmg-body" style="margin-top: 10px;">
+          Version 1.1 adds three team-season variables from existing UFA transaction data: <strong>net_aav</strong> (acquired AAV minus departed AAV), contract term features (<strong>mean_contract_years</strong>, <strong>count_long_term</strong>), and retention strategy (<strong>pct_retained</strong>). These additions test whether departures, term commitment, and continuity explain performance change beyond the original gross-spending and MIS models.
+        </p>
         <pre class="methods-code" aria-label="Exact regression commands"><code>model_a_full <- lm(
   points_pct_change ~ total_aav_spent + prior_season_points_pct + season_type + cap_ceiling_change,
   data = panel_full
@@ -81,6 +84,26 @@ model_a_restricted <- lm(
 model_b_restricted <- lm(
   points_pct_change ~ total_mis + prior_season_points_pct + season_type + cap_ceiling_change,
   data = panel_restricted
+)
+
+model_c_full <- lm(
+  points_pct_change ~ net_aav + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_full
+)
+
+model_d_full <- lm(
+  points_pct_change ~ total_mis + mean_contract_years + count_long_term + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_full
+)
+
+model_e_full <- lm(
+  points_pct_change ~ total_mis + pct_retained + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_full
+)
+
+model_f_full <- lm(
+  points_pct_change ~ net_aav + mean_contract_years + pct_retained + prior_season_points_pct + season_type + cap_ceiling_change,
+  data = panel_full
 )</code></pre>
         <p class="tmg-body" style="margin-top:12px;">
           Standard errors and p-values are the default OLS standard errors from R <strong>lm()</strong> + <strong>broom::tidy()</strong> in Version 1.

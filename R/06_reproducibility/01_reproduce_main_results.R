@@ -11,6 +11,9 @@ pipeline_scripts <- c(
   here::here("R", "03_feature_engineering", "01_build_MIS.R"),
   here::here("R", "03_feature_engineering", "02_build_cap_variables.R"),
   here::here("R", "03_feature_engineering", "03_build_geography.R"),
+  here::here("R", "03_feature_engineering", "05_build_net_aav.R"),
+  here::here("R", "03_feature_engineering", "06_build_contract_length.R"),
+  here::here("R", "03_feature_engineering", "07_build_retention.R"),
   here::here("R", "03_feature_engineering", "04_build_master_panel.R"),
   here::here("R", "04_analysis", "01_descriptive_stats.R"),
   here::here("R", "04_analysis", "02_regression_models.R"),
@@ -35,4 +38,12 @@ cat("- output/tables/model_a_full_coefficients.csv\n")
 cat("- output/tables/model_b_full_coefficients.csv\n")
 cat("- output/tables/model_a_restricted_coefficients.csv\n")
 cat("- output/tables/model_b_restricted_coefficients.csv\n")
+cat("- output/tables/model_c_full_coefficients.csv\n")
+cat("- output/tables/model_c_restricted_coefficients.csv\n")
+cat("- output/tables/model_d_full_coefficients.csv\n")
+cat("- output/tables/model_d_restricted_coefficients.csv\n")
+cat("- output/tables/model_e_full_coefficients.csv\n")
+cat("- output/tables/model_e_restricted_coefficients.csv\n")
+cat("- output/tables/model_f_full_coefficients.csv\n")
+cat("- output/tables/model_f_restricted_coefficients.csv\n")
 cat("- output/tables/model_comparison_summary.csv\n")

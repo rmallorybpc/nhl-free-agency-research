@@ -256,6 +256,24 @@
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
+        <h2 class="tmg-h2">Does any of this predict team improvement?</h2>
+        <p class="tmg-body">
+          Version 1.1 adds three UFA-side dimensions beyond gross spending: net spending
+          (what teams added minus what they lost), contract term behavior, and same-team
+          retention strategy. These additions test whether the original spending null result
+          changes once we account for departures, term commitment, and continuity decisions.
+        </p>
+        <ol class="tmg-body" style="margin: 8px 0 16px 20px;">
+          <li><strong>Net spending</strong> - addresses replacement cases where teams lose high-value players and replace with several lower-value additions.</li>
+          <li><strong>Contract term</strong> - tests whether long-term commitments predict differently than short-term flexibility.</li>
+          <li><strong>Retention rate</strong> - tests whether teams that re-sign their own UFAs perform differently than teams that let UFAs walk.</li>
+        </ol>
+        <div id="v11Verdict" class="tmg-body">
+          Loading V1.1 verdicts...
+        </div>
+      </section>
+
+      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">What the null result does and does not mean</h2>
         <p class="tmg-body">
           Offseason spending is not the primary driver of whether an NHL team improves next season. The strongest predictor is where they started. Teams and analysts who attribute a team's improvement primarily to their offseason moves should consider how much of that improvement would have happened regardless.
@@ -431,6 +449,7 @@
       const quartileBody = document.getElementById('quartileTableBody');
       const modelComparisonBody = document.getElementById('modelComparisonBody');
       const modelVerdict = document.getElementById('modelVerdict');
+      const v11Verdict = document.getElementById('v11Verdict');
       const geographyBody = document.getElementById('geographyOverallBody');
       if (f1) f1.innerHTML = fallbackHtml;
       if (f2) f2.innerHTML = fallbackHtml;
@@ -440,7 +459,92 @@
       if (quartileBody) quartileBody.innerHTML = '<tr><td colspan="4"><em>Quartile table temporarily unavailable.</em></td></tr>';
       if (modelComparisonBody) modelComparisonBody.innerHTML = '<tr><td colspan="5"><em>Model comparison table temporarily unavailable.</em></td></tr>';
       if (modelVerdict) modelVerdict.innerHTML = fallbackHtml;
+      if (v11Verdict) v11Verdict.innerHTML = fallbackHtml;
       if (geographyBody) geographyBody.innerHTML = '<tr><td colspan="5"><em>Geography table temporarily unavailable.</em></td></tr>';
+    }
+
+    function significanceBand(pValue) {
+      if (!Number.isFinite(pValue)) {
+        return { label: 'not meaningful', tone: 'muted', detail: 'p unavailable' };
+      }
+      if (pValue < 0.05) {
+        return { label: 'statistically meaningful', tone: 'success', detail: `p = ${pValue.toFixed(3)}` };
+      }
+      if (pValue < 0.10) {
+        return { label: 'suggestive', tone: 'warning', detail: `p = ${pValue.toFixed(3)}` };
+      }
+      return { label: 'not meaningful', tone: 'muted', detail: `p = ${pValue.toFixed(3)}` };
+    }
+
+    function toneColor(tone) {
+      if (tone === 'success') return 'var(--tmg-success)';
+      if (tone === 'warning') return 'var(--tmg-warning)';
+      return 'var(--tmg-text-muted)';
+    }
+
+    function renderV11Verdict(modelCFullRows, modelDFullRows, modelEFullRows, modelFFullRows) {
+      const netAav = getRowByTerm(modelCFullRows, 'net_aav');
+      const meanContract = getRowByTerm(modelDFullRows, 'mean_contract_years');
+      const pctRetained = getRowByTerm(modelEFullRows, 'pct_retained');
+
+      if (!netAav || !meanContract || !pctRetained) {
+        setFindingsFallback();
+        return;
+      }
+
+      const netBand = significanceBand(getPValue(netAav));
+      const termBand = significanceBand(getPValue(meanContract));
+      const retentionBand = significanceBand(getPValue(pctRetained));
+
+      const modelFTrackedTerms = modelFFullRows
+        .filter(r => ['net_aav', 'mean_contract_years', 'pct_retained'].includes(r.term))
+        .map(r => ({ term: r.term, band: significanceBand(getPValue(r)) }));
+
+      const meaningfulInF = modelFTrackedTerms.filter(x => x.band.tone === 'success');
+      const suggestiveInF = modelFTrackedTerms.filter(x => x.band.tone === 'warning');
+
+      const termLabel = {
+        net_aav: 'Net spending',
+        mean_contract_years: 'Contract term',
+        pct_retained: 'Retention rate'
+      };
+
+      let kitchenSinkSummary = 'In Model F, none of the three variables are meaningful when tested together.';
+      if (meaningfulInF.length > 0) {
+        const names = meaningfulInF.map(x => termLabel[x.term]).join(', ');
+        kitchenSinkSummary = `In Model F, ${names} remains statistically meaningful when tested together.`;
+      } else if (suggestiveInF.length > 0) {
+        const names = suggestiveInF.map(x => termLabel[x.term]).join(', ');
+        kitchenSinkSummary = `In Model F, ${names} is suggestive but not statistically meaningful when tested together.`;
+      }
+
+      const cards = [
+        { title: 'Net spending (Model C: net_aav)', band: netBand },
+        { title: 'Contract term (Model D: mean_contract_years)', band: termBand },
+        { title: 'Retention rate (Model E: pct_retained)', band: retentionBand }
+      ].map(item => `
+        <article class="tmg-card" style="padding: 14px; border-left: 4px solid ${toneColor(item.band.tone)}; margin-bottom: 10px;">
+          <p class="tmg-card-label" style="margin-bottom: 6px;">${item.title}</p>
+          <p class="tmg-card-value" style="color: ${toneColor(item.band.tone)}; font-size: 1rem;">${item.band.label}</p>
+          <p class="tmg-card-sub">${item.band.detail}</p>
+        </article>
+      `).join('');
+
+      const allTones = [netBand.tone, termBand.tone, retentionBand.tone];
+      const headline = allTones.includes('success')
+        ? 'At least one V1.1 variable is statistically meaningful.'
+        : allTones.includes('warning')
+          ? 'V1.1 variables are suggestive but not definitively meaningful.'
+          : 'V1.1 variables do not show meaningful predictive signal.';
+
+      const container = document.getElementById('v11Verdict');
+      if (container) {
+        container.innerHTML = `
+          <p><strong>${headline}</strong> The results below are generated directly from the latest regression outputs.</p>
+          ${cards}
+          <p style="margin-top: 12px;">${kitchenSinkSummary}</p>
+        `;
+      }
     }
 
     function renderModelComparisonTable(modelSummary, mAFull, mBFull, mARest, mBRest) {
@@ -961,6 +1065,10 @@
       fetchCsvSafe(coefficientUrlCandidates('model_b_full_coefficients.csv'), 'model_b_full_coefficients.csv'),
       fetchCsvSafe(coefficientUrlCandidates('model_a_restricted_coefficients.csv'), 'model_a_restricted_coefficients.csv'),
       fetchCsvSafe(coefficientUrlCandidates('model_b_restricted_coefficients.csv'), 'model_b_restricted_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_c_full_coefficients.csv'), 'model_c_full_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_d_full_coefficients.csv'), 'model_d_full_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_e_full_coefficients.csv'), 'model_e_full_coefficients.csv'),
+      fetchCsvSafe(coefficientUrlCandidates('model_f_full_coefficients.csv'), 'model_f_full_coefficients.csv'),
       fetchCsvSafe(coefficientUrlCandidates('quartile_summary.csv'), 'quartile_summary.csv'),
       fetchCsvSafe(coefficientUrlCandidates('quartile_examples.csv'), 'quartile_examples.csv'),
       fetchCsvSafe(coefficientUrlCandidates('geography_overall_summary.csv'), 'geography_overall_summary.csv'),
@@ -972,6 +1080,10 @@
       modelBFullCsv,
       modelARestrictedCsv,
       modelBRestrictedCsv,
+      modelCFullCsv,
+      modelDFullCsv,
+      modelEFullCsv,
+      modelFFullCsv,
       quartileSummaryCsv,
       quartileExamplesCsv,
       geoOverallCsv,
@@ -988,6 +1100,10 @@
       const modelBFullRows = parseCsv(modelBFullCsv);
       const modelARestrictedRows = parseCsv(modelARestrictedCsv);
       const modelBRestrictedRows = parseCsv(modelBRestrictedCsv);
+      const modelCFullRows = modelCFullCsv ? parseCsv(modelCFullCsv) : [];
+      const modelDFullRows = modelDFullCsv ? parseCsv(modelDFullCsv) : [];
+      const modelEFullRows = modelEFullCsv ? parseCsv(modelEFullCsv) : [];
+      const modelFFullRows = modelFFullCsv ? parseCsv(modelFFullCsv) : [];
 
       renderModelComparisonTable(
         modelComparisonRows,
@@ -1006,6 +1122,13 @@
         modelBRestrictedRows,
         modelComparisonRows
       );
+
+      if (modelCFullRows.length && modelDFullRows.length && modelEFullRows.length && modelFFullRows.length) {
+        renderV11Verdict(modelCFullRows, modelDFullRows, modelEFullRows, modelFFullRows);
+      } else {
+        setFindingsFallback();
+        return;
+      }
 
       if (quartileSummaryCsv && quartileExamplesCsv) {
         const summaryParsed = parseCsv(quartileSummaryCsv);

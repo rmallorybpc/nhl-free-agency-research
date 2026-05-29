@@ -84,11 +84,85 @@ if (restricted_has_season_type_variation) {
 	)
 }
 
+# Model C Full replaces gross spending with net spending (acquired minus departed).
+model_c_full <- lm(
+	points_pct_change ~ net_aav + prior_season_points_pct + season_type + cap_ceiling_change,
+	data = panel_full
+)
+
+# Model D Full adds contract-length behavior to MIS.
+model_d_full <- lm(
+	points_pct_change ~ total_mis + mean_contract_years + count_long_term + prior_season_points_pct + season_type + cap_ceiling_change,
+	data = panel_full
+)
+
+# Model E Full adds same-team retention strategy to MIS.
+model_e_full <- lm(
+	points_pct_change ~ total_mis + pct_retained + prior_season_points_pct + season_type + cap_ceiling_change,
+	data = panel_full
+)
+
+# Model F Full jointly tests net spending, contract term, and retention strategy.
+model_f_full <- lm(
+	points_pct_change ~ net_aav + mean_contract_years + pct_retained + prior_season_points_pct + season_type + cap_ceiling_change,
+	data = panel_full
+)
+
+if (restricted_has_season_type_variation) {
+	model_c_restricted <- lm(
+		points_pct_change ~ net_aav + prior_season_points_pct + season_type + cap_ceiling_change,
+		data = panel_restricted
+	)
+
+	model_d_restricted <- lm(
+		points_pct_change ~ total_mis + mean_contract_years + count_long_term + prior_season_points_pct + season_type + cap_ceiling_change,
+		data = panel_restricted
+	)
+
+	model_e_restricted <- lm(
+		points_pct_change ~ total_mis + pct_retained + prior_season_points_pct + season_type + cap_ceiling_change,
+		data = panel_restricted
+	)
+
+	model_f_restricted <- lm(
+		points_pct_change ~ net_aav + mean_contract_years + pct_retained + prior_season_points_pct + season_type + cap_ceiling_change,
+		data = panel_restricted
+	)
+} else {
+	model_c_restricted <- lm(
+		points_pct_change ~ net_aav + prior_season_points_pct + cap_ceiling_change,
+		data = panel_restricted
+	)
+
+	model_d_restricted <- lm(
+		points_pct_change ~ total_mis + mean_contract_years + count_long_term + prior_season_points_pct + cap_ceiling_change,
+		data = panel_restricted
+	)
+
+	model_e_restricted <- lm(
+		points_pct_change ~ total_mis + pct_retained + prior_season_points_pct + cap_ceiling_change,
+		data = panel_restricted
+	)
+
+	model_f_restricted <- lm(
+		points_pct_change ~ net_aav + mean_contract_years + pct_retained + prior_season_points_pct + cap_ceiling_change,
+		data = panel_restricted
+	)
+}
+
 model_objects <- list(
 	"Model A Full" = model_a_full,
 	"Model B Full" = model_b_full,
 	"Model A Restricted" = model_a_restricted,
-	"Model B Restricted" = model_b_restricted
+	"Model B Restricted" = model_b_restricted,
+	"Model C Full" = model_c_full,
+	"Model C Restricted" = model_c_restricted,
+	"Model D Full" = model_d_full,
+	"Model D Restricted" = model_d_restricted,
+	"Model E Full" = model_e_full,
+	"Model E Restricted" = model_e_restricted,
+	"Model F Full" = model_f_full,
+	"Model F Restricted" = model_f_restricted
 )
 
 tidy_outputs <- imap(model_objects, ~ tidy(.x) %>% mutate(model_name = .y))
@@ -99,15 +173,34 @@ write_csv(tidy_outputs[["Model A Full"]], file.path(output_dir, "model_a_full_co
 write_csv(tidy_outputs[["Model B Full"]], file.path(output_dir, "model_b_full_coefficients.csv"))
 write_csv(tidy_outputs[["Model A Restricted"]], file.path(output_dir, "model_a_restricted_coefficients.csv"))
 write_csv(tidy_outputs[["Model B Restricted"]], file.path(output_dir, "model_b_restricted_coefficients.csv"))
+write_csv(tidy_outputs[["Model C Full"]], file.path(output_dir, "model_c_full_coefficients.csv"))
+write_csv(tidy_outputs[["Model C Restricted"]], file.path(output_dir, "model_c_restricted_coefficients.csv"))
+write_csv(tidy_outputs[["Model D Full"]], file.path(output_dir, "model_d_full_coefficients.csv"))
+write_csv(tidy_outputs[["Model D Restricted"]], file.path(output_dir, "model_d_restricted_coefficients.csv"))
+write_csv(tidy_outputs[["Model E Full"]], file.path(output_dir, "model_e_full_coefficients.csv"))
+write_csv(tidy_outputs[["Model E Restricted"]], file.path(output_dir, "model_e_restricted_coefficients.csv"))
+write_csv(tidy_outputs[["Model F Full"]], file.path(output_dir, "model_f_full_coefficients.csv"))
+write_csv(tidy_outputs[["Model F Restricted"]], file.path(output_dir, "model_f_restricted_coefficients.csv"))
 
 comparison_summary <- glance_outputs %>%
-	select(model_name, r.squared, adj.r.squared, AIC, BIC, nobs)
+	transmute(model_name, r.squared, adj.r.squared, AIC, BIC, N = nobs)
 
 write_csv(comparison_summary, file.path(output_dir, "model_comparison_summary.csv"))
 
 extract_primary_significance <- function(tidy_df) {
+	primary_term_priority <- c(
+		"total_aav_spent",
+		"total_mis",
+		"net_aav",
+		"mean_contract_years",
+		"count_long_term",
+		"pct_retained"
+	)
+
 	primary_row <- tidy_df %>%
-		filter(term %in% c("total_mis", "total_aav_spent")) %>%
+		filter(term %in% primary_term_priority) %>%
+		mutate(priority_rank = match(term, primary_term_priority)) %>%
+		arrange(priority_rank) %>%
 		slice_head(n = 1)
 
 	if (nrow(primary_row) == 0) {
@@ -227,6 +320,7 @@ completion_summary <- comparison_console %>%
 		model_name,
 		adj_r_squared = round(adj.r.squared, 6),
 		primary_variable,
+		primary_p_value = round(primary_p_value, 6),
 		significance = case_when(
 			primary_sig_p_lt_0_05 == "Yes" ~ "p < 0.05",
 			primary_sig_p_lt_0_10 == "Yes" ~ "p < 0.10",
@@ -241,7 +335,20 @@ for (i in seq_len(nrow(completion_summary))) {
 		row$model_name,
 		"| adj. R^2 =", row$adj_r_squared,
 		"|", row$primary_variable,
+		"(p =", row$primary_p_value, ")",
 		"significance:", row$significance,
 		"\n"
 	)
 }
+
+adj_r2_table <- comparison_summary %>%
+	transmute(
+		model_name,
+		adj_r_squared = round(adj.r.squared, 6),
+		AIC = round(AIC, 3),
+		N = as.integer(N)
+	) %>%
+	arrange(match(model_name, names(model_objects)))
+
+cat("\n=== Adjusted R^2 Side-by-Side ===\n")
+print(adj_r2_table, n = Inf)

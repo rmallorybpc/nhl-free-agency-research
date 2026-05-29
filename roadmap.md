@@ -29,9 +29,22 @@ Key findings:
 - Offseason UFA spending does not reliably predict team improvement,
   whether measured in raw dollars or a position-weighted Movement Impact
   Score
+- Net spending (acquired minus departed UFA AAV) shows a meaningful
+  relationship with team improvement in V1.1 model extensions
+- Contract-term and retention-rate features are weaker signals in V1.1:
+  contract term is not meaningful and retention is suggestive in one
+  restricted specification
 - Movement geography (within division, cross conference) does not reliably
   predict improvement either
 - Findings hold when the COVID-affected 2020 and 2021 seasons are excluded
+
+V1.1 shipped methodological completions:
+- Net AAV feature (`net_aav`)
+- Contract-length distribution features (`mean_contract_years`,
+  `max_contract_years`, `count_long_term`, `weighted_avg_years`)
+- Same-team retention features (`pct_retained`, `pct_aav_retained`)
+- Regression expansion from 4 to 12 models (A/B/C/D/E/F, full + restricted)
+- Dynamic findings-page verdicts sourced from the updated model outputs
 
 Deliberately out of scope in V1: trade deadline activity, restricted free
 agents, AHL call-ups, entry-level signings, playoff performance, and
@@ -51,7 +64,7 @@ These add new analysis or new data to the research itself.
 |---|---|---|
 | Trade deadline analysis (rentals vs term acquisitions) | Large | The most natural next study. Requires a new movement-event taxonomy, mid-season data, and retained-salary tracking. The March deadline creates a clean before/after window |
 | RFA signings analysis | Small | Restricted free agent data is already extracted in the raw file. Unfilter and flag it to compare RFA vs UFA outcomes. Good entry point for a contributor |
-| Contract length vs team outcome | Small | Existing data has contract_years. A descriptive analysis of whether longer deals correlate with team change. Another good entry point |
+| Contract length vs team outcome | Done in V1.1 | Implemented as model features (`mean_contract_years`, `count_long_term`). Future work could test nonlinear effects or interaction terms |
 | ELC / top prospect signings | Medium | The high-impact rookie class (e.g., a franchise prospect signing). Define a prospect threshold and flag separately |
 | Age + contract length efficiency | Large | Requires extracting player age (Spotrac pages or nhlscraper bios) and defining a contract-efficiency outcome. Connects to aging-curve literature. Arguably its own study rather than an extension |
 | Individual player reset effect | Large | The original behavioral economics framing (Hengchen Dai) applied at the player level rather than the team level. Needs per-player performance before and after a move |
@@ -127,5 +140,5 @@ sources.
 
 ---
 
-*Roadmap maintained as of the V1 project close, May 2026. The research
+*Roadmap updated after V1.1 release, May 2026. The research
 methodology and scope decisions are documented in METHODS.md.*

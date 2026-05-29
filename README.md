@@ -20,6 +20,15 @@ Live dashboard: https://rmallorybpc.github.io/nhl-free-agency-research/
 
 Bottom line: **starting team quality is usually more predictive than total UFA spending.**
 
+## Latest update (V1.1, May 2026)
+
+- Added net spending (`net_aav`), contract-term features, and same-team retention rate to the team-season model.
+- Re-ran and expanded the regression suite from 4 to 12 specifications (full + COVID-restricted variants).
+- Main update: net spending shows a meaningful relationship with next-season change; contract term and retention are weaker signals in this Version 1.1 setup.
+- Updated dashboard findings language to load verdicts dynamically from current model output tables.
+
+See [CHANGELOG.md](CHANGELOG.md) for a concise release entry and [METHODS.md](METHODS.md) for exact formulas and scripts.
+
 ## Why this project exists
 
 Offseason narratives often focus on who spent the most and who "won July." This project tests whether those narratives hold up when evaluated across multiple seasons and all teams.
