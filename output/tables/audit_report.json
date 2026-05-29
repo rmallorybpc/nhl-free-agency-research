@@ -1,5 +1,5 @@
 {
-  "audit_timestamp": "2026-05-28T14:01:27.630Z",
+  "audit_timestamp": "2026-05-29T14:08:17.254Z",
   "audit_version": "1.0",
   "site_base_url": "https://rmallorybpc.github.io/nhl-free-agency-research",
   "mode": "ci",
@@ -335,8 +335,14 @@
       "name": "CSV data integrity",
       "status": "fail",
       "checks_run": 31,
-      "issues_found": 2,
+      "issues_found": 4,
       "details": [
+        {
+          "page": "data/processed/nhl_master_analysis_panel.csv",
+          "severity": "warning",
+          "message": "Row count mismatch",
+          "context": "Expected 284, found 252."
+        },
         {
           "page": "data/processed/nhl_signed_free_agents_clean.csv",
           "severity": "warning",
@@ -348,6 +354,12 @@
           "severity": "error",
           "message": "CSV file missing",
           "context": "Expected file could not be loaded."
+        },
+        {
+          "page": "output/tables/model_comparison_summary.csv",
+          "severity": "warning",
+          "message": "Row count mismatch",
+          "context": "Expected 4, found 12."
         }
       ],
       "notes": [
