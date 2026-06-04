@@ -1,5 +1,7 @@
 # NHL Free Agency Research
 
+[![Automated Site Audit](https://github.com/rmallorybpc/nhl-free-agency-research/actions/workflows/audit.yml/badge.svg?branch=main)](https://github.com/rmallorybpc/nhl-free-agency-research/actions/workflows/audit.yml)
+
 An applied sports analytics project built around one front-office question:
 
 **Does spending in NHL unrestricted free agency (UFA) predict team improvement the next season?**

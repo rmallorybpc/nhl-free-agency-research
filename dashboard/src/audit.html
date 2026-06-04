@@ -181,14 +181,6 @@
       </section>
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
-        <h2 class="tmg-h2">Last run</h2>
-        <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
-          <li><strong>Last run:</strong> 2026-05-22 12:45 MDT</li>
-          <li><strong>Summary:</strong> Historical snapshot shown below; use the latest generated audit report for current totals.</li>
-        </ul>
-      </section>
-
-      <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">How the audit works</h2>
         <p class="tmg-body">
           The audit performs a set of reproducible checks against the site and the data files referenced in the repo. It
@@ -200,73 +192,58 @@
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">Checks performed</h2>
+        <p class="tmg-body-sm tmg-text-muted" style="margin-top:0;">
+          This table defines what each check evaluates. The current results and last-run timestamp are loaded from the committed audit report in <strong>Live results</strong>.
+        </p>
         <div style="overflow-x:auto;">
           <table class="tmg-table">
             <thead>
               <tr>
                 <th>Check</th>
                 <th>What it tests</th>
-                <th>Status</th>
-                <th>Severity</th>
-                <th>Notes</th>
+                <th>Implementation detail</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Broken internal links</td>
                 <td>Pages and assets return 200</td>
-                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
-                <td><span class="audit-pill audit-pill-info">Info</span></td>
-                <td>No broken internal links detected in the latest audit report.</td>
+                <td>Checks internal page and asset targets referenced by the dashboard.</td>
               </tr>
               <tr>
                 <td>Dataset schema validation</td>
                 <td>Required columns present and types</td>
-                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
-                <td><span class="audit-pill audit-pill-info">Info</span></td>
-                <td>All required columns found in <code>ufas_2018-2023.csv</code></td>
+                <td>Validates key columns in <code>data/processed/nhl_signed_free_agents_clean.csv</code> and verifies expected offseason year coverage.</td>
               </tr>
               <tr>
                 <td>Missing contract values</td>
                 <td>Percent of signings with null contract value</td>
-                <td><span class="audit-pill audit-pill-warning">Warn</span></td>
-                <td><span class="audit-pill audit-pill-warning">High</span></td>
-                <td>3.2% missing in 2021; see remediation. <a href="https://github.com/rmallorybpc/nhl-free-agency-research/issues/new?title=Audit%20remediation%3A%20Missing%20contract%20values&body=Failing%20check%3A%20Missing%20contract%20values%0ATimestamp%3A%202026-05-22%2012%3A45%20MDT%0ASuggested%20fix%3A%20Review%202021%20rows%20and%20impute%20or%20fill%20contract%20values" target="_blank" rel="noopener noreferrer">Remediation</a></td>
+                <td>Flags missing values in key contract fields so incomplete rows are visible before modeling.</td>
               </tr>
               <tr>
                 <td>Duplicate transactions</td>
                 <td>Exact duplicate rows in signings table</td>
-                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
-                <td><span class="audit-pill audit-pill-info">Info</span></td>
-                <td>No duplicates found</td>
+                <td>Scans expected CSVs for duplicates that can inflate counts or spending totals.</td>
               </tr>
               <tr>
                 <td>MIS calculation check</td>
                 <td>MIS formula applied and totals match</td>
-                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
-                <td><span class="audit-pill audit-pill-info">Info</span></td>
-                <td>MIS sums match expected totals</td>
+                <td>Checks derived movement metrics used by downstream analyses for structural consistency.</td>
               </tr>
               <tr>
                 <td>Unrendered placeholders</td>
                 <td>Loading spinners or JS errors</td>
-                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
-                <td><span class="audit-pill audit-pill-info">Info</span></td>
-                <td>No placeholders detected</td>
+                <td>Detects unresolved loading placeholders in page HTML.</td>
               </tr>
               <tr>
                 <td>External link health</td>
                 <td>Spotrac, NHL API endpoints reachable</td>
-                <td><span class="audit-pill audit-pill-warning">Warn</span></td>
-                <td><span class="audit-pill audit-pill-warning">Medium</span></td>
-                <td>Spotrac rate-limited during check. <a href="https://github.com/rmallorybpc/nhl-free-agency-research/issues/new?title=Audit%20remediation%3A%20External%20link%20health&body=Failing%20check%3A%20External%20link%20health%0ATimestamp%3A%202026-05-22%2012%3A45%20MDT%0ASuggested%20fix%3A%20Retry%20check%20or%20add%20rate-limit%20handling%20for%20Spotrac" target="_blank" rel="noopener noreferrer">Remediation</a></td>
+                <td>Performs best-effort reachability checks for external dependencies.</td>
               </tr>
               <tr>
                 <td>Accessibility quick check</td>
                 <td>Images have alt text</td>
-                <td><span class="audit-pill audit-pill-pass">Pass</span></td>
-                <td><span class="audit-pill audit-pill-info">Low</span></td>
-                <td>Minor missing alt text on team logos</td>
+                <td>Flags images with missing or empty alt text for accessibility review.</td>
               </tr>
             </tbody>
           </table>
@@ -306,7 +283,7 @@
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);" aria-live="polite">
         <h2 class="tmg-h2">Live results</h2>
-        <p class="tmg-body-sm tmg-text-muted" id="automatedMeta">Loading latest audit report...</p>
+        <p class="tmg-body-sm tmg-text-muted" id="automatedMeta">Loading latest committed audit report...</p>
         <div class="audit-summary-grid" id="automatedSummaryTiles"></div>
         <div style="overflow-x:auto; margin-top:12px;">
           <table class="tmg-table" id="auditResultsTable">
@@ -330,9 +307,18 @@
 
       <section class="tmg-card-wide" style="margin-bottom: var(--tmg-gap);">
         <h2 class="tmg-h2">CI integration</h2>
+        <p class="tmg-body-sm" style="margin:0 0 10px;">
+          <a href="https://github.com/rmallorybpc/nhl-free-agency-research/actions/workflows/audit.yml" target="_blank" rel="noopener noreferrer" aria-label="Automated Site Audit workflow status">
+            <img src="https://github.com/rmallorybpc/nhl-free-agency-research/actions/workflows/audit.yml/badge.svg?branch=main" alt="Automated Site Audit workflow status" />
+          </a>
+        </p>
         <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
-          <li>Recommended: add this audit to GitHub Actions so it runs on every push and opens a PR for critical failures.</li>
-          <li>Example workflow: <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/.github/workflows/audit.yml" target="_blank" rel="noopener noreferrer">.github/workflows/audit.yml</a>.</li>
+          <li>The audit is already automated in GitHub Actions and runs on every push to <code>main</code>, on a weekly schedule, and on manual dispatch.</li>
+          <li>The workflow runs <code>npm run audit</code> and commits updated <code>output/tables/audit_report.json</code> directly when the report changes.</li>
+          <li>A strict quality-gate job runs on scheduled runs (and optional manual strict runs) and fails the workflow when audit failures are present.</li>
+          <li>Current failure behavior: the report records failing checks, and strict-gate executions can fail the workflow run. The workflow does not open PRs automatically.</li>
+          <li>Workflow file: <a href="https://github.com/rmallorybpc/nhl-free-agency-research/blob/main/.github/workflows/audit.yml" target="_blank" rel="noopener noreferrer">.github/workflows/audit.yml</a>.</li>
+          <li>Future option (not implemented): create an issue or PR automatically on critical failures.</li>
         </ul>
       </section>
 
@@ -366,7 +352,7 @@
         <h2 class="tmg-h2">Appendix</h2>
         <ul class="tmg-body-sm" style="margin:0; padding-left:18px;">
           <li>Example JSON output (downloadable): <code>audit-results/latest.json</code></li>
-          <li>CI badge: add when GitHub Actions workflow is configured.</li>
+          <li>CI status badge links to the live audit workflow run history.</li>
         </ul>
       </section>
     </div>
@@ -557,7 +543,7 @@
       } catch (err) {
         AUTO_META.textContent = 'Automated audit report unavailable: ' + (err && err.message ? err.message : 'unknown error');
         AUTO_SUMMARY.innerHTML = '<article class="tmg-card"><p class="tmg-card-value" style="color:var(--tmg-warning)">Unavailable</p></article>';
-        RESULTS_TABLE.innerHTML = '<tr><td colspan="5">Could not load output/tables/audit_report.json.</td></tr>';
+        RESULTS_TABLE.innerHTML = '<tr><td colspan="5">Report unavailable: could not load output/tables/audit_report.json.</td></tr>';
       }
     }
 

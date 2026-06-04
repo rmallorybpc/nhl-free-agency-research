@@ -909,6 +909,16 @@
             ? { min: 2017, max: 2025, label: '2017-2025 Spotrac offseason window' }
             : { min: 2017, max: 2026, label: '2017-2026 team-season window' };
 
+          // For documented coverage windows, flag both out-of-bounds values and exact-window drift.
+          if (yearCol === 'spotrac_year' && (minYear !== yearWindow.min || maxYear !== yearWindow.max)) {
+            issues.push({
+              page: cfg.file,
+              severity: 'warning',
+              message: 'Spotrac offseason coverage mismatch',
+              context: 'Expected exact range ' + yearWindow.min + '-' + yearWindow.max + ', found ' + minYear + '-' + maxYear + '.'
+            });
+          }
+
           if (minYear < yearWindow.min || maxYear > yearWindow.max) {
             issues.push({
               page: cfg.file,
