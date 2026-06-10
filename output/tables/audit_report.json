@@ -1,13 +1,13 @@
 {
-  "audit_timestamp": "2026-06-07T07:33:02.310Z",
+  "audit_timestamp": "2026-06-10T18:41:23.765Z",
   "audit_version": "1.0",
   "site_base_url": "https://rmallorybpc.github.io/nhl-free-agency-research",
   "mode": "ci",
   "summary": {
     "total_checks": 364,
-    "passed": 3,
+    "passed": 2,
     "warnings": 2,
-    "failures": 2
+    "failures": 3
   },
   "categories": [
     {
@@ -331,10 +331,53 @@
     },
     {
       "name": "Page structure integrity",
-      "status": "pass",
+      "status": "fail",
       "checks_run": 49,
-      "issues_found": 0,
-      "details": [],
+      "issues_found": 7,
+      "details": [
+        {
+          "page": "welcome.html",
+          "severity": "error",
+          "message": "TMG Tool Suite dropdown incomplete",
+          "context": "Dropdown button and NHL Analysis link should both be present."
+        },
+        {
+          "page": "findings.html",
+          "severity": "error",
+          "message": "TMG Tool Suite dropdown incomplete",
+          "context": "Dropdown button and NHL Analysis link should both be present."
+        },
+        {
+          "page": "index.html",
+          "severity": "error",
+          "message": "TMG Tool Suite dropdown incomplete",
+          "context": "Dropdown button and NHL Analysis link should both be present."
+        },
+        {
+          "page": "team.html",
+          "severity": "error",
+          "message": "TMG Tool Suite dropdown incomplete",
+          "context": "Dropdown button and NHL Analysis link should both be present."
+        },
+        {
+          "page": "explorer.html",
+          "severity": "error",
+          "message": "TMG Tool Suite dropdown incomplete",
+          "context": "Dropdown button and NHL Analysis link should both be present."
+        },
+        {
+          "page": "forecast.html",
+          "severity": "error",
+          "message": "TMG Tool Suite dropdown incomplete",
+          "context": "Dropdown button and NHL Analysis link should both be present."
+        },
+        {
+          "page": "audit.html",
+          "severity": "error",
+          "message": "TMG Tool Suite dropdown incomplete",
+          "context": "Dropdown button and NHL Analysis link should both be present."
+        }
+      ],
       "notes": []
     },
     {
